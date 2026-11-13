@@ -3000,6 +3000,72 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .invt small{display:block;margin-top:3px;font-size:12.5px;line-height:1.3;color:#F3E0A6}
 .invgo{flex:none;border:0;border-radius:999px;padding:10px 16px;font-weight:900;font-size:14px;background:var(--goldg);color:#1A1406;box-shadow:0 0 14px rgba(199,160,74,.55)}
 .invmore{border:0;background:none;color:#E6CF96;font-weight:800;font-size:13px;text-decoration:underline;padding:2px}
+/* 1. bandeau d'invitation compact (hauteur du logo) */
+.invban{gap:6px!important;margin:10px 18px 0!important}
+.invrow{padding:6px 6px 6px 10px!important;gap:10px!important;min-height:44px;border-radius:14px!important}
+.invic{width:30px!important;height:30px!important;font-size:16px!important;border-radius:9px!important}
+.invt{display:flex;align-items:baseline;gap:8px;min-width:0}
+.invt b{flex:none;font-size:17px!important}
+.invt small{margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px!important}
+.invgo{padding:7px 14px!important;font-size:13px!important}
+.ntftools{display:flex;gap:8px;margin:0 0 12px}
+.ntft{flex:1;border:1px solid rgba(243,224,166,.35);background:rgba(0,0,0,.3);color:#F3E0A6;border-radius:999px;padding:8px 10px;font-weight:800;font-size:12.5px}
+.ntft:disabled{opacity:.4}
+/* 2. bandeau supérieur : uniquement le prix, fond doré orangé */
+.hmtin.hmtonly{display:flex;justify-content:center}
+.hmtin.hmtonly .hmtp{display:none}
+.hmtonly .hmtpr{padding:8px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,#F6D58A 0%,#E2A23C 50%,#B8711F 100%);box-shadow:0 0 18px rgba(226,162,60,.55),inset 0 1px 0 rgba(255,255,255,.45)}
+.hmtonly .hmtpr small{color:#3A2405}
+.hmtonly .hmtpr b{background:none;color:#2A1702;-webkit-text-fill-color:#2A1702}
+/* Retour : une étape, en bas à droite du cadre */
+.sret{display:inline-flex!important;align-items:center;gap:4px;width:auto!important;height:auto!important;padding:6px 12px 6px 9px!important;border-radius:999px!important;border:1px solid rgba(243,224,166,.5)!important;background:rgba(20,12,2,.55)!important;color:#EED9AA!important;font-weight:800;font-size:12.5px}
+.flbx .sret{position:absolute!important;right:10px!important;bottom:10px!important;left:auto!important;top:auto!important}
+.suhd{position:relative}
+.suhd>.sret{position:absolute;right:12px;bottom:12px;z-index:3}
+.suhd{padding-bottom:52px!important}
+/* 3a. cadre de la compétition : moitié de hauteur, petit logo à côté de la saison */
+#app .suhd.mpev{min-height:0!important;padding:14px 16px 14px!important;justify-content:center!important;gap:0!important;text-align:left!important;align-items:stretch!important}
+#app .suhd.mpev .mpevt{display:flex;flex-direction:column;align-items:flex-start;padding-right:0}
+#app .suhd.mpev .mpevk{font-size:11.5px}
+#app .suhd.mpev .mpevn{margin-top:4px!important;font-size:var(--evfs,40px)!important;max-width:100%}
+.mpevrow{display:flex;align-items:center;gap:10px;margin-top:8px;padding-right:96px}
+.mpevrow .mpevl{flex:none;margin:0!important;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6))}
+.mpevrow .mpevd{margin:0!important;font-size:14px!important;line-height:1.25}
+#app .suhd.mpev>.sret{bottom:12px;right:12px}
+#app .suhd.mpev .mpevb{top:12px;right:12px}
+/* 3b. « Tu défies qui ? » : même largeur et même hauteur que le cadre de la compétition, textes un peu plus grands */
+.mpform{margin-left:8px!important;margin-right:8px!important}
+.mpform .h3grid.solo .h3lab{font-size:22px!important}
+.mpform .hff:not(.hfdone) .hfh.one .hfot b{font-size:25px}
+.mpform .hff:not(.hfdone) .hfh.one .hfot small{font-size:14px}
+.mpform .hfp b{font-size:21px}
+.mpform .hfmt{font-size:24px}
+/* 3c. filtres « Comment tu joues » : fond plein */
+.mpmode{background:linear-gradient(160deg,#3B2B10,#1E1608)!important;border:1px solid rgba(217,182,106,.55)!important;box-shadow:0 8px 18px -10px rgba(0,0,0,.9)}
+.mpmode.on{background:linear-gradient(160deg,#6A4C17,#3A2A0D)!important;border:1.5px solid #E6C680!important}
+.mpnonew{display:flex;justify-content:flex-end;margin-top:10px}
+.mpnone{border:1px solid rgba(243,224,166,.5);background:#1E1608;color:#F3E0A6;border-radius:999px;padding:8px 14px;font-weight:800;font-size:13px}
+#app .suhd.mpev .mpevk{min-height:32px;display:flex;align-items:center;padding-right:96px}#app .suhd.mpev .mpevb{top:14px!important}
+/* 5. bouton d'action fixé juste au-dessus du menu du bas (page de sélection) */
+.mpfix{position:fixed!important;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 76px);z-index:36;margin:0!important;padding:0 14px;display:flex;justify-content:center;pointer-events:none}
+.mpfix .sugo{pointer-events:auto;width:min(492px,100%)}
+.mpfix .sugo.soft{background:rgba(20,14,4,.92)!important;color:#E6CF96!important;border:1.5px dashed rgba(230,198,128,.7)!important;box-shadow:0 8px 22px rgba(0,0,0,.6)!important;font-size:15px}
+.suwrap:has(.mpfix){padding-bottom:calc(env(safe-area-inset-bottom) + 160px)!important}
+.mpform.glow{animation:mpglow 2.4s ease-out}
+@keyframes mpglow{0%,60%{filter:drop-shadow(0 0 0 rgba(243,214,140,0))}15%,45%{filter:drop-shadow(0 0 18px rgba(255,226,150,.95)) brightness(1.15)}100%{filter:none}}
+@media (prefers-reduced-motion:reduce){.mpform.glow{animation:none;outline:3px solid #F1DDA8;outline-offset:4px;border-radius:22px}}
+/* 6. « Paramétrer ma partie » : récapitulatif sur fond plein, encadré de portée, titre par type */
+#app .suhd:not(.mpev){background:linear-gradient(160deg,#3A2A0E 0%,#21180A 60%,#160F06 100%)!important;border:1.5px solid rgba(217,182,106,.75)!important;box-shadow:0 0 22px rgba(199,160,74,.22),0 18px 36px -16px rgba(0,0,0,.9)!important;backdrop-filter:none!important}
+#app .suhd:not(.mpev) .sutag{background:rgba(0,0,0,.4)!important;border:1px solid rgba(243,224,166,.3)!important;color:#FFF6E2!important}
+.suscope{display:flex;gap:10px;align-items:flex-start;margin:14px 18px 0;padding:12px 14px;border-radius:16px;border:1.5px solid #E6C680;background:linear-gradient(135deg,#4A3510,#241906);box-shadow:0 0 18px rgba(199,160,74,.3)}
+.suscope span{font-size:18px;line-height:1.2}.suscope p{margin:0;font-size:14px;font-weight:700;line-height:1.35;color:#FFF0D0}
+.sucatt{color:#E6C680}
+/* 7. la partie qui vient d'être créée : en tête, apparition douce */
+.pcnew{animation:pcnewin 1.1s cubic-bezier(.3,1.3,.5,1) both,pcnewglow 2.6s ease-in-out .9s 2;box-shadow:0 0 0 2px #F1DDA8,0 0 26px rgba(243,214,140,.55)!important}
+@keyframes pcnewin{0%{opacity:0;transform:translateY(14px) scale(.97)}60%{opacity:1;transform:translateY(-3px) scale(1.01)}100%{transform:none}}
+@keyframes pcnewglow{0%,100%{box-shadow:0 0 0 2px #F1DDA8,0 0 18px rgba(243,214,140,.35)}50%{box-shadow:0 0 0 2px #F1DDA8,0 0 34px rgba(243,214,140,.75)}}
+@media (prefers-reduced-motion:reduce){.pcnew{animation:none}}
+.invrow{overflow:hidden;max-width:100%}.invt{flex:1 1 0!important;min-width:0!important}.invt small{flex:1 1 0;min-width:0}
 </style>
 </head>
 <body>
@@ -3402,7 +3468,7 @@ function evCard(cid,badge,name,meta,dates,rank,sid){const c=FIND[cid];if(!c)retu
 /* en-tête commun des onglets : même hauteur, thème doré */
 const PH_DECO=`<svg class="phdeco" viewBox="0 0 200 140" aria-hidden="true"><defs><linearGradient id="phg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EED9AA"/><stop offset=".5" stop-color="#C7A04A"/><stop offset="1" stop-color="#9C7432"/></linearGradient></defs><path d="M0 120 C60 96 120 132 200 104" stroke="#C7A04A" stroke-width="1.5" fill="none" opacity=".35"/><path d="M0 132 C70 110 130 140 200 118" stroke="#EED9AA" stroke-width="1" fill="none" opacity=".25"/></svg>`;
 /* logo, cloche et profil : la même ligne que sur l'accueil (sans les projecteurs), en tête des pages principales */
-function brandRow(){return`<div class="phbrand"><div class="logo"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CFA85A" stroke-width="2.4" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span><span class="wm">BET'S <b>FRIENDS</b></span></div><span style="display:flex;gap:8px"><button type="button" class="iconbtn ntfbell" data-act="ntfOpen" aria-label="Notifications${unreadN()?" : "+unreadN()+" nouvelle"+(unreadN()>1?"s":""):S.ntfSeen?"":" : 1 nouvelle"}" aria-haspopup="dialog">${S.ntfSeen&&!unreadN()?"":`<i class="ntfdot" aria-hidden="true">${unreadN()||""}</i>`}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button type="button" class="iconbtn pbtn" aria-label="Mon profil" data-act="profile">${avatar(me(),34)}</button></span></div>`;}
+function brandRow(){return`<div class="phbrand"><div class="logo"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CFA85A" stroke-width="2.4" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span><span class="wm">BET'S <b>FRIENDS</b></span></div><span style="display:flex;gap:8px"><button type="button" class="iconbtn ntfbell" data-act="ntfOpen" aria-label="Notifications${unreadN()?" : "+unreadN()+" nouvelle"+(unreadN()>1?"s":""):S.ntfSeen?"":" : 1 nouvelle"}" aria-haspopup="dialog">${S.ntfSeen&&!unreadN()?"":`<i class="ntfdot" aria-hidden="true"></i>`}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button type="button" class="iconbtn pbtn" aria-label="Mon profil" data-act="profile">${avatar(me(),34)}</button></span></div>`;}
 function pageHead(title,sub,back){const n=title.replace(/<[^>]+>/g,"").length;return`<div class="phead phb">${PH_DECO}${brandRow()}${back||""}<h1${n>22?' style="font-size:32px"':n>14?' style="font-size:32px;white-space:nowrap"':""}>${title}</h1>${sub?`<p>${sub}</p>`:""}</div>`;}
 /* urgence : un pari encore ouvert se ferme dans moins de 24 h (ou est déjà en cours de fermeture) */
 function urgency(p){if(!p||p.free)return null;let t=Infinity;try{rowsOfParty(p).forEach(r=>{if(r.it&&itemState(p,r)==="open")t=Math.min(t,(p.state||{})[r.key]==="open"?+r.it.date:closeAt(r.it));});}catch(e){return null;}if(t===Infinity)return null;const h=(t-+NOW)/36e5;if(h>24)return null;return h<=1?"Ferme très bientôt":"Ferme dans "+Math.round(h)+" h";}
@@ -3506,13 +3572,13 @@ function hmPeople(q,excl){const ex=new Set((excl||[]).map(normS)),fr=friendsSet(
 function gMem(x){const ex=new Set((x.ex||[]).map(normS));return((groupById(x.id)||{}).members||[]).filter(n=>!isMeName(n)&&!ex.has(normS(n)));}
 
 /* accueil : bandeau supérieur pleine largeur — ta partie en préparation, Annuler (repart de zéro) et le prix */
-function hmTopRender(){const el=document.getElementById("hmtop");if(!el)return;const su=S.screen==="setup",mp=S.screen==="mpick",on=!S.screen||S.screen==="home"||su||mp;el.hidden=!on;document.body.classList.toggle("hastop",on);if(!on)return;
+function hmTopRender(){const el=document.getElementById("hmtop");if(!el)return;const su=S.screen==="setup",mp=S.screen==="mpick",on=((!S.screen||S.screen==="home")&&!!hmS().sport)||su||mp;el.hidden=!on;document.body.classList.toggle("hastop",on);if(!on)return;
   const H=hmS(),nm=x=>{const m=x.k==="m"?memberByName(x.name):null;return x.k==="g"?(groupById(x.id)||{name:x.name}).name:(m?m.short:x.name);};
   const who=H.mode==="duel"&&H.duel?"Duel avec "+nm(H.duel):H.mode==="multi"&&H.multi.length?(H.multi.length===1&&H.multi[0].k==="g"?"Groupe "+nm(H.multi[0]):"Multijoueur · "+H.multi.map(nm).slice(0,2).join(", ")+(H.multi.length>2?" +"+(H.multi.length-2):"")):"";
   const sp=H.sport?(H3_SP.find(x=>x[0]===H.sport)||[,""])[1]:"";
   const parts=[who,sp].filter(Boolean),any=parts.length||H.flowOn;
   let pr=null;try{pr=su?S._suTot:mp?(S.sel.full?sizePrice(0,true,false)[0]:selCount()?sizePrice(selCount(),false,false)[0]:null):null;}catch(e){}
-  el.innerHTML=`<div class="hmtin">${!su&&!mp&&H.flowOn?`<button type="button" class="hmtx" data-act="hmStep" aria-label="Revenir à l'étape précédente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span>Retour</span></button><button type="button" class="hmtx hmtx2" data-act="hmReset" aria-label="Tout annuler">Annuler</button>`:su||mp?`<button type="button" class="hmtx" data-act="back" aria-label="Revenir au choix des matchs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span>Retour</span></button>`:any?`<button type="button" class="hmtx" data-act="hmReset" aria-label="Annuler et recommencer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span>Annuler</span></button>`:""}
+  el.innerHTML=`<div class="hmtin hmtonly">
    <span class="hmtp" aria-hidden="true"></span>
    <span class="hmtpr"><small>Ta partie ${pr?"":"dès"}</small><b>${pr?eur(pr):"1,99 €"}</b></span></div>`;}
 /* retour d'une étape dans le parcours : on retire la dernière précision choisie */
@@ -3609,7 +3675,7 @@ function h3Back(){const H=hmS(),ctx=H.flip;if(!ctx)return`<div class="hfb" aria-
     ${hmInvBox(ctx)}${!duel&&H.multi.length>1?`<button type="button" class="hfgrp" data-act="hmGrpOpen">👥 En faire un groupe</button>`:""}</div>
    ${sel.length?`<button type="button" class="hfok" data-act="h3Unflip">C'est bon</button>`:""}</div>`;}
 function h3Create(){const H=hmS(),rd=h3Ready(),A=S._cwAnim,was=A&&performance.now()-A.t0<H3CW_D?true:!!S._cwOn;H.goSeen=rd;S._cwOn=rd;
-  return`<div class="h3cw${was?"":" off"}" data-on="${rd?1:0}"${rd?"":" inert aria-hidden=\"true\""}><div class="h3ci"><button type="button" class="h3create" data-act="h3Go"${rd?"":" tabindex=\"-1\""}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Je crée ma partie</button></div></div>`;}
+  return`<div class="h3cw${was?"":" off"}" data-on="${rd?1:0}"${rd?"":" inert aria-hidden=\"true\""}><div class="h3ci"><button type="button" class="h3create" data-act="h3Go"${rd?"":" tabindex=\"-1\""}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Démarrer</button></div></div>`;}
 const H3CW_D=600,H3CW_E="cubic-bezier(.65,0,.35,1)";
 function h3Ease(p){return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;}
 function h3ScrollTo(to){cancelAnimationFrame(S._scRaf);const from=scrollY,t0=performance.now();if(Math.abs(to-from)<1)return;
@@ -3635,16 +3701,18 @@ function emailMember(q){const e=normEmail(q);if(!HM_MAILRX.test(e))return null;i
 function notify(uid,type,text,extra){if(!db||!uid||uid===S.uid)return;const id=type+"_"+(extra&&(extra.pid||extra.gid)||"")+"_"+S.uid+"_"+uid+"_"+Date.now().toString(36);
   const d=Object.assign({to:uid,from:S.uid||null,fromName:me().name||"Un ami",fromPhoto:okPhoto(me().photo)&&me().photo.length<60000?me().photo:null,type,text,at:new Date().toISOString(),read:false},extra||{});
   NTF_COLS.forEach(c=>{try{db.doc(c+"/"+id).set(d).catch(()=>{});}catch(_){}});}
-function invNotifs(){const seen=LS("bf_invseen")||{};let L=[];try{L=(S.parties||[]).filter(p=>p&&!p.demo&&isMemberView(p));}catch(_){}
+function invNotifs(){const seen=LS("bf_invseen")||{},cl=LS("bf_invclear")||{};let L=[];try{L=(S.parties||[]).filter(p=>p&&!p.demo&&isMemberView(p)&&!cl[p.id]);}catch(_){}
   return L.map(p=>({type:"party",pid:p.id,text:orgName(p)+" t'invite à la partie « "+p.name+" »",at:p.createdAt||"",read:!!seen[p.id],_inv:1}));}
 const allNotifs=()=>{const R=Object.values(NOTIFS),have=new Set(R.filter(n=>n.pid).map(n=>n.pid));return R.concat(invNotifs().filter(n=>!have.has(n.pid)));};
 const unreadN=()=>allNotifs().filter(n=>!n.read).length;
 function ntfSub(){if(!db||!S.uid||S._ntfOn)return;S._ntfOn=1;NTF_COLS.forEach(c=>{try{db.collection(c).where("to","==",S.uid).onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();const k=v.type+"|"+(v.pid||v.gid||"")+"|"+v.from+"|"+v.at;NOTIFS[k]=Object.assign({},v,{_id:d.id,_c:c,read:!!(v.read||(NOTIFS[k]&&NOTIFS[k].read))});});
     const ty=document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);if(!ty)render();},()=>{});}catch(_){}});}
+function ntfClearAll(){const cl=LS("bf_invclear")||{};invNotifs().forEach(n=>cl[n.pid]=1);LS("bf_invclear",cl);const sv=LS("bf_invseen")||{};invNotifs().forEach(n=>sv[n.pid]=1);LS("bf_invseen",sv);
+  Object.entries(NOTIFS).forEach(([k,n])=>{NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).delete().catch(()=>{});}catch(_){}});delete NOTIFS[k];});S.ntfSeen=true;}
 function ntfMarkRead(){const sv=LS("bf_invseen")||{};invNotifs().forEach(n=>sv[n.pid]=1);LS("bf_invseen",sv);Object.values(NOTIFS).forEach(n=>{if(n.read)return;n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});});}
 const agoTxt=iso=>{const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1?"À l'instant":m<60?"Il y a "+m+" min":m<1440?"Il y a "+Math.round(m/60)+" h":new Date(iso).toLocaleDateString("fr-BE",{day:"numeric",month:"short"});};
-function ntfItems(){return allNotifs().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":"🤝"}</span>`;
-  const act=n.type==="party"&&n.pid?`<button type="button" class="pfpl" data-act="ntfParty" data-id="${esc(n.pid)}">Voir la partie</button>`:n.type==="friend"&&n.fromName&&!(me().friends||[]).some(x=>normS(x)===normS(n.fromName))?`<button type="button" class="pfpl" data-act="ntfBack" data-n="${esc(n.fromName)}" data-uid="${esc(n.from||"")}">Ajouter en retour</button>`:"";
+function ntfItems(){return allNotifs().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":n.type==="joined"?"✅":n.type==="deleted"?"🗑️":"🤝"}</span>`;
+  const act=(n.type==="party"||n.type==="joined")&&n.pid?`<button type="button" class="pfpl" data-act="ntfParty" data-id="${esc(n.pid)}">Voir la partie</button>`:n.type==="friend"&&n.fromName&&!(me().friends||[]).some(x=>normS(x)===normS(n.fromName))?`<button type="button" class="pfpl" data-act="ntfBack" data-n="${esc(n.fromName)}" data-uid="${esc(n.from||"")}">Ajouter en retour</button>`:"";
   return`<li class="ntfi${n.read?"":" new"}">${av}<div><b>${esc(n.text||"")}</b><small>${agoTxt(n.at)}</small>${act?`<div class="ntfa">${act}</div>`:""}</div></li>`;}).join("");}
 function invBanner(){const L=allNotifs().filter(n=>n.type==="party"&&n.pid&&!n.read);if(!L.length)return"";
   return`<div class="invban" role="status">${L.slice(0,3).map(n=>`<div class="invrow"><span class="invic" aria-hidden="true">🎟️</span><div class="invt"><b>Tu es invité !</b><small>${esc(n.text)}</small></div><button type="button" class="invgo" data-act="ntfParty" data-id="${esc(n.pid)}">Voir</button></div>`).join("")}${L.length>3?`<button type="button" class="invmore" data-act="ntfOpen">+ ${L.length-3} autre${L.length-3>1?"s":""} invitation${L.length-3>1?"s":""}</button>`:""}</div>`;}
@@ -3660,6 +3728,7 @@ function ntfPop(){if(!S.ntf)return"";let D;try{D=partiesData();}catch(e){D={sec:
   let ready=[];try{ready=readyParties(D);}catch(e){}const nP=D.sec.todo.reduce((a,p)=>a+D.todoN(p),0),nR=ready.length;
   return`<div class="ntfbg" data-act="ntfClose"></div><div class="ntf" role="dialog" aria-modal="true" aria-labelledby="ntft">
    <div class="ntfh"><b class="disp" id="ntft">Notifications</b><button type="button" class="ntfx" data-act="ntfClose" aria-label="Fermer">✕</button></div>
+   <div class="ntftools"><button type="button" class="ntft" data-act="ntfReadAll"${unreadN()||!S.ntfSeen?"":" disabled"}>✓ Tout marquer comme lu</button><button type="button" class="ntft" data-act="ntfClearAll"${allNotifs().length?"":" disabled"}>🗑️ Tout effacer</button></div>
    <div class="ntfbtns">
     <button type="button" class="ntfb red" data-act="ntfGo" data-k="pending"${nP?"":" disabled"}><b>Paris en attente</b><small>${nP} pari${nP>1?"s":""}</small></button>
     <button type="button" class="ntfb blue" data-act="ntfGo" data-k="ready"${nR?"":" disabled"}><b>Changer le prono d'une partie</b><small>(${nR} partie${nR>1?"s":""})</small></button></div>
@@ -3761,7 +3830,7 @@ function flBanner(){const f=flS(),co=flCountry(),c=flComp(),p=flPrice(),pills=hm
   /* un seul cadre pleine largeur : ton terrain de jeu ; la formule et la façon de jouer se règlent sur la page de l'événement */
   const H=hmS(),spn=(H3_SP.find(x=>x[0]===H.sport)||[,""])[1];pills.splice(0,pills.length,...pills.filter(x=>!/data-to="(mode|sub|team|typ)"/.test(x)));
   return`<section class="flban flban2 solo" aria-label="Ta partie"><svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="h3gold" gradientUnits="userSpaceOnUse" x1="4" y1="4" x2="44" y2="44"><stop offset="0" stop-color="#E6C680"/><stop offset=".5" stop-color="#C9A04E"/><stop offset="1" stop-color="#9A7535"/></linearGradient></defs></svg>
-   <div class="flbx"><button type="button" class="flbk2" data-act="flSportBack" aria-label="Changer de terrain de jeu (la formule est gardée)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><small class="flbk">Ton terrain de jeu</small><span class="flbi flbis">${H3_ICO[H.sport]||""}</span><b class="flbn">${esc(spn)}</b>${pills.length?`<div class="flpills">${pills.join("")}</div>`:`<span class="flvok">✓ Validé</span>`}</div></section>`;}
+   <div class="flbx"><button type="button" class="flbk2 sret" data-act="hmStep" aria-label="Revenir à l'étape précédente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Retour</button><small class="flbk">Ton terrain de jeu</small><span class="flbi flbis">${H3_ICO[H.sport]||""}</span><b class="flbn">${esc(spn)}</b>${pills.length?`<div class="flpills">${pills.join("")}</div>`:`<span class="flvok">✓ Validé</span>`}</div></section>`;}
 function flPriceCell(p){const face=v=>v==null?`<small>dès</small><b>1,99&nbsp;€</b>`:`<small>ta partie</small><b>${flEur(v)}</b>`;const key=p==null?"d":String(p),ch=S._flPK!==undefined&&S._flPK!==key,old=S._flPV;S._flPK=key;S._flPV=p;
   return`<div class="flbp" aria-live="polite"><div class="flbpi${ch?" turn"+(p!=null&&(old==null||p>old)?" up":" down"):""}"><div class="flbf">${face(ch?old:p)}</div><div class="flbb" aria-hidden="${ch?"false":"true"}">${face(p)}</div></div></div>`;}
 function flGrid(cells,cols,label,cls){return`<div class="flcad sp-${hmS().sport}"><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span><div class="flgrid${cells.length>8&&!cls?" many":""}${cls?" "+cls:""}" style="--cols:${cols}" role="group" aria-label="${esc(label)}">${cells.map((h,i)=>h.replace('class="flc','style="--i:'+i+'" class="flc')).join("")}</div></div>`;}
@@ -3966,14 +4035,14 @@ function flEvtPick(){const c=flComp(),f=flS(),co=flCountry(),sp=hmS().sport,nm=f
   const n=subsOf(c).reduce((a,su)=>a+su.items.filter(i=>!isDone(i)).length,0),u=({velo:"étape",golf:"pari",f1:"séance"})[sp]||"match";
   return`<h2 class="fllab flok"><span class="flokc" aria-hidden="true">✓</span><span class="flokt">Ton choix est <em>fait</em></span></h2><div class="flcad flevt sp-${sp}"><span class="flevck">✓ Choisi</span><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span>
    <div class="flevi">${compBadge(c,64)}<span><b>${esc(nm)}</b><small>${esc(c.desc||c.flag||"")}</small><small class="flevn">${n} ${u}${n>1?"s":""} à venir</small></span></div></div>
-   <button type="button" class="h3create fadein" data-act="toCreate"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Je crée ma partie</button>`;}
+   <button type="button" class="h3create fadein" data-act="toCreate"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Continuer</button>`;}
 
 function vHome(){
   const flood=side=>`<div class="flood ${side}" aria-hidden="true"><div class="beam"></div><div class="beam b2"></div><div class="mast"></div><div class="panel">${"<i></i>".repeat(16)}</div><div class="halo"></div></div>`;
   const tower=flood("l")+flood("r");
   let h=`<div class="night goldhome">${tower}
    <div class="top"><div class="logo"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CFA85A" stroke-width="2.4" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span><span class="wm">BET'S <b>FRIENDS</b></span></div>
-   <span style="display:flex;gap:8px"><button type="button" class="iconbtn ntfbell" data-act="ntfOpen" aria-label="Notifications${unreadN()?" : "+unreadN()+" nouvelle"+(unreadN()>1?"s":""):S.ntfSeen?"":" : 1 nouvelle"}" aria-haspopup="dialog">${S.ntfSeen&&!unreadN()?"":`<i class="ntfdot" aria-hidden="true">${unreadN()||""}</i>`}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button type="button" class="iconbtn pbtn" aria-label="Mon profil" data-act="profile">${avatar(me(),34)}</button></span></div>
+   <span style="display:flex;gap:8px"><button type="button" class="iconbtn ntfbell" data-act="ntfOpen" aria-label="Notifications${unreadN()?" : "+unreadN()+" nouvelle"+(unreadN()>1?"s":""):S.ntfSeen?"":" : 1 nouvelle"}" aria-haspopup="dialog">${S.ntfSeen&&!unreadN()?"":`<i class="ntfdot" aria-hidden="true"></i>`}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button type="button" class="iconbtn pbtn" aria-label="Mon profil" data-act="profile">${avatar(me(),34)}</button></span></div>
    ${hmBanner()}${invBanner()}
    <div class="h3hd"><div><div class="muted" style="font-weight:600">Ce soir, c'est match.</div><h1 class="disp">Défie tes potes…<br>deviens le <em>roi du&nbsp;prono</em></h1></div></div>
    ${hmS().flowOn?flView():h3Play()}
@@ -4465,13 +4534,14 @@ function groupTab(p){const others=partyNames(p).filter(n=>n!=="Toi");
    <div class="mpc" style="margin-bottom:12px">${["Toi"].concat(others).map(n=>`<span class="chip2">${esc(n)}</span>`).join("")}</div>
    <label class="lab" for="pgname">Nom du groupe</label><input class="inp" id="pgname" data-pg="1" value="${esc(S.pgName!=null?S.pgName:p.name)}" maxlength="40">
    <button type="button" class="btn block" style="margin-top:12px" data-act="groupFromParty">👥 Créer le groupe</button></div></div>`;}
-function friendsSet(){const set=new Set();allGroups().forEach(g=>g.members.forEach(n=>set.add(normS(n))));return set;}
+function friendsSet(){const set=new Set();allGroups().forEach(g=>g.members.forEach(n=>set.add(normS(n))));(me().friends||[]).forEach(n=>set.add(normS(n)));try{realFriends().forEach(f=>set.add(normS(f.name)));}catch(_){}return set;}
 /* qui puis-je trouver ? règles de visibilité */
 function findMembers(q,excl){q=normS(q).replace(/^@/,"");const fr=friendsSet(),ex=new Set((excl||[]).map(normS));
   return MEMBERS.filter(m=>!ex.has(normS(m.short))&&!ex.has(normS(m.name))).filter(m=>{
     const hit=!q||normS(m.name).includes(q)||normS(m.pseudo).includes(q)||normS(m.short).includes(q);
-    if(m.vis==="public")return hit;
-    if(m.vis==="amis")return hit&&(fr.has(normS(m.short))||fr.has(normS(m.name)));
+    const isFr=fr.has(normS(m.short))||fr.has(normS(m.name))||fr.has(normS(m.pseudo));
+    if(m.vis==="public"||isFr)return hit;
+    if(m.vis==="amis")return false;
     return q&&normS(m.pseudo)===q;});}
 const memberByName=n=>MEMBERS.find(m=>normS(m.short)===normS(n)||normS(m.name)===normS(n));
 const okPhoto=v=>typeof v==="string"&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v);
@@ -4808,14 +4878,14 @@ function vParties(){
   const rdy=ready.filter(p=>!cur.includes(p)&&!D.sec.todo.includes(p));
   const todoL=D.sec.todo.filter(p=>!cur.includes(p)).sort(byKo);rdy.sort(byKo);
   /* pronos en attente = toutes les parties avec un prono à faire (en cours ou à venir) ; paris pris = rien à faire, pas encore terminées */
-  const pend=D.all.filter(p=>D.todoN(p)).sort(byKo),taken=ready.slice().sort(byKo);
+  const JN=S.justNew&&S.justNew.id,pend=D.all.filter(p=>D.todoN(p)||p.id===JN).sort(byKo),taken=ready.slice().sort(byKo);if(JN){const i=pend.findIndex(p=>p.id===JN);if(i>0)pend.unshift(pend.splice(i,1)[0]);}
   const doneL=D.all.filter(p=>D.sec.done.includes(p)||hasPlayed(p)).sort((a,b)=>endT(b)-endT(a)||String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
   const head=(t,sub)=>pageHead(t,sub,f?`<button type="button" class="back phback" data-act="pfBack" aria-label="Retour"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>`:"");
   /* pages de liste : cartes verticales épurées */
   const pcard=p=>{const c=p.free?null:FIND[p.comp],g=partyGroup(p),[st,col]=partyStatus(p),r=D.RK.get(p.id),n=D.todoN(p),sid=sportOfParty(p),fin=D.sec.done.includes(p),tk=SP_TK[sid]||SP_TK.free;
     const rk=r?`${r.rank}${r.rank>1?"e":"er"}`:"";
     const ph=phaseInfo(p).k,right=`<span class="pcright">${r&&ph!=="soon"?rkPill(r,0,ph==="live"):""}${n?todoTile(n,0,p.id):!fin&&rdy.includes(p)?editTile():""}</span>`;
-    return`<button type="button" class="pcard pc2 ph-${ph} pcsu pcsp sp-${sid}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span><b class="pct">${!n&&urgIc(p)?urgIc(p):""}${esc(p.name)}</b><span class="pcb">${c?compBadge(c,44):`<span class="prfree">🥂</span>`}</span><span class="pcm"><small>${phaseLine(p,n?urgTag(vibeT(p)):"",1)}</small>${fin&&gainOf(p)>0?`<em class="pcgain">+${gainOf(p).toLocaleString("fr-BE")} cr.</em>`:playedTxt(p)}</span>${right}</button>`;};
+    return`<button type="button" class="pcard pc2 ph-${ph} pcsu pcsp sp-${sid}${S.justNew&&S.justNew.id===p.id?" pcnew":""}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span><b class="pct">${!n&&urgIc(p)?urgIc(p):""}${esc(p.name)}</b><span class="pcb">${c?compBadge(c,44):`<span class="prfree">🥂</span>`}</span><span class="pcm"><small>${phaseLine(p,n?urgTag(vibeT(p)):"",1)}</small>${fin&&gainOf(p)>0?`<em class="pcgain">+${gainOf(p).toLocaleString("fr-BE")} cr.</em>`:playedTxt(p)}</span>${right}</button>`;};
   const grid=list=>list.length?`<div class="pclist">${list.map(pcard).join("")}</div>`:`<p class="empty">${f&&f.k==="pending"?"Tout est fait, chapeau 👌":"Rien ici pour l'instant."}</p>`;
   if(f){
     if(f.k==="groups"){const gs=allGroups();return head("PAR <b>GROUPE</b>","Une bande d'amis, ses parties")+`<div class="ptg">${gs.map(g=>{const ps=groupParties(g),t=ps.reduce((a,p)=>a+D.todoN(p),0);return`<button type="button" class="pcat" data-act="pf" data-k="group" data-v="${esc(g.id)}">${scene("sport",1)}<span class="ptsh"></span><span class="pcic">${esc(g.name.split(" ").filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join("").toUpperCase())}</span><span class="pttx"><b>${esc(g.name)}</b><small>${g.members.length} membres · ${ps.length} partie${ps.length>1?"s":""}</small>${t?`<em>✏️ ${t} prono${t>1?"s":""} à faire</em>`:""}</span></button>`;}).join("")}</div>`;}
@@ -4840,7 +4910,8 @@ function vParties(){
   /* tri (pas un filtre) : toutes les parties restent, seul l'ordre change — par urgence (fermeture la plus proche) ou par classement (ta meilleure place d'abord) */
   /* un 2e clic sur le tri actif inverse l'ordre (flèche ↓ = ordre normal, ↑ = inversé) */
   const tkSortOf=k=>{const o=Object.assign({by:k==="done"?(D.all.some(p=>hasPlayed(p)&&!D.sec.done.includes(p))?"cur":"fin"):"urg",rev:false},k==="ready"?{}:(S.tkSort||{})[k]);if(k==="pending"&&!["urg","new"].includes(o.by))o.by="urg";if(k==="done"&&!["cur","fin"].includes(o.by))o.by="fin";if(o.by==="rank")o.by="cur";return o;};
-  const tkSorted=(k,list)=>{const o=tkSortOf(k),rk=p=>{const r=D.RK.get(p.id);return r&&phaseInfo(p).k!=="soon"?r.rank:Infinity;};
+  const tkSorted=(k,list)=>{const r0=tkSorted0(k,list);if(k==="pending"&&JN){const i=r0.findIndex(p=>p.id===JN);if(i>0)r0.unshift(r0.splice(i,1)[0]);}return r0;};
+  const tkSorted0=(k,list)=>{const o=tkSortOf(k),rk=p=>{const r=D.RK.get(p.id);return r&&phaseInfo(p).k!=="soon"?r.rank:Infinity;};
     let a=list.slice();
     /* Historique : récentes / podiums / victoires */
     if(k==="done"){const R=p=>{const r=D.RK.get(p.id);return r?r.rank:99;};a.sort((x,y)=>endT(y)-endT(x));/* Résultats : parties en cours (matchs déjà joués) ou terminées */if(o.by==="cur"||o.by==="fin"){const fin=p=>D.sec.done.includes(p);a=a.filter(p=>o.by==="fin"?fin(p):!fin(p));if(o.by==="cur")a.sort((x,y)=>byKo(x,y));return a;}if(o.by==="gain")a=a.slice().sort((x,y)=>gainOf(y)-gainOf(x)||endT(y)-endT(x));if(o.by==="pod")a=a.filter(p=>R(p)<=3).sort((x,y)=>R(x)-R(y)||endT(y)-endT(x));else if(o.by==="win")a=a.filter(p=>R(p)===1);if(o.rev)a.reverse();return a;}
@@ -5288,7 +5359,7 @@ function syncEmails(p){if(!p.players)return;const pp=PP[p.id]||{};
 /* première visite d'un pote reconnu : son doc partypicks (vide) sert de « a rejoint » */
 function ensureJoined(p){if(!db||!isMemberView(p)||JOINED[p.id])return;const me=meP(p);JOINED[p.id]=1;
   const ref=db.doc("partypicks/"+p.id+"__"+me.id);
-  ref.get().then(s=>{if(s.exists)return;const doc={pid:p.id,player:me.id,uid:S.uid||null,email:S.email||null,picks:{},at:new Date().toISOString()};(PP[p.id]=PP[p.id]||{})[me.id]=doc;return ref.set(doc);}).catch(()=>{JOINED[p.id]=0;});}
+  ref.get().then(s=>{if(s.exists)return;const doc={pid:p.id,player:me.id,uid:S.uid||null,email:S.email||null,picks:{},at:new Date().toISOString()};(PP[p.id]=PP[p.id]||{})[me.id]=doc;return ref.set(doc).then(()=>notify(p.owner,"joined",(myLabel()||me.name||"Un pote")+" a rejoint ta partie « "+p.name+" »",{pid:p.id}));}).catch(()=>{JOINED[p.id]=0;});}
 function writeMyPicks(p,mine,msg){const me=myId(p);
   if(isMemberView(p)){const doc={pid:p.id,player:me,uid:S.uid||null,email:S.email||null,picks:mine,at:new Date().toISOString()};(PP[p.id]=PP[p.id]||{})[me]=doc;
     if(db)db.doc("partypicks/"+p.id+"__"+me).set(doc).catch(e=>toast(e&&e.code==="invalid_argument"?"Pronos non enregistrés : demande à l'organisateur de te donner le droit de modifier l'appli (menu Partager).":"Enregistrement impossible, réessaie."));
@@ -5313,7 +5384,7 @@ function welcomeSeen(pid){try{const k="bf_welcome_"+pid;if(localStorage.getItem(
 function addPlayerPrice(p){const free=p.people-playersOf(p).length;if(free>0)return{amount:0,detail:"Place déjà payée · "+free+" place"+(free>1?"s":"")+" libre"+(free>1?"s":"")+" sur "+p.people};const n=p.people,ex=playersExtra(n+1)-playersExtra(n);const started=partyStarted(p);
   return started?{amount:r99(Math.max(LATE.minPlayer,ex*LATE.feeRate)),detail:ex?`Changement de tranche ${eur(ex)} + supplément partie en cours`:`Supplément partie en cours`}:{amount:ex,detail:ex?`Passage à la tranche ${playersBand(n+1)}`:"Toujours dans la même tranche"};}
 function savePartyDoc(p,msg){if(!p.demo&&!isOwner(p)){toast("Seul l'organisateur peut modifier la partie.");return;}if(!p.demo)syncEmails(p);const doc=Object.assign({},p);delete doc.id;
-  const done=()=>{if(msg)toast(msg);render();};
+  const done=()=>{if(msg)toast(msg);if(S.screen==="party"&&S.ptv&&S.ptv[p.id]==="settings"&&S.partyView===p.id){S.ptv[p.id]="games";S.orgMode=null;S.rtab=null;window.scrollTo(0,0);}render();};
   if(db&&!p.demo)db.doc("parties/"+p.id).set(doc).then(done,()=>toast("Enregistrement impossible, réessaie."));else done();}
 
 /* ===================================================================== MES PARIS (saisie des pronostics) */
@@ -5993,17 +6064,17 @@ function vMpick(){const c=FIND[S.sel.comp];if(!c)return vHome();const sp=c.sport
   let h=`<div class="subg" aria-hidden="true">${SU_ART[sp.id]||SU_ART.def}</div><div class="suwrap${suS().intro?" intro":""}">
    <div class="top sutop"><div class="logo"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8B48A" stroke-width="2.4" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span><span class="wm">BET'S <b>FRIENDS</b></span></div><button type="button" class="iconbtn" data-act="back" aria-label="Revenir à l'accueil"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
    <section class="suhd mpev ev-${sp.id}" aria-label="Événement : ${esc(nm)}"><button type="button" class="mpevb" data-act="mpEvt">Changer</button>
-    <div class="mpevl">${compBadge(c,84)}</div><div class="mpevt"><small class="mpevk">${SP_ICON[sp.id]||""} ${esc(sp.name)}${c.flag?" · "+esc(c.flag):""}</small>
-    <h1 class="mpevn">${esc(nm)}</h1>${c.desc?`<p class="mpevd">${esc(c.desc)}</p>`:""}</div></section>
-   <section class="susec mpform">${(()=>{const H=hmS(),fl=H.flip&&!H.flipAnim;return`<div class="h3grid solo${fl?" wide":""}" id="h3grid"><section aria-labelledby="h3l1"><h2 class="h3lab" id="h3l1">Tes <em>potes…</em></h2><div class="hfc${fl?" flipped":""}" id="h3card"><div class="hfin">${h3Front()}${h3Back()}</div></div></section></div>`;})()}</section>
+    <div class="mpevt"><small class="mpevk">${SP_ICON[sp.id]||""} ${esc(sp.name)}${c.flag?" · "+esc(c.flag):""}</small>
+    <h1 class="mpevn">${esc(nm)}</h1><div class="mpevrow"><span class="mpevl">${compBadge(c,40)}</span>${c.desc?`<p class="mpevd">${esc(c.desc)}</p>`:""}</div></div><button type="button" class="sret" data-act="back" aria-label="Revenir à l'étape précédente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Retour</button></section>
+   <section class="susec mpform">${(()=>{const H=hmS(),fl=H.flip&&!H.flipAnim;return`<div class="h3grid solo${fl?" wide":""}" id="h3grid"><section aria-labelledby="h3l1"><h2 class="h3lab" id="h3l1">Tu défies <em>qui ?</em></h2><div class="hfc${fl?" flipped":""}" id="h3card"><div class="hfin">${h3Front()}${h3Back()}</div></div></section></div>`;})()}</section>
    <section class="susec"><h2>Comment tu joues</h2>
     <div class="mpmodes" role="group" aria-label="Façon de jouer">${M.map(([k,l,d])=>{const on=f.mode===k;return`<button type="button" class="mpmode${on?" on":""}" data-act="mpMode" data-v="${k}" aria-pressed="${on}"><b>${esc(l)}</b>${d&&k!=="all"?`<small>${esc(d)}</small>`:k==="all"?`<small>${F?"Tout est inclus":"Le pack complet"}</small>`:""}</button>`;}).join("")}</div>
-    ${f.mode==="team"||f.mode==="h2h"?mpTeamGrid(c):f.mode&&!PH?mpPicker(c):f.mode?"":`<p class="suhelp mpfree">Ou coche directement tes ${w[1]} ci-dessous.</p>`}</section>
-   ${PH?mpPhaseList(c,F):`<section class="susec"><h2>Tes ${w[1]} <small>${need?"":F?"Tout inclus · "+L.length:n+" sur "+L.length}</small></h2>${F?`<p class="suhelp">Tous les ${w[1]} de la compétition sont inclus, y compris ceux encore à venir. Voici les prochains :</p>`:""}
+    ${f.mode==="team"||f.mode==="h2h"?mpTeamGrid(c):f.mode&&!PH?mpPicker(c):""}${f.mode&&(F||n>0)?`<div class="mpnonew"><button type="button" class="mpnone" data-act="mpNone">✕ Tout décocher (${F?L.length:n})</button></div>`:""}</section>
+   ${!f.mode?"":PH?mpPhaseList(c,F):`<section class="susec"><h2>Tes ${w[1]} <small>${need?"":F?"Tout inclus · "+L.length:n+" sur "+L.length}</small></h2>${F?`<p class="suhelp">Tous les ${w[1]} de la compétition sont inclus, y compris ceux encore à venir. Voici les prochains :</p>`:""}
     ${need?`<p class="sumore mpneed">${esc(need)}</p>`:groups.map(g=>{const gall=g.L.length>1&&(F||g.L.every(i=>S.sel.items[g.su.id+"/"+i.id]));return`<div class="mpgrp"><div class="mpgh"><span>${esc(g.su.name)}</span>${g.L.length>1&&!F?`<button type="button" class="mpall${gall?" on":""}" data-act="mpAll" data-su="${esc(g.su.id)}" aria-pressed="${gall}">${gall?"✓ ":""}${esc(mpWhole())}</button>`:""}</div>${g.L.map(i=>{const k=g.su.id+"/"+i.id,on=F||!!S.sel.items[k],d=new Date(i.date);
       return`<button type="button" class="mprow${on?" on":""}" data-act="mpTick" data-key="${esc(k)}" aria-pressed="${on}"><span class="mpck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="mpm"><b>${suMatch(i)}</b><small>${i.tbd?"Affiche à venir":esc(fmtD(d)+" · "+fmtT(d))}</small></span></button>`;}).join("")}</div>`;}).join("")||`<p class="sumore">Aucun ${w[0]} disponible pour ce choix.</p>`}${F&&!need&&L.length>5?`<p class="sumore mpneed">+ ${L.length-5} autres ${w[1]}, tous inclus</p>`:""}
    </section>`}
-   <div class="sufoot mpfoot"><button type="button" class="sugo mpgo" data-act="mpGo"${(n||F)&&who?"":" disabled"}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>${!who?"Choisis avec qui tu joues":n||F?"Paramétrer ma partie":"Coche au moins 1 "+w[0]}</button></div></div>`;
+   ${n||F?`<div class="sufoot mpfoot mpfix"><button type="button" class="sugo mpgo${who?"":" soft"}" data-act="mpGo"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>${who?"Paramétrer ma partie":"Choisis avec qui tu joues"}</button></div>`:""}</div>`;
   h+=hmGrpPop();
   return h;}
 /* les matchs visibles sont cochés d'office quand on choisit un tour, un joueur… ; on peut ensuite en décocher */
@@ -6073,6 +6144,7 @@ function suBets(scope,cat){const d=suCfgOf(scope);if(!d||!BETS[cat])return"";con
   return`<div class="suf">${FORMULAS.map(([k,l,s])=>`<button type="button" class="sufo" data-act="suF" data-s="${S_}" data-f="${k}" aria-pressed="${d.formula===k}"><b>${l}</b><small>${s}</small></button>`).join("")}</div>
    ${BETS[cat].map(([id,label,t],i)=>{const b=d.bets[i];if(!b)return"";return`<div class="subet${b.on?" on":""}"><button type="button" class="sutg" data-act="suOn" data-s="${S_}" data-i="${i}" aria-pressed="${b.on}" aria-label="${esc(label)}"><span></span></button><span class="subl"><b>${esc(label)}</b><small>${TYPE_LBL[t]||""}</small></span>${b.on?`<span class="supts"><button type="button" data-act="suPts" data-s="${S_}" data-i="${i}" data-d="-1" aria-label="Moins de points">−</button><b>${b.pts}<small>pts</small></b><button type="button" data-act="suPts" data-s="${S_}" data-i="${i}" data-d="1" aria-label="Plus de points">+</button></span>`:""}</div>`;}).join("")}
    <p class="susum">${sm.n} pari${sm.n>1?"s":""} · jusqu'à ${sm.pts} points par ${cat.startsWith("f1")?"séance":cat.startsWith("golf")?"jour":cat.startsWith("velo")?"étape":"match"}</p>`;}
+const SU_CAT_T={f1_course:"Course",f1_qualifs:"Qualifications",f1_sprint:"Sprint",f1_sq:"Qualifs sprint",f1_wdc:"Champion du monde",f1_wcc:"Champion constructeurs",f1_rook:"Meilleur débutant",golf_round:"Chaque jour",golf_win:"Vainqueur",velo_stage:"Étapes",velo_gc:"Classement général",velo_jersey:"Maillots",tennis:"Matchs",tennis_round:"Matchs",tennis_title:"Vainqueur du tournoi",tennis_group:"Phase de groupes",foot:"Matchs",foot_ko:"Matchs à élimination",basket:"Matchs",rugby:"Matchs",ryder:"Ryder Cup",long:"Paris de la saison"};
 const SU_ALL_T={f1_course:"Toutes les courses",f1_qualifs:"Toutes les qualifs",f1_sprint:"Tous les sprints",f1_sq:"Toutes les qualifs sprint",golf_round:"Tous les jours",golf_win:"Le dernier jour",velo_stage:"Toutes les étapes",tennis_round:"Tous les tours",tennis_title:"Vainqueur du tournoi",foot_ko:"Matchs à élimination"};
 function vSetup(){
   const c=FIND[S.sel.comp];if(!c)return vHome();const sp=c.sport,cr=S.create,s=suS(),H=hmS(),f=flS();
@@ -6090,7 +6162,7 @@ function vSetup(){
    <section class="suhd" aria-label="Ta partie"><h1 class="sut"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Paramétrer ma partie</h1>
     <div class="sutags"><span class="sutag">${SP_ICON[sp.id]||""} ${what}</span><span class="sutag">👥 ${who}${H.mode==="duel"?"":" · "+cr.people+" joueurs"}</span></div>
     <div class="suorg"><i>✓</i>Mode organisateur <small>· ouvert pour la création</small></div>
-    <div class="suprice"><span>${S.sel.full?esc(lbl):on.length+" "+(on.length>1?word[1]:word[0])+(ex?" · "+cr.people+" joueurs":"")}</span><b>${eur(tot)}</b></div></section>`;
+    <div class="suprice"><span>${S.sel.full?esc(lbl):on.length+" "+(on.length>1?word[1]:word[0])+(ex?" · "+cr.people+" joueurs":"")}</span><b>${eur(tot)}</b></div><button type="button" class="sret" data-act="back" aria-label="Revenir à l'étape précédente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Retour</button></section>`;
   /* onglets : Tes matchs · Les paris · La cagnotte (un seul visible à la fois) */
   const tab=["matchs","paris","cagnotte"].includes(s.tab)?s.tab:"paris";
   h+=`<div class="pad sutabw"><div class="ptnav bnr sutabs" role="tablist">${[["paris","Réglage des paris"],["cagnotte","La cagnotte"],["matchs","Tes "+word[1]]].map(([k,l])=>`<button type="button" role="tab" data-act="suTab" data-t="${k}" aria-selected="${tab===k}" class="${tab===k?"on":""}">${esc(l)}</button>`).join("")}</div></div>`;
@@ -6107,7 +6179,8 @@ function vSetup(){
       ${op&&own?`<div class="supan">${suBets(r.key,r.cat)}<button type="button" class="sulink sugen" data-act="suFollow" data-key="${k}" data-cat="${esc(r.cat)}">↺ Revenir au réglage général</button></div>`:""}</div>`;}).join("")||`<p class="sumore">Aucun ${word[0]} à venir pour ce choix.</p>`}
     ${hidden>0||s.more&&rows.length>LIM?`<p class="sumore"><button type="button" class="sulink" data-act="suMore">${s.more?"Réduire la liste":"Voir les "+hidden+" autres "+word[1]}</button></p>`:""}</div></section>`;
   /* 2. les paris, réglage général par type de rendez-vous */
-  if(tab==="paris")cats.forEach((cat,j)=>{h+=`<section class="susec suin1"${D(2+j)}><h2>Réglage des paris <small>${nCat[cat]>1?esc(SU_ALL_T[cat]||"Tous les "+word[1]):"Ton "+word[0]}</small></h2>
+  if(tab==="paris"&&on.length>1)h+=`<div class="suscope"><span aria-hidden="true">ℹ️</span><p>Ces réglages s'appliquent à ${/^(séance|étape)$/.test(word[0])?"toutes":"tous"} les ${esc(word[1])} sélectionné${/^(séance|étape)$/.test(word[0])?"e":""}s. Tu pourras ensuite les affiner ${esc(word[0])} par ${esc(word[0])}.</p></div>`;
+  if(tab==="paris")cats.forEach((cat,j)=>{h+=`<section class="susec suin1"${D(2+j)}><h2>Réglage des paris${SU_CAT_T[cat]&&(cats.length>1||!/^Matchs$/.test(SU_CAT_T[cat]))?` <span class="sucatt">— ${esc(SU_CAT_T[cat])}</span>`:""} <small>${nCat[cat]>1?esc(SU_ALL_T[cat]||"Tous les "+word[1]):(/^(séance|étape)$/.test(word[0])?"Ta ":"Ton ")+word[0]}</small></h2>
     <p class="suhelp"><span class="suauto">Résultats relevés automatiquement</span> · tu choisis une formule, ou tu coches toi-même et tu ajustes les points.</p>
     <div class="sucard">${suBets("all:"+cat,cat)}</div></section>`;});
   /* 3. la cagnotte */
@@ -6135,7 +6208,7 @@ function vPay(){const c=FIND[S.sel.comp];if(!c)return vHome();const sp=c.sport,c
    <div class="top sutop"><div class="logo"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8B48A" stroke-width="2.4" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span><span class="wm">BET'S <b>FRIENDS</b></span></div><button type="button" class="iconbtn" data-act="back" aria-label="Revenir aux réglages" ${s.paying?"disabled":""}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button></div>
    <section class="suhd" aria-label="Paiement"><h1 class="sut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Paiement</h1>
     <div class="sutags"><span class="sutag">${SP_ICON[sp.id]||""} ${esc(autoPartyName())}</span><span class="sutag">👥 ${who}</span></div>
-    <div class="suprice"><span>À payer une seule fois</span><b>${eur(tot)}</b></div></section>
+    <div class="suprice"><span>À payer une seule fois</span><b>${eur(tot)}</b></div><button type="button" class="sret" data-act="back" aria-label="Revenir à l'étape précédente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Retour</button></section>
    <section class="susec"><h2>Ta partie</h2><div class="sucard"><div class="sufoot" style="margin:6px 0 8px">
     <div class="pl"><span>${esc(lbl)}</span><b>${eur(sz)}</b></div>
     <div class="pl"><span>${cr.people} joueurs</span><b>${ex?"+ "+eur(ex):"inclus"}</b></div>
@@ -6170,7 +6243,7 @@ function suAct(a,t){const s=suS();
 function busyUI(){return !!(window._tkF||window._touching||document.querySelector(".prowbox.tkmove,.prowbox.closing,.vtmove,.morphov"));}
 function dataRender(){if(window._drT)return;const go=()=>{window._drT=null;if(busyUI()){window._drT=setTimeout(go,250);return;}render();};go();}
 if(!window._touchOn){window._touchOn=1;const on=()=>{clearTimeout(window._touchT);window._touching=1;},off=()=>{clearTimeout(window._touchT);window._touchT=setTimeout(()=>{window._touching=0;},400);};addEventListener("touchstart",on,{passive:true,capture:true});addEventListener("touchend",off,{passive:true,capture:true});addEventListener("touchcancel",off,{passive:true,capture:true});}
-function render(){try{requestAnimationFrame(()=>{h3Fit();flFit();h3cwSync();ensureCreateVisible();});let nh=document.getElementById("ntfHost");if(!nh){nh=document.createElement("div");nh.id="ntfHost";document.body.appendChild(nh);}nh.innerHTML=S.ntf?ntfPop():"";document.documentElement.style.overflow=S.ntf?"hidden":"";}catch(e){}
+function render(){if(S.justNew&&(S.screen!=="parties"||Date.now()-S.justNew.t>120000))S.justNew=null;try{requestAnimationFrame(()=>{h3Fit();flFit();h3cwSync();ensureCreateVisible();});let nh=document.getElementById("ntfHost");if(!nh){nh=document.createElement("div");nh.id="ntfHost";document.body.appendChild(nh);}nh.innerHTML=S.ntf?ntfPop():"";document.documentElement.style.overflow=S.ntf?"hidden":"";}catch(e){}
   const md=document.getElementById("mdefs");if(md&&!md.firstChild)md.innerHTML=MEDAL_DEFS;
   const v={home:vHome,events:vEvents,sports:vSports,sport:vSport,comp:vComp,rounds:vRounds,clubs:vClubs,sub:vSub,match:vMatch,free:vFree,create:vCreate,parties:vParties,party:vParty,groups:vFriends,group:vGroup,bet:vBet,profile:vProfile,search:vSearch,member:vMember,custom:vCustom,cfg:vCfg,setup:vSetup,mpick:vMpick,pay:vPay}[S.screen]||vHome;
   const _pd=document.getElementById("tkpad"),_ph=_pd?_pd.style.height:"",_y=window.scrollY,_sk=S.screen+"|"+(S.partyView||"")+"|"+(S.comp||"")+"|"+(S.sport||""),_same=render._sk===_sk;render._sk=_sk;
@@ -6240,8 +6313,8 @@ async function saveParty(){
   else S.parties.push(Object.assign({id},doc));
   (doc.players||[]).forEach(pl=>{if(pl.uid)notify(pl.uid,"party",(me().name||"Ton pote")+" t'invite à la partie « "+doc.name+" »",{pid:id});});
   const hasMail=(doc.emails||[]).length>0;
-  if(!S._suPaid)toast(S.groupCtx?"Partie créée et ajoutée au groupe !":hasMail?"Partie créée ! Envoie maintenant les invitations.":"Partie créée !");S.groupCtx=null;S.sel={comp:null,full:false,items:{}};S.su=null;S.createFree=false;S.create={name:"",people:6,amount:20,split:"50-30-20",custom:[50,30,20],err:"",friends:[]};
-  if(S._suPaid){S._suPaid=false;S.orgMode=null;S.stack=[];S.pfStack=[];S.pf=null;S.pfOpen="pending";S.partyView=null;S.ptOpen=null;S.screen="parties";if(S.hm){S.hm.flowOn=false;S.hm.fl={};}render();window.scrollTo(0,0);toast("Paiement confirmé · ta partie est dans Pronos en attente");return;}
+  if(!S._suPaid)toast(S.groupCtx?"Partie créée et ajoutée au groupe !":hasMail?"Partie créée ! Envoie maintenant les invitations.":"Partie créée !");S.groupCtx=null;S.sel={comp:null,full:false,items:{}};S.su=null;S.createFree=false;if(S.hm)Object.assign(S.hm,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null,keepWho:false});S.create={name:"",people:6,amount:20,split:"50-30-20",custom:[50,30,20],err:"",friends:[]};
+  if(S._suPaid){S.justNew={id,t:Date.now()};S._suPaid=false;S.orgMode=null;S.stack=[];S.pfStack=[];S.pf=null;S.pfOpen="pending";S.partyView=null;S.ptOpen=null;S.screen="parties";if(S.hm){S.hm.flowOn=false;S.hm.fl={};}render();window.scrollTo(0,0);toast("Paiement confirmé · ta partie est dans Pronos en attente");return;}
   S.stack=[];S.partyView=id;S.ptab="settings";S.ptOpen="pt-settings";S.screen="party";render();window.scrollTo(0,0);
 }
 document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.cq){S.cq=t.value;const g=document.getElementById("clg");if(g)g.innerHTML=clubGrid();}},true);
@@ -6268,7 +6341,7 @@ document.addEventListener("click",e=>{
       const rws_=rowsOfParty(p),isAllK=S.cfgKey.startsWith("all:"),catK=isAllK?S.cfgKey.slice(4):null,started_=rws_.some(x=>x.it&&itemState(p,x)!=="open"),nOpen=isAllK?rws_.filter(x=>x.cat===catK&&x.it&&itemState(p,x)==="open").length:0;
       const notify=()=>{if(!(isAllK&&started_&&nOpen&&a!=="cfgReset"))return;const sm=cfgSummary(cfg[S.cfgKey],catK);const txt="⚙️ L'organisateur a modifié les paris des "+nOpen+" "+(catK.startsWith("f1")?"sessions":"matchs")+" à venir : "+sm.f+" · "+sm.n+" paris. Les matchs déjà commencés ne changent pas, et les pronos sur les paris retirés ne comptent plus.";
         const msg={uid:"sys",name:"Bet's Friends",text:txt.slice(0,400),at:Date.now(),sys:true};if(db&&!p.demo){const id="m"+Date.now().toString(36)+"sys";db.doc("chats/"+p.id+"/msgs/"+id).set(msg).catch(()=>{});CHAT[p.id]=(CHAT[p.id]||[]).concat([Object.assign({id},msg)]);}else CHAT_LOCAL[p.id]=(CHAT_LOCAL[p.id]||[]).concat([msg]);};
-      const done=()=>{notify();toast(a==="cfgReset"?"Réglage effacé":isAllK&&started_?"Paris à venir mis à jour · joueurs prévenus":"Paris enregistrés");S.cfgDraft=null;back();};
+      const done=()=>{notify();toast(a==="cfgReset"?"Réglage effacé":isAllK&&started_?"Paris à venir mis à jour · joueurs prévenus":"Paris enregistrés");S.cfgDraft=null;S.ptv=S.ptv||{};if(S.ptv[p.id]==="settings"){S.ptv[p.id]="games";S.orgMode=null;S.rtab=null;}back();};
       if(db&&!p.demo)db.doc("parties/"+p.id).set(doc).then(done,()=>toast("Enregistrement impossible, réessaie."));else done();break;}
     case "optEdit":S.optEdit=+t.dataset.i;render();setTimeout(()=>{const e=document.getElementById("oe"+t.dataset.i);if(e)e.focus();},50);break;
     case "optDone":S.optEdit=null;render();break;
@@ -6373,7 +6446,9 @@ case "kf":{const p=partyById(S.partyView);S.kf=Object.assign({},S.kf,{[p.id]:t.d
     case "demoVibe":toast("Partie de démo, juste pour montrer les messages d'urgence 😉");break;
     /* accueil → Mes parties, avec le ticket choisi déjà ouvert (les anciennes pages de liste n'existent plus) */
     case "ntfOpen":{S.ntf=true;render();setTimeout(()=>{const x=document.querySelector(".ntf .ntfx");if(x)x.focus({preventScroll:true});},50);break;}
-case "ntfClose":{S.ntf=false;S.ntfSeen=true;ntfMarkRead();render();break;}
+case "ntfReadAll":{S.ntfSeen=true;ntfMarkRead();render();toast("Tout est marqué comme lu");break;}
+    case "ntfClearAll":{ntfClearAll();render();toast("Notifications effacées");break;}
+    case "ntfClose":{S.ntf=false;S.ntfSeen=true;ntfMarkRead();render();break;}
     case "ntfParty":{S.ntf=false;S.ntfSeen=true;{const pid=t.dataset.id,sv=LS("bf_invseen")||{};sv[pid]=1;LS("bf_invseen",sv);Object.values(NOTIFS).forEach(n=>{if(n.pid===pid&&!n.read){n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});}});}S.stack=[];S.partyView=t.dataset.id;if(!partyById(t.dataset.id)){S.screen="parties";render();toast("La partie arrive… si elle n'apparaît pas, rouvre l'appli.");break;}S.screen="party";render();window.scrollTo(0,0);break;}
     case "ntfBack":{const n=t.dataset.n,m=me();m.friends=[...new Set((m.friends||[]).concat([n]))];saveFriends();if(t.dataset.uid)notify(t.dataset.uid,"friend",(m.name||"Ton pote")+" t'a ajouté à ses amis");render();toast(n+" ajouté à tes amis ✓");break;}
 case "ntfGo":{S.ntf=false;S.ntfSeen=true;S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dataset.k;render();window.scrollTo(0,0);break;}
@@ -6421,8 +6496,8 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "frSelAll":{const F=myFriends().map(f=>f.name);S.frSel=(S.frSel||[]).length===F.length?[]:F;render();break;}
     case "frAdd":{const n=(t.dataset.n||"").trim();if(!n)break;const m=me();if(t.dataset.e){S.frMail=Object.assign(LS("bf_frmail")||{},{[n]:t.dataset.e});LS("bf_frmail",S.frMail);}m.friends=[...new Set((m.friends||[]).concat([n]))];S.frQ="";saveFriends();{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"friend",(m.name||"Un pote")+" t'a ajouté à ses amis");}render();toast(n+" ajouté à tes amis ✓");break;}
     case "frAddMail":{const e=t.dataset.e,n=e.split("@")[0];S.frMail=Object.assign(LS("bf_frmail")||{},{[n]:e});LS("bf_frmail",S.frMail);const m=me();m.friends=[...new Set((m.friends||[]).concat([n]))];S.frQ="";saveFriends();render();location.href=hmInvMail(n,e);break;}
-    case "frDuel":{const n=t.dataset.n,H=hmS();H.multi=[{k:memberByName(n)?"m":"inv",name:n,email:(LS("bf_frmail")||{})[n]}];H.mode="duel";H.duel=H.multi[0];H.validated=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast("Duel contre "+n+" : choisis ton terrain de jeu");break;}
-    case "frPlay":{const L=S.frSel||[];if(!L.length)break;const H=hmS();H.multi=L.map(n=>({k:memberByName(n)?"m":"inv",name:n}));const one=L.length===1;H.mode=one?"duel":"multi";H.duel=one?H.multi[0]:null;H.validated=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast(one?"Duel prêt : choisis ton terrain de jeu":"Partie à "+(L.length+1)+" : choisis ton terrain de jeu");break;}
+    case "frDuel":{const n=t.dataset.n,H=hmS();H.multi=[{k:memberByName(n)?"m":"inv",name:n,email:(LS("bf_frmail")||{})[n]}];H.mode="duel";H.duel=H.multi[0];H.validated=true;H.keepWho=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast("Duel contre "+n+" : choisis ton terrain de jeu");break;}
+    case "frPlay":{const L=S.frSel||[];if(!L.length)break;const H=hmS();H.multi=L.map(n=>({k:memberByName(n)?"m":"inv",name:n}));const one=L.length===1;H.mode=one?"duel":"multi";H.duel=one?H.multi[0]:null;H.validated=true;H.keepWho=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast(one?"Duel prêt : choisis ton terrain de jeu":"Partie à "+(L.length+1)+" : choisis ton terrain de jeu");break;}
     case "frGroup":go("group",{groupView:t.dataset.id});break;
     case "frNewGroup":S.frNew=true;render();setTimeout(()=>{const e=document.querySelector(".frsheet input");if(e)e.focus();},60);break;
     case "frNewClose":S.frNew=false;render();break;
@@ -6435,11 +6510,13 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "mpTick":{mpUnfull();const k=t.dataset.key;if(S.sel.items[k])delete S.sel.items[k];else S.sel.items[k]=1;const y=scrollY;render();scrollTo(0,y);break;}
     case "mpAll":{mpUnfull();const L=mpRows().filter(([su])=>!t.dataset.su||su.id===t.dataset.su),all=L.every(([su,i])=>S.sel.items[su.id+"/"+i.id]);L.forEach(([su,i])=>{const k=su.id+"/"+i.id;if(all)delete S.sel.items[k];else S.sel.items[k]=1;});const y=scrollY;render();scrollTo(0,y);break;}
     case "mpFull":{if(S.sel.full){S.sel.full=false;S.sel.items={};}else{S.sel.full=true;S.sel.items={};}const y=scrollY;render();scrollTo(0,y);break;}
-    case "mpGo":if((selCount()||S.sel.full)&&h3Who()){const cr=S.create;S.groupCtx=null;cr.friends=[];cr.people=2;hmPrefill();suS().tab="paris";suMorph(t,"setup");}break;
+    case "mpGo":if((selCount()||S.sel.full)&&!h3Who()){const f=document.querySelector(".mpform");if(f){f.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"});f.classList.remove("glow");void f.offsetWidth;f.classList.add("glow");setTimeout(()=>f.classList.remove("glow"),2600);}break;}
+    if((selCount()||S.sel.full)&&h3Who()){const cr=S.create;S.groupCtx=null;cr.friends=[];cr.people=2;hmPrefill();suS().tab="paris";suMorph(t,"setup");}break;
 case "mpEvt":{const f=flS();["comp","mode","sub","team","typ","subs","phOk","teams","tmOk","h2h","intl","autoC"].forEach(k=>delete f[k]);if(f.g&&!flxUseGroups())delete f.g;S.sel={comp:null,full:false,items:{}};S.mpWhoOpen=false;back();setTimeout(()=>{window.scrollTo(0,0);try{flShowStage();}catch(e){}},60);break;}
 case "mpWho":{const H=hmS();S.mpWhoOpen=!S.mpWhoOpen;if(!S.mpWhoOpen){H.validated=h3Who();H.wctx=null;}else H.wctx=H.mode||"duel";const y=scrollY;render();scrollTo(0,y);break;}
 case "mpWhoMode":{const H=hmS(),c=t.dataset.ctx;H.wctx=c;if(c==="duel"?!!H.duel:H.multi.length>0)H.mode=c;const y=scrollY;render();scrollTo(0,y);break;}
-case "mpMode":{const f=flS(),v=t.dataset.v,same=f.mode===v;["subs","phOk","teams","tmOk","h2h","typ"].forEach(k=>delete f[k]);
+case "mpNone":{S.sel.items={};S.sel.full=false;const y=scrollY;render();scrollTo(0,y);toast("Tout est décoché");break;}
+    case "mpMode":{const f=flS(),v=t.dataset.v,same=f.mode===v;["subs","phOk","teams","tmOk","h2h","typ"].forEach(k=>delete f[k]);
   if(same){delete f.mode;S.sel={comp:f.comp,full:false,items:{}};}else{f.mode=v;S.sel={comp:f.comp,full:v==="all"&&!f.intl,items:{}};if(v==="all"&&f.intl)mpAuto();}
   const y=scrollY;render();scrollTo(0,y);break;}
 case "mpSub":case "mpTeam":{const f=flS(),key=a==="mpSub"?"subs":"teams",v=t.dataset.v,arr=f[key]||(f[key]=[]),ix=arr.indexOf(v);if(ix>=0)arr.splice(ix,1);else arr.push(v);
@@ -6461,7 +6538,7 @@ case "mpTyp":{const f=flS(),v=t.dataset.v;if(f.typ===v)delete f.typ;else f.typ=v
   if(H.validated&&el){const f=el.querySelector(".hff");if(f)f.outerHTML=h3Front();}
   if(g){g.classList.remove("wide");if(H.validated&&!H.sport)g.classList.add("await");const r=g.querySelector("section:last-child");if(r)r.inert=false;}if(el)el.classList.remove("flipped");setTimeout(()=>{H.flip=null;if(S.screen==="home"||S.screen==="mpick")render();},matchMedia("(prefers-reduced-motion:reduce)").matches?0:600);break;}
     case "h3Sport":{const H=hmS(),id=t.dataset.id,old=H.sport;H.sport=old===id?null:id;H.anim={in:H.sport,out:old};const y=scrollY,keep=!!(old&&H.sport);if(keep)S._cbHold=true;render();H.anim=null;if(keep){scrollTo(0,y);requestAnimationFrame(()=>{scrollTo(0,y);});}break;}
-    case "h3Go":{const H=hmS();if(!h3Ready())break;if(H.sport&&H.sport!=="free"){H.flowOn=true;H.fl={};S._flPK=undefined;S._flPV=undefined;S.sel={comp:null,full:false,items:{}};render();flShowStage();break;}if(H.sport==="free"){go("free");toast("Partie prête : invente ton pari");break;}go("sport",{sport:H.sport});toast(H.mode==="duel"?"Duel prêt : choisis ton match":"Partie prête : choisis tes matchs");break;}
+    case "h3Go":{const H=hmS();if(!h3Ready())break;if(!H.keepWho){Object.assign(H,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null});}H.keepWho=false;if(H.sport&&H.sport!=="free"){H.flowOn=true;H.fl={};S._flPK=undefined;S._flPV=undefined;S.sel={comp:null,full:false,items:{}};render();flShowStage();break;}if(H.sport==="free"){go("free");toast("Partie prête : invente ton pari");break;}go("sport",{sport:H.sport});toast(H.mode==="duel"?"Duel prêt : choisis ton match":"Partie prête : choisis tes matchs");break;}
     case "hmGrpOpen":{const H=hmS();H.grpPop=true;H.grpName=H.grpName||"";render();setTimeout(()=>{const e=document.getElementById("hmgname");if(e)e.focus();},60);break;}
     case "hmGrpClose":hmS().grpPop=false;render();break;
     case "hmGrpSave":{const H=hmS(),nm=String(H.grpName||"").trim();if(!nm){toast("Donne un nom au groupe.");const e=document.getElementById("hmgname");if(e)e.focus();break;}
@@ -6570,7 +6647,7 @@ case "hmGx":{const H=hmS(),x=H.multi[+t.dataset.i];if(x&&x.k==="g"){x.ex=(x.ex||
       if((was.fake||was.local)&&p.picks&&p.picks[id]){p.picks=Object.assign({},p.picks);delete p.picks[id];}
       if(p.invited&&p.invited[id]){p.invited=Object.assign({},p.invited);delete p.invited[id];}
       S.emEdit=null;S.emDraft=null;savePartyDoc(p,e?"Adresse enregistrée":"Adresse retirée");break;}
-    case "delParty":{const id=t.dataset.id;if(S.delArm!==id){S.delArm=id;render();break;}if(db)db.doc("parties/"+id).delete().catch(()=>toast("Suppression impossible"));else S.parties=S.parties.filter(p=>p.id!==id);S.screen="parties";S.stack=[];render();toast("Partie supprimée");break;}
+    case "delParty":{const id=t.dataset.id;if(S.delArm!==id){S.delArm=id;render();break;}{const p0=partyById(id);if(p0)(p0.players||[]).forEach(x=>{if(x.uid&&x.uid!==S.uid)notify(x.uid,"deleted",(myLabel()||"L'organisateur")+" a supprimé la partie « "+p0.name+" »",{gid:id});});}if(db)db.doc("parties/"+id).delete().catch(()=>toast("Suppression impossible"));else S.parties=S.parties.filter(p=>p.id!==id);S.screen="parties";S.stack=[];render();toast("Partie supprimée");break;}
   }
 });
 document.addEventListener("keydown",e=>{const t=e.target;if(e.key==="Enter"&&t.dataset&&t.dataset.chat){e.preventDefault();chatSend(t.value);return;}if(e.key==="Enter"&&t.dataset&&t.dataset.cu==="team"){e.preventDefault();const b=document.querySelector('[data-act="cuTeam"]');if(b)b.click();return;}if((e.key==="Enter"||e.key===" ")&&t.classList&&t.classList.contains("fc")){e.preventDefault();t.click();}});
