@@ -2982,6 +2982,11 @@ body:has(#app .evhero) #app .subg,body:has(#app .mhero) #app .subg,body:has(#app
 .pfhero>.phdeco{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;opacity:.5;pointer-events:none;z-index:0}.pfhero>*:not(.phdeco){position:relative;z-index:1}
 body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40% at 50% 0%,rgba(199,160,74,.12),transparent 70%),linear-gradient(180deg,#14100A 0,#0D0A06 60%,#080604 100%)!important;background-attachment:fixed!important}
 .mpform .hfc{transition:height .3s cubic-bezier(.3,1,.5,1)}
+.pfdanger{margin-top:28px;padding:14px;border-radius:18px;border:1.5px dashed rgba(229,83,75,.55);background:rgba(229,83,75,.06)}
+.pfdanger b{display:block;color:#FF9A92;font-size:15px}.pfdanger small{display:block;font-size:12.5px;color:#C9B98E;margin:4px 0 10px}
+.pfpurge{background:rgba(229,83,75,.18)!important;color:#FFB3AC!important;border:1px solid rgba(229,83,75,.6)!important}
+.pfpurge.arm{background:#C0392B!important;color:#fff!important}
+.pfpm{margin:0 0 10px;font-size:13px;font-weight:700;color:#FFE6CC}
 </style>
 </head>
 <body>
@@ -4385,6 +4390,15 @@ function pfAuto(now){clearTimeout(S._pfT);const run=()=>{const d=S.pfDraft||Obje
   if(now)run();else S._pfT=setTimeout(run,700);}
 function saveProfile(){const d=S.pfDraft||Object.assign({},me());if(!String(d.name||"").trim())return toast("Écris le nom affiché.");if(!String(d.pseudo||"").trim())return toast("Choisis un pseudo.");
   const doc=pfDoc(d);applyProfile(doc);S.pfDraft=Object.assign({},me());pfWrite(doc).then(ok=>{render();if(ok)toast("Profil enregistré ✓");});}
+/* remise à zéro des données de test : parties, pronos, messages, groupes (comptes et profils gardés) */
+async function purgeAll(){if(!db)return toast("Pas de connexion à la base.");S.purging=true;S.purgeMsg="";render();let ok=0,ko=0;
+  const del=async ref=>{try{await ref.delete();ok++;}catch(_){ko++;}};
+  const wipe=async col=>{let sn;try{sn=await db.collection(col).get();}catch(_){ko++;return[];}const ids=sn.docs.map(d=>d.id);for(let i=0;i<ids.length;i+=20)await Promise.all(ids.slice(i,i+20).map(id=>del(db.doc(col+"/"+id))));return ids;};
+  const pids=await wipe("parties");
+  for(const pid of pids.concat((S.rawParties||[]).map(p=>p.id)).filter((v,i,a)=>v&&a.indexOf(v)===i)){try{const sn=await db.collection("chats/"+pid+"/msgs").get();await Promise.all(sn.docs.map(d=>del(db.doc("chats/"+pid+"/msgs/"+d.id))));}catch(_){}await del(db.doc("chats/"+pid));}
+  await wipe("chats");await wipe("partypicks");await wipe("groups");
+  const m=me();m.friends=[];S.groups=[];S.rawGroups=[];S.rawParties=[];S.parties=[];S.frSel=[];try{Object.keys(localStorage).filter(k=>/^bf_/.test(k)&&!/^bf_pf_/.test(k)&&k!=="bf_hsz").forEach(k=>localStorage.removeItem(k));}catch(_){}
+  pfWrite(pfDoc({}),true);S.purging=false;S.purgeMsg=ko?`${ok} élément(s) effacé(s), ${ko} refusé(s) par la base : il faudra finir dans la console Firebase.`:`C'est fait : ${ok} élément(s) effacé(s). L'appli est vide.`;render();toast(ko?"Effacement partiel":"Tout est effacé ✓");}
 function saveFriends(){pfWrite(pfDoc({}),true);}
 async function loadProfile(){const loc=LS(pfLocalKey());if(loc)applyProfile(loc);const path=profilePath();if(!db||!path){if(loc)render();return;}
   try{const sn=await db.doc(path).get();if(sn&&sn.exists){const d=sn.data();const newer=loc&&loc.at&&(!d.at||loc.at>d.at);applyProfile(newer?loc:d);if(newer)pfWrite(loc,true);else peoplePublish(pfDoc({}));if(S.screen==="profile")S.pfDraft=null;render();}else if(loc){pfWrite(loc,true);render();}else{let nm="";try{const u=UAPI&&await UAPI.me();nm=(u&&(u.name||(u.email||"").split("@")[0]))||"";}catch(_){}if(nm){nm=nm.charAt(0).toUpperCase()+nm.slice(1);const ps=normS(nm).replace(/[^a-z0-9]/g,"").slice(0,24)||"joueur";S.me=Object.assign(me(),{name:nm,pseudo:ps,vis:"public"});pfWrite(pfDoc({}),true);render();}}}catch(_){if(loc)render();}}
@@ -4441,6 +4455,7 @@ function vProfile(){
    <h2 class="pfh">Mon lien d'invitation</h2>
    <div class="pfcard pflink"><span>${esc(link.replace(/^https?:\/\//,""))}</span><button type="button" class="pfpl" data-act="frShare">Partager</button></div>
    <button type="button" class="btn ghost block pfsave" data-act="pfSave">Enregistrer maintenant</button>
+   ${db&&S.uid?`<div class="pfdanger"><b>Remise à zéro (test)</b><small>Efface toutes les parties, tous les pronos, les messages et les groupes de l'appli, pour tout le monde. Les comptes et les profils sont gardés.</small>${S.purgeMsg?`<p class="pfpm">${esc(S.purgeMsg)}</p>`:""}<button type="button" class="btn block pfpurge${S.purgeArm?" arm":""}" data-act="purgeAll"${S.purging?" disabled":""}>${S.purging?"Effacement en cours…":S.purgeArm?"⚠️ Touche encore pour TOUT effacer":"🗑️ Tout effacer"}</button></div>`:""}
    </div>`;
   return h;
 }
@@ -6359,6 +6374,7 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "frNewGroup":S.frNew=true;render();setTimeout(()=>{const e=document.querySelector(".frsheet input");if(e)e.focus();},60);break;
     case "frNewClose":S.frNew=false;render();break;
     case "frNewGo":{S.ngSel=(S.frSel||[]).slice();if(!(S.ngName||"").trim())return toast("Donne un nom au groupe.");if(!S.ngSel.length)S.ngSel=[];S.frNew=false;S.frSel=[];const nm=S.ngName.trim(),mem=S.ngSel;const g={id:"g"+Date.now().toString(36),name:nm.slice(0,40),members:["Toi"].concat(mem.filter(x=>x.toLowerCase()!=="toi")).slice(0,50),parties:[],owner:S.uid||null,createdAt:new Date().toISOString()};S.groups=(S.groups||[]).concat([g]);S.ngName="";S.ngSel=[];if(db){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>toast("Enregistrement impossible."));}S.groupView=g.id;go("group");toast("Groupe créé ✓");break;}
+    case "purgeAll":{if(S.purging)break;if(!S.purgeArm){S.purgeArm=true;render();setTimeout(()=>{if(S.purgeArm&&!S.purging){S.purgeArm=false;render();}},6000);break;}S.purgeArm=false;purgeAll();break;}
     case "pfSave":saveProfile();break;
     case "mAdd":{const ctx=t.dataset.ctx,n=t.dataset.name.trim();if(!n)break;if(ctx==="ng"){S.ngSel=(S.ngSel||[]).concat([n]);}else{const g=groupById(S.groupView);if(g.members.some(x=>normS(x)===normS(n)))return toast(n+" est déjà dans le groupe");g.members=g.members.concat([n]);if(db&&!g.demo){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>{});}toast(n+" ajouté au groupe");}S["mq_"+ctx]="";render();break;}
     case "mDel":S.ngSel=(S.ngSel||[]).filter(x=>x!==t.dataset.name);render();break;
