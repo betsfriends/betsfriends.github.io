@@ -3036,7 +3036,7 @@ This typically indicates that your device does not have a healthy Internet conne
       <div class="er" id="bf-er"></div>
       <button class="go" type="submit">${t?"Cr\xE9er mon compte":r?"Envoyer le lien":"Se connecter"}</button>
       ${t||r?`<button class="lk" type="button" data-m="login">J'ai d\xE9j\xE0 un compte : me connecter</button>`:'<button class="lk" type="button" data-m="signup">Pas encore de compte ? Cr\xE9er un compte</button><button class="lk" type="button" data-m="reset">Mot de passe oubli\xE9</button>'}
-    </form>`,n.querySelectorAll("[data-m]").forEach(u=>u.onclick=()=>{jr=u.dataset.m,e()});let i=n.querySelector("form"),o=n.querySelector("#bf-er"),a=n.querySelector(".go");i.onsubmit=async u=>{u.preventDefault(),o.textContent="",o.className="er",a.disabled=!0;let h=i.email.value.trim().toLowerCase(),d=i.password&&i.password.value;try{if(jr==="reset")await aa(Ae,h),o.className="er ok",o.textContent="C'est envoy\xE9 ! Regarde tes e-mails (et les spams).";else if(jr==="signup"){let p=i.name.value.trim();if(!p)throw{code:"x",message:"\xC9cris ton pr\xE9nom."};let y=await ca(Ae,h,d);await la(y.user,{displayName:p}).catch(()=>{});let T=p.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"").slice(0,24)||"toi";await Fs(St(zr,"data","users",y.user.uid,"profile"),{name:p,pseudo:T,vis:"amis",at:new Date().toISOString()}).catch(()=>{})}else await ua(Ae,h,d)}catch(p){o.textContent=Kv[p.code]||p.message||"Erreur, r\xE9essaie."}a.disabled=!1}}}var tp=document.createElement("style");tp.textContent=zv;document.head.appendChild(tp);var Su=!1;da(Ae,async n=>{let e=document.getElementById("bf-splash");if(!n){Su&&location.reload(),e&&e.remove(),$v();return}if(Su)return;Su=!0,await qv(n);let t=document.getElementById("bf-login");t&&t.remove(),e&&e.remove(),ep()});new MutationObserver(()=>{let n=document.querySelector('[data-act="pfSave"]');if(!n||document.getElementById("bf-out"))return;let e=document.createElement("button");e.id="bf-out",e.type="button",e.className="btn ghost block",e.style.marginTop="12px",e.textContent="Se d\xE9connecter"+(Ae.currentUser&&Ae.currentUser.email?" ("+Ae.currentUser.email+")":""),e.onclick=()=>window.bfLogout(),n.insertAdjacentElement("afterend",e)}).observe(document.documentElement,{childList:!0,subtree:!0});})();
+    </form>`,n.querySelectorAll("[data-m]").forEach(u=>u.onclick=()=>{jr=u.dataset.m,e()});let i=n.querySelector("form"),o=n.querySelector("#bf-er"),a=n.querySelector(".go");i.onsubmit=async u=>{u.preventDefault(),o.textContent="",o.className="er",a.disabled=!0;let h=i.email.value.trim().toLowerCase(),d=i.password&&i.password.value;try{if(jr==="reset")await aa(Ae,h),o.className="er ok",o.textContent="C'est envoy\xE9 ! Regarde tes e-mails (et les spams).";else if(jr==="signup"){let p=i.name.value.trim();if(!p)throw{code:"x",message:"\xC9cris ton pr\xE9nom."};let y=await ca(Ae,h,d);await la(y.user,{displayName:p}).catch(()=>{});let T=p.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"").slice(0,24)||"toi";await Fs(St(zr,"data","users",y.user.uid,"profile"),{name:p,pseudo:T,vis:"public",at:new Date().toISOString()}).catch(()=>{})}else await ua(Ae,h,d)}catch(p){o.textContent=Kv[p.code]||p.message||"Erreur, r\xE9essaie."}a.disabled=!1}}}var tp=document.createElement("style");tp.textContent=zv;document.head.appendChild(tp);var Su=!1;da(Ae,async n=>{let e=document.getElementById("bf-splash");if(!n){Su&&location.reload(),e&&e.remove(),$v();return}if(Su)return;Su=!0,await qv(n);let t=document.getElementById("bf-login");t&&t.remove(),e&&e.remove(),ep()});new MutationObserver(()=>{let n=document.querySelector('[data-act="pfSave"]');if(!n||document.getElementById("bf-out"))return;let e=document.createElement("button");e.id="bf-out",e.type="button",e.className="btn ghost block",e.style.marginTop="12px",e.textContent="Se d\xE9connecter"+(Ae.currentUser&&Ae.currentUser.email?" ("+Ae.currentUser.email+")":""),e.onclick=()=>window.bfLogout(),n.insertAdjacentElement("afterend",e)}).observe(document.documentElement,{childList:!0,subtree:!0});})();
 </script>
 
 <div id="sbg" aria-hidden="true"></div><div class="hmtop" id="hmtop" hidden></div><div class="app" id="app"></div>
@@ -4356,16 +4356,17 @@ function groupBody(g){const ps=groupParties(g);let h="";
 
 /* ===================================================================== MEMBRES INSCRITS (fictifs) + PROFIL + RECHERCHE */
 const VIS={public:["Public","Tout le monde peut me trouver par mon nom ou mon pseudo"],amis:["Amis de mes groupes","Seuls les membres de mes groupes et leurs amis me voient"],discret:["Discret","On me trouve uniquement avec mon @pseudo exact"]};
-const MEMBERS=[
- ["max","Max","Max Dumont","Bruxelles","amis"],["alex","Alex","Alexandre Lenoir","Bruxelles","public"],["daki","Daki","Dakota Mertens","Uccle","amis"],["thomas","Thomas","Thomas Verbeke","Waterloo","public"],
- ["lucas","Lucas","Lucas Fontaine","Liège","public"],["sam","Sam","Samuel Hendrickx","Namur","amis"],["noe","Noé","Noé Lambert","Bruxelles","public"],["karim","Karim","Karim Bensaïd","Anderlecht","public"],
- ["julie","Julie","Julie Claes","Ixelles","amis"],["ines","Inès","Inès Moreau","Lille","public"],["paul","Paul","Paul Simon","Paris","discret"],
- ["lea","Léa","Léa Dubois","Bruxelles","public"],["hugo","Hugo","Hugo Martin","Mons","public"],["camille","Camille","Camille Leroy","Charleroi","amis"],["sofia","Sofia","Sofia Rossi","Bruxelles","public"],
- ["yanis","Yanis","Yanis Benali","Liège","public"],["emma","Emma","Emma Janssens","Gand","public"],["nathan","Nathan","Nathan Peeters","Anvers","discret"],["chloe","Chloé","Chloé Lambrecht","Wavre","public"],
- ["mehdi","Mehdi","Mehdi Haddad","Bruxelles","public"],["clara","Clara","Clara Wouters","Louvain","amis"],["jean","Tonton Jean","Jean Dupuis","Namur","discret"]
-].map(([pseudo,short,name,city,vis],i)=>({id:"u-"+pseudo,pseudo,short,name,city,vis,color:["#22E4FF","#EFE4C8","#CFA85A","#FFB547","#9B8CFF","#4DD6A6"][i%6]}));
+/* membres = les vrais inscrits (annuaire « people »), plus aucun faux joueur */
+const MEMBERS=[];
+const PEOPLE_COLS=["people","data/dir/people"];
+const pColor=id=>["#22E4FF","#EFE4C8","#CFA85A","#FFB547","#9B8CFF","#4DD6A6"][[...String(id)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7)%6];
+function peopleApply(list){const by={};MEMBERS.forEach(m=>by[m.uid]=m);list.forEach(d=>{if(!d||!d.uid||d.uid===S.uid)return;const nm=String(d.name||"").trim();if(!nm)return;
+    by[d.uid]={id:"u-"+d.uid,uid:d.uid,pseudo:String(d.pseudo||nm).replace(/^@/,"").replace(/\s+/g,"").toLowerCase().slice(0,24),short:nm.split(/\s+/)[0],name:nm,city:String(d.city||""),vis:VIS[d.vis]?d.vis:"public",color:pColor(d.uid),photo:okPhoto(d.photo)?d.photo:undefined};});
+  MEMBERS.splice(0,MEMBERS.length,...Object.values(by).sort((a,b)=>a.name.localeCompare(b.name)));SIDX=null;}
+function peopleEntry(doc){return{uid:S.uid,name:doc.name,pseudo:doc.pseudo,city:doc.city||"",vis:doc.vis||"public",photo:doc.photo&&doc.photo.length<120000?doc.photo:null,at:doc.at||new Date().toISOString()};}
+function peoplePublish(doc){if(!db||!S.uid||!doc||!doc.name)return;const e=peopleEntry(doc);PEOPLE_COLS.forEach(c=>{try{db.doc(c+"/"+S.uid).set(e).catch(()=>{});}catch(_){}});}
 const normS=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
-function me(){return S.me||(S.me={pseudo:"toi",name:"Toi",city:"Bruxelles",vis:"public",color:"#CFA85A"});}
+function me(){return S.me||(S.me={pseudo:"toi",name:"Toi",city:"",vis:"public",color:"#CFA85A"});}
 /* profil de l'utilisateur connecté : doc privé data/users/<uid>/profile (capability user + db), rechargé au démarrage */
 const PF_KEYS=["name","pseudo","city","vis","photo"];
 const profilePath=()=>S.uid?"data/users/"+S.uid+"/profile":null;
@@ -4375,7 +4376,7 @@ function pfDirty(){const d=S.pfDraft;if(!d)return false;const m=me();return PF_K
 const pfLocalKey=()=>"bf_pf_"+(S.uid||"local");
 function pfDoc(src){const d=Object.assign({},me(),src||{});const o=cleanProfile(d);if(!o.name)o.name=me().name||"Toi";if(!o.pseudo)o.pseudo=me().pseudo||"toi";o.friends=cleanProfile({friends:me().friends||[]}).friends||[];o.at=new Date().toISOString();return o;}
 function pfStatus(ok){S.pfSt=ok;const e=document.getElementById("pfst");if(e){e.className="pfst "+(ok===true?"ok":ok===false?"ko":"wait");e.textContent=ok===true?"✓ Enregistré":ok===false?"⚠️ Pas encore envoyé · gardé sur ce téléphone":"Enregistrement…";}}
-function pfWrite(doc,quiet){LS(pfLocalKey(),doc);const path=profilePath();pfStatus(null);
+function pfWrite(doc,quiet){LS(pfLocalKey(),doc);peoplePublish(doc);const path=profilePath();pfStatus(null);
   if(db&&path)return db.doc(path).set(doc).then(()=>{pfStatus(true);return true;},()=>{pfStatus(false);if(!quiet)toast("Pas de connexion : c'est gardé sur ce téléphone, réessaie plus tard.");return false;});
   pfStatus(true);return Promise.resolve(true);}
 /* sauvegarde automatique : chaque changement du profil part tout de suite (léger délai pendant la frappe) */
@@ -4386,7 +4387,7 @@ function saveProfile(){const d=S.pfDraft||Object.assign({},me());if(!String(d.na
   const doc=pfDoc(d);applyProfile(doc);S.pfDraft=Object.assign({},me());pfWrite(doc).then(ok=>{render();if(ok)toast("Profil enregistré ✓");});}
 function saveFriends(){pfWrite(pfDoc({}),true);}
 async function loadProfile(){const loc=LS(pfLocalKey());if(loc)applyProfile(loc);const path=profilePath();if(!db||!path){if(loc)render();return;}
-  try{const sn=await db.doc(path).get();if(sn&&sn.exists){const d=sn.data();const newer=loc&&loc.at&&(!d.at||loc.at>d.at);applyProfile(newer?loc:d);if(newer)pfWrite(loc,true);if(S.screen==="profile")S.pfDraft=null;render();}else if(loc){pfWrite(loc,true);render();}}catch(_){if(loc)render();}}
+  try{const sn=await db.doc(path).get();if(sn&&sn.exists){const d=sn.data();const newer=loc&&loc.at&&(!d.at||loc.at>d.at);applyProfile(newer?loc:d);if(newer)pfWrite(loc,true);else peoplePublish(pfDoc({}));if(S.screen==="profile")S.pfDraft=null;render();}else if(loc){pfWrite(loc,true);render();}else{let nm="";try{const u=UAPI&&await UAPI.me();nm=(u&&(u.name||(u.email||"").split("@")[0]))||"";}catch(_){}if(nm){nm=nm.charAt(0).toUpperCase()+nm.slice(1);const ps=normS(nm).replace(/[^a-z0-9]/g,"").slice(0,24)||"joueur";S.me=Object.assign(me(),{name:nm,pseudo:ps,vis:"public"});pfWrite(pfDoc({}),true);render();}}}catch(_){if(loc)render();}}
 /* vrais potes : les joueurs qui ont rejoint mes parties (ou l'organisateur et les autres joueurs des parties où je suis inscrit) */
 function realFriends(){const by={};(S.parties||[]).filter(p=>!p.demo&&p.players).forEach(p=>{const me=myId(p);
   rawPlayers(p).forEach(pl=>{if(pl.id===me||pl.fake)return;const org=pl.id===p.owner,j=org||joinedOf(p,pl);const nm=org&&p.owner!==S.uid?orgName(p):pl.name;const k=normS(nm);
@@ -4488,7 +4489,7 @@ function vSearch(){
   const q=normS(S.sq||"").trim();
   let h=`<div class="night" style="padding-bottom:6px"><div class="hero" style="background:transparent;min-height:0;padding-bottom:6px"><div class="bar">${backBtn}<span class="chip">Recherche</span></div>
    <input class="inp sbig" id="sq" data-sq="1" value="${esc(S.sq||"")}" placeholder="Équipe, joueur, pilote, compétition, groupe, membre…" autocomplete="off"></div></div>`;
-  if(q.length<2){h+=`<div class="pad"><div class="lab">Essaie</div><div class="ideas">${["Arsenal","Alcaraz","Verstappen","Rahm","Ligue des champions","Les potes","Léa"].map(x=>`<button type="button" class="idea" data-act="sqSet" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>`;return h;}
+  if(q.length<2){h+=`<div class="pad"><div class="lab">Essaie</div><div class="ideas">${["Arsenal","Alcaraz","Verstappen","Rahm","Ligue des champions"].map(x=>`<button type="button" class="idea" data-act="sqSet" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>`;return h;}
   const words=q.split(/\s+/),hit=n=>words.every(w=>n.includes(w));
   const comps=[],matches=[];searchIndex().forEach(x=>{if(!hit(x.n))return;if(x.k==="comp")comps.push(x);else if(!isDone(x.it))matches.push(x);});
   matches.sort((a,b)=>a.it.date-b.it.date);
@@ -6557,6 +6558,7 @@ render();
   S.notOwner=true;try{UAPI=await window.claude.use("user");if(UAPI){S.uid=await UAPI.id();try{const m=await UAPI.me();if(m){if(!S.uid&&m.id)S.uid=m.id;S.email=m.email?normEmail(m.email):null;}}catch(_){S.email=null;}try{S.notOwner=!(await UAPI.isOwner());}catch(_){S.notOwner=true;}try{S.canWrite=await UAPI.can("data.write");}catch(_){S.canWrite=null;}}}catch(_){}
   if(!db)return;
   loadProfile();
+  PEOPLE_COLS.forEach(c=>{try{db.collection(c).onSnapshot(sn=>{peopleApply(sn.docs.map(d=>Object.assign({uid:d.id},d.data())));const ty=document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);if(["groups","group","home","profile","member","search","setup","mpick"].includes(S.screen)&&!ty)render();},()=>{});}catch(_){}});
   const typing=()=>document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   const softRender=()=>{if(["home","parties","party","bet"].includes(S.screen)&&!typing())dataRender();};
   /* pronos des potes (collection « partypicks ») : un abonnement par paquet de 30 parties visibles, renouvelé seulement si l'ensemble change */
