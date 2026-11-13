@@ -2812,8 +2812,30 @@ body.hastop .goldhome .flood{top:2px!important}
 .flcad.flevt{aspect-ratio:auto!important;min-height:0!important;padding:16px 14px!important}
 .flcad.flevt .flpb,.flcad.flevt .flcc{opacity:.45}
 .flevck{position:absolute;top:10px;right:10px;z-index:2;padding:5px 10px;border-radius:999px;background:var(--goldg);color:#1A1406;font-size:11.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 12px rgba(199,160,74,.5)}
-.flevt .flevi{padding-right:60px;padding-top:6px}
+.flcad.flevt{padding-top:42px!important}
+.flevt .flevi{padding-right:0}
 .flevnx{margin:10px 2px 0;text-align:center;font-size:13.5px;font-weight:700;color:#E6CF96}
+/* accueil : la page s'arrête pile au-dessus du menu — plus de vide à faire défiler sous les sports */
+body.hastop .night.goldhome{min-height:0!important;padding-bottom:calc(env(safe-area-inset-bottom) + 60px)!important}
+.goldhome .h3cw.off{display:none!important}
+
+/* « ✓ Ton choix est fait » : bulle et titre alignés sur la même ligne, bien détachés de la carte en dessous */
+.fllab.flok{margin-top:22px!important;margin-bottom:16px!important;align-items:center;gap:12px;line-height:1}
+.fllab.flok .flokt{display:block;padding-top:.08em}
+/* page de l'événement : l'événement est la vedette (grand, centré), la formule devient un bandeau compact en dessous */
+.suhd.mpev{flex-direction:column!important;align-items:center!important;text-align:center!important;gap:10px!important;padding:24px 16px 22px!important}
+.mpevl{zoom:1.2}
+.mpevt{width:100%;padding-top:0!important}
+.mpevn{margin-top:6px!important}
+.mpform .h3grid.solo .h3lab{height:42px!important;line-height:42px!important;font-size:19px!important}
+.mpform .h3grid .hfc{margin-top:42px!important}
+.mpform .hfc{height:92px!important}
+.mpform .hfc:has(.hfdone){height:150px!important}
+.mpform .hff:not(.hfdone) .hfh{display:grid!important;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:10px;row-gap:2px;align-content:center;justify-content:center;justify-items:start;text-align:left!important}
+.mpform .hff:not(.hfdone) .hfh .hmi{grid-row:1/3;align-self:center;order:0!important;width:38px!important;height:38px!important;margin:0!important}
+.mpform .hff:not(.hfdone) .hfh .hmi svg{width:20px;height:20px}
+.mpform .hff:not(.hfdone) .hfh b{font-size:18px!important;white-space:nowrap;align-self:end;line-height:1}
+.mpform .hff:not(.hfdone) .hfh small{align-self:start;font-size:11.5px!important;margin:0!important}
 </style>
 </head>
 <body>
@@ -3551,7 +3573,7 @@ function flSearch(n,what){return n>8?`<div class="flsearch">${HM_ICO.search}<inp
 function flTmCols(n){if(n<=8)return flCols(n);const e=c=>Math.ceil(n/c)*c-n;let b=6;[5,4].forEach(c=>{if(e(c)<e(b))b=c;});return b;}
 function flCols(n){if(n<=3)return Math.max(1,n);if(n===4)return 2;if(n<=6)return 3;if(n<=8)return 4;const e=c=>Math.ceil(n/c)*c-n;return e(3)<e(4)?3:4;}
 function flStage(){if(hmS().sport!=="foot")return flxStage();const f=flS(),co=flCountry(),c=flComp();let lab="",h="";
-  if(!co){lab=`Ton <em>pays…</em>`;h=flGrid(FL_C.map(x=>`<button type="button" class="flc flcn" data-act="flPick" data-k="c" data-v="${x.id}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><span class="flbub">${x.id==="wd"?FL_GLOBE:flFlag(x.id).replace('viewBox="0 0 30 20"','viewBox="5 0 20 20" preserveAspectRatio="xMidYMid slice"')}</span></button>`),4,"Pays");}
+  if(!co){lab=`Choisis ton <em>event…</em>`;h=flGrid(FL_C.map(x=>`<button type="button" class="flc flcn" data-act="flPick" data-k="c" data-v="${x.id}" aria-label="${esc(x.name)}" title="${esc(x.name)}"><span class="flbub">${x.id==="wd"?FL_GLOBE:flFlag(x.id).replace('viewBox="0 0 30 20"','viewBox="5 0 20 20" preserveAspectRatio="xMidYMid slice"')}</span></button>`),4,"Pays");}
   else if(!c){lab=`Ta <em>compétition…</em>`;const L=co.comps.map(id=>FIND[id]).filter(Boolean);
     const cells=L.map(x=>`<button type="button" class="flc" data-act="flPick" data-k="comp" data-v="${x.id}">${compBadge(x,40)}<b>${esc(x.name)}</b></button>`);
     h=cells.length?flGrid(cells,flCols(cells.length),"Compétitions"):`<div class="flcad flempty sp-foot"><p>Pas de compétition mondiale pour l'instant.<br><small>La Coupe du monde 2030 arrivera ici.</small></p></div>`;}
@@ -3745,8 +3767,8 @@ function flView(){const na=S._flKeep;let st="";if(!flComp())st=flStage();if(flCo
 /* accueil : l'événement est choisi, le bouton or ouvre sa page (formule, façon de jouer, matchs) */
 function flEvtPick(){const c=flComp(),f=flS(),co=flCountry(),sp=hmS().sport,nm=f.intl?"Coupes d'Europe · clubs "+(co?co.name:""):c.name;
   const n=subsOf(c).reduce((a,su)=>a+su.items.filter(i=>!isDone(i)).length,0),u=({velo:"étape",golf:"pari",f1:"séance"})[sp]||"match";
-  return`<h2 class="fllab flok"><span class="flokc" aria-hidden="true">✓</span>Ton choix est <em>fait</em></h2><div class="flcad flevt sp-${sp}"><span class="flevck">✓ Choisi</span><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span>
-   <div class="flevi">${compBadge(c,64)}<span><b>${esc(nm)}</b><small>${esc(c.desc||c.flag||"")}</small><small class="flevn">${n} ${u}${n>1?"s":""} à venir</small></span></div></div><p class="flevnx">Tout est prêt : il ne reste qu'à créer ta partie ↓</p>
+  return`<h2 class="fllab flok"><span class="flokc" aria-hidden="true">✓</span><span class="flokt">Ton choix est <em>fait</em></span></h2><div class="flcad flevt sp-${sp}"><span class="flevck">✓ Choisi</span><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span>
+   <div class="flevi">${compBadge(c,64)}<span><b>${esc(nm)}</b><small>${esc(c.desc||c.flag||"")}</small><small class="flevn">${n} ${u}${n>1?"s":""} à venir</small></span></div></div>
    <button type="button" class="h3create fadein" data-act="toCreate"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Je crée ma partie</button>`;}
 
 function vHome(){
