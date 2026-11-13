@@ -2990,6 +2990,16 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .ntfdot:not(:empty){min-width:18px;height:18px;width:auto!important;padding:0 5px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;color:#fff;line-height:1}
 .ntfi .ntfa{margin-top:8px}.ntfi .ntfa .pfpl{padding:7px 13px;font-size:12.5px}
 .ntfi>.uav{flex:none}
+/* accueil : « Tu es invité » en tout premier */
+.invban{position:relative;z-index:2;display:grid;gap:8px;margin:12px 18px 0}
+.invrow{display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:18px;border:1.5px solid #F1DDA8;background:radial-gradient(90% 140% at 0% 0%,rgba(255,236,190,.35),transparent 60%),linear-gradient(135deg,#5A3F10,#2A1D06);box-shadow:0 0 0 3px rgba(199,160,74,.18),0 0 26px rgba(243,214,140,.45);animation:invpulse 2.4s ease-in-out infinite}
+@keyframes invpulse{0%,100%{box-shadow:0 0 0 3px rgba(199,160,74,.18),0 0 18px rgba(243,214,140,.3)}50%{box-shadow:0 0 0 3px rgba(199,160,74,.3),0 0 34px rgba(243,214,140,.6)}}
+@media (prefers-reduced-motion:reduce){.invrow{animation:none}}
+.invic{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:rgba(0,0,0,.3)}
+.invt{flex:1;min-width:0}.invt b{display:block;font-family:var(--display);font-weight:900;font-size:21px;line-height:1;text-transform:uppercase;color:#FFF6E2}
+.invt small{display:block;margin-top:3px;font-size:12.5px;line-height:1.3;color:#F3E0A6}
+.invgo{flex:none;border:0;border-radius:999px;padding:10px 16px;font-weight:900;font-size:14px;background:var(--goldg);color:#1A1406;box-shadow:0 0 14px rgba(199,160,74,.55)}
+.invmore{border:0;background:none;color:#E6CF96;font-weight:800;font-size:13px;text-decoration:underline;padding:2px}
 </style>
 </head>
 <body>
@@ -3513,7 +3523,7 @@ const HM_MAILRX=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 function hmMailName(e){return String(e).split("@")[0].split(/[._\-+]+/).filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ")||e;}
 function hmMailRow(ctx,q){return`<button type="button" class="hmrow inv" data-act="hmInvite" data-ctx="${ctx}" data-name="${esc(hmMailName(q))}" data-email="${esc(q)}"><span class="hmgi">✉️</span><span><b>Inviter ${esc(q)}</b><small>Par e-mail, avec le lien de la partie.</small></span><i>+</i></button>`;}
 function hmResults(ctx){const H=hmS(),q=(H.q[ctx]||"").trim(),nq=normS(q).replace(/^@/,"");if(!q)return"";
-  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em)return`<button type="button" class="hmrow" data-act="hmPick" data-ctx="${ctx}" data-k="m" data-name="${esc(em.short)}">${avatar(em,34)}<span><b>${esc(em.short)}</b><small>Inscrit · ${esc(em.name)} · @${esc(em.pseudo)}</small></span><i>+</i></button>`;return hmMailRow(ctx,q);}
+  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em)return`<button type="button" class="hmrow" data-act="hmPick" data-ctx="${ctx}" data-k="m" data-name="${esc(em.short)}" data-email="${esc(normEmail(q))}">${avatar(em,34)}<span><b>${esc(em.short)}</b><small>Inscrit · ${esc(em.name)} · @${esc(em.pseudo)}</small></span><i>+</i></button>`;return hmMailRow(ctx,q);}
   if(q.includes("@")&&!q.startsWith("@"))return`<p class="hmnone">Termine l'adresse e-mail pour l'inviter.</p>`;
   if(ctx==="duel"){
     const ps=hmPeople(q,H.duel?[H.duel.name]:[]);let h=ps.map(m=>`<button type="button" class="hmrow" data-act="hmPick" data-ctx="duel" data-k="m" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.short)}</b><small>${m.fr?"Ami · ":""}${esc(m.name)} · @${esc(m.pseudo)}</small></span><i>+</i></button>`).join("");
@@ -3625,14 +3635,27 @@ function emailMember(q){const e=normEmail(q);if(!HM_MAILRX.test(e))return null;i
 function notify(uid,type,text,extra){if(!db||!uid||uid===S.uid)return;const id=type+"_"+(extra&&(extra.pid||extra.gid)||"")+"_"+S.uid+"_"+uid+"_"+Date.now().toString(36);
   const d=Object.assign({to:uid,from:S.uid||null,fromName:me().name||"Un ami",fromPhoto:okPhoto(me().photo)&&me().photo.length<60000?me().photo:null,type,text,at:new Date().toISOString(),read:false},extra||{});
   NTF_COLS.forEach(c=>{try{db.doc(c+"/"+id).set(d).catch(()=>{});}catch(_){}});}
-const unreadN=()=>Object.values(NOTIFS).filter(n=>!n.read).length;
+function invNotifs(){const seen=LS("bf_invseen")||{};let L=[];try{L=(S.parties||[]).filter(p=>p&&!p.demo&&isMemberView(p));}catch(_){}
+  return L.map(p=>({type:"party",pid:p.id,text:orgName(p)+" t'invite à la partie « "+p.name+" »",at:p.createdAt||"",read:!!seen[p.id],_inv:1}));}
+const allNotifs=()=>{const R=Object.values(NOTIFS),have=new Set(R.filter(n=>n.pid).map(n=>n.pid));return R.concat(invNotifs().filter(n=>!have.has(n.pid)));};
+const unreadN=()=>allNotifs().filter(n=>!n.read).length;
 function ntfSub(){if(!db||!S.uid||S._ntfOn)return;S._ntfOn=1;NTF_COLS.forEach(c=>{try{db.collection(c).where("to","==",S.uid).onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();const k=v.type+"|"+(v.pid||v.gid||"")+"|"+v.from+"|"+v.at;NOTIFS[k]=Object.assign({},v,{_id:d.id,_c:c,read:!!(v.read||(NOTIFS[k]&&NOTIFS[k].read))});});
     const ty=document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);if(!ty)render();},()=>{});}catch(_){}});}
-function ntfMarkRead(){Object.values(NOTIFS).forEach(n=>{if(n.read)return;n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});});}
+function ntfMarkRead(){const sv=LS("bf_invseen")||{};invNotifs().forEach(n=>sv[n.pid]=1);LS("bf_invseen",sv);Object.values(NOTIFS).forEach(n=>{if(n.read)return;n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});});}
 const agoTxt=iso=>{const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1?"À l'instant":m<60?"Il y a "+m+" min":m<1440?"Il y a "+Math.round(m/60)+" h":new Date(iso).toLocaleDateString("fr-BE",{day:"numeric",month:"short"});};
-function ntfItems(){return Object.values(NOTIFS).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":"🤝"}</span>`;
+function ntfItems(){return allNotifs().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":"🤝"}</span>`;
   const act=n.type==="party"&&n.pid?`<button type="button" class="pfpl" data-act="ntfParty" data-id="${esc(n.pid)}">Voir la partie</button>`:n.type==="friend"&&n.fromName&&!(me().friends||[]).some(x=>normS(x)===normS(n.fromName))?`<button type="button" class="pfpl" data-act="ntfBack" data-n="${esc(n.fromName)}" data-uid="${esc(n.from||"")}">Ajouter en retour</button>`:"";
   return`<li class="ntfi${n.read?"":" new"}">${av}<div><b>${esc(n.text||"")}</b><small>${agoTxt(n.at)}</small>${act?`<div class="ntfa">${act}</div>`:""}</div></li>`;}).join("");}
+function invBanner(){const L=allNotifs().filter(n=>n.type==="party"&&n.pid&&!n.read);if(!L.length)return"";
+  return`<div class="invban" role="status">${L.slice(0,3).map(n=>`<div class="invrow"><span class="invic" aria-hidden="true">🎟️</span><div class="invt"><b>Tu es invité !</b><small>${esc(n.text)}</small></div><button type="button" class="invgo" data-act="ntfParty" data-id="${esc(n.pid)}">Voir</button></div>`).join("")}${L.length>3?`<button type="button" class="invmore" data-act="ntfOpen">+ ${L.length-3} autre${L.length-3>1?"s":""} invitation${L.length-3>1?"s":""}</button>`:""}</div>`;}
+/* partout à l'écran, « Toi » devient mon vrai prénom (les données gardent « Toi » en interne) */
+function myLabel(){const n=String(me().name||"").trim();return n&&normS(n)!=="toi"?n:"";}
+const TOI_RX=/(^|[^A-Za-zÀ-ÿ])Toi(?![A-Za-zÀ-ÿ])/g;
+function meNames(root){const nm=myLabel();if(!nm||!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:t=>t.nodeValue.includes("Toi")&&!(t.parentNode&&/^(SCRIPT|STYLE|TEXTAREA)$/.test(t.parentNode.nodeName))?1:3});const L=[];while(w.nextNode())L.push(w.currentNode);
+  L.forEach(t=>{const v=t.nodeValue.replace(TOI_RX,(m,a)=>a+nm);if(v!==t.nodeValue)t.nodeValue=v;});
+  root.querySelectorAll("u").forEach(u=>{if(normS(u.textContent)==="toi"){u.textContent="(moi)";}});
+  root.querySelectorAll("[aria-label*='Toi'],[title*='Toi']").forEach(e=>["aria-label","title"].forEach(a=>{const v=e.getAttribute(a);if(v&&v.includes("Toi"))e.setAttribute(a,v.replace(TOI_RX,(m,x)=>x+nm));}));}
+if(!window._meNmOn){window._meNmOn=1;let q=0;new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;meNames(document.body);});}).observe(document.documentElement,{childList:true,subtree:true});}
 function ntfPop(){if(!S.ntf)return"";let D;try{D=partiesData();}catch(e){D={sec:{todo:[]},todoN:()=>0};}
   let ready=[];try{ready=readyParties(D);}catch(e){}const nP=D.sec.todo.reduce((a,p)=>a+D.todoN(p),0),nR=ready.length;
   return`<div class="ntfbg" data-act="ntfClose"></div><div class="ntf" role="dialog" aria-modal="true" aria-labelledby="ntft">
@@ -3951,7 +3974,7 @@ function vHome(){
   let h=`<div class="night goldhome">${tower}
    <div class="top"><div class="logo"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CFA85A" stroke-width="2.4" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg></span><span class="wm">BET'S <b>FRIENDS</b></span></div>
    <span style="display:flex;gap:8px"><button type="button" class="iconbtn ntfbell" data-act="ntfOpen" aria-label="Notifications${unreadN()?" : "+unreadN()+" nouvelle"+(unreadN()>1?"s":""):S.ntfSeen?"":" : 1 nouvelle"}" aria-haspopup="dialog">${S.ntfSeen&&!unreadN()?"":`<i class="ntfdot" aria-hidden="true">${unreadN()||""}</i>`}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button type="button" class="iconbtn pbtn" aria-label="Mon profil" data-act="profile">${avatar(me(),34)}</button></span></div>
-   ${hmBanner()}
+   ${hmBanner()}${invBanner()}
    <div class="h3hd"><div><div class="muted" style="font-weight:600">Ce soir, c'est match.</div><h1 class="disp">Défie tes potes…<br>deviens le <em>roi du&nbsp;prono</em></h1></div></div>
    ${hmS().flowOn?flView():h3Play()}
 `;
@@ -4387,7 +4410,13 @@ const PEOPLE_COLS=["people","data/dir/people"];
 const pColor=id=>["#22E4FF","#EFE4C8","#CFA85A","#FFB547","#9B8CFF","#4DD6A6"][[...String(id)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7)%6];
 function peopleApply(list){const by={};MEMBERS.forEach(m=>by[m.uid]=m);list.forEach(d=>{if(!d||!d.uid||d.uid===S.uid)return;const nm=String(d.name||"").trim();if(!nm)return;
     by[d.uid]={id:"u-"+d.uid,uid:d.uid,pseudo:String(d.pseudo||nm).replace(/^@/,"").replace(/\s+/g,"").toLowerCase().slice(0,24),short:nm.split(/\s+/)[0],name:nm,city:String(d.city||""),vis:VIS[d.vis]?d.vis:"public",eh:d.eh||null,color:pColor(d.uid),photo:okPhoto(d.photo)?d.photo:undefined};});
-  MEMBERS.splice(0,MEMBERS.length,...Object.values(by).sort((a,b)=>a.name.localeCompare(b.name)));SIDX=null;}
+  MEMBERS.splice(0,MEMBERS.length,...Object.values(by).sort((a,b)=>a.name.localeCompare(b.name)));SIDX=null;setTimeout(partyRepair,0);}
+/* réparation : dans MES parties, un pote invité par son prénom qui correspond à un inscrit est rattaché à son compte (il voit alors la partie) */
+const REPAIRED={};
+function partyRepair(){if(!db||!S.uid||!MEMBERS.length)return;(S.rawParties||[]).forEach(p=>{if(!p||p.owner!==S.uid||p.demo||!p.players||REPAIRED[p.id])return;let ch=false;
+  const pl=p.players.map(x=>{if(!x||x.id===p.owner||x.uid)return x;const hits=MEMBERS.filter(m=>normS(m.short)===normS(x.name)||normS(m.name)===normS(x.name)||(x.email&&m.eh&&EH[normEmail(x.email)]===m.eh));if(hits.length!==1)return x;ch=true;return Object.assign({},x,{uid:hits[0].uid});});
+  REPAIRED[p.id]=1;if(!ch)return;const uids=pl.map(x=>x.uid).filter(Boolean);
+  db.doc("parties/"+p.id).update({players:pl,uids}).then(()=>{pl.forEach(x=>{if(x.uid&&!(p.players.find(y=>y.id===x.id)||{}).uid)notify(x.uid,"party",(me().name||"Ton pote")+" t'invite à la partie « "+p.name+" »",{pid:p.id});});},()=>{REPAIRED[p.id]=0;});});}
 function peopleEntry(doc){return{eh:S.eh||null,uid:S.uid,name:doc.name,pseudo:doc.pseudo,city:doc.city||"",vis:doc.vis||"public",photo:doc.photo&&doc.photo.length<120000?doc.photo:null,at:doc.at||new Date().toISOString()};}
 function peoplePublish(doc){if(!db||!S.uid||!doc||!doc.name)return;if(S.email&&!S.eh){sha256(S.email).then(h=>{S.eh=h;if(h)peoplePublish(doc);});return;}const e=peopleEntry(doc);PEOPLE_COLS.forEach(c=>{try{db.doc(c+"/"+S.uid).set(e).catch(()=>{});}catch(_){}});}
 const normS=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
@@ -4510,7 +4539,7 @@ function vFriends(){
   return h;
 }
 function frResults(){const q=(S.frQ||"").trim();if(!q)return"";const nq=normS(q).replace(/^@/,""),have=new Set(myFriends().map(f=>normS(f.name)));
-  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em){const on=have.has(normS(em.short));return`<div class="frres"><button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(em.id)}" data-n="${esc(em.short)}">${avatar(em,34)}<span><b>${esc(em.name)}</b><small>Inscrit sur Bet's Friends · @${esc(em.pseudo)}</small></span><i>${on?"✓":"+"}</i></button></div>`;}}
+  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em){const on=have.has(normS(em.short));return`<div class="frres"><button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(em.id)}" data-n="${esc(em.short)}" data-e="${esc(normEmail(q))}">${avatar(em,34)}<span><b>${esc(em.name)}</b><small>Inscrit sur Bet's Friends · @${esc(em.pseudo)}</small></span><i>${on?"✓":"+"}</i></button></div>`;}}
   if(HM_MAILRX.test(q))return`<div class="frres"><button type="button" class="hmrow inv" data-act="frAddMail" data-e="${esc(q)}"><span class="hmgi">✉️</span><span><b>Inviter ${esc(q)}</b><small>Un e-mail avec ton lien d'invitation, et on l'ajoute à tes amis</small></span><i>+</i></button></div>`;
   const ps=findMembers(q,[]).filter(m=>!isMeName(m.short)).slice(0,6);
   let h=ps.map(m=>{const on=have.has(normS(m.short));return`<button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(m.id)}" data-n="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.name)}</b><small>@${esc(m.pseudo)} · ${esc(m.city)}</small></span><i>${on?"✓":"+"}</i></button>`;}).join("");
@@ -6171,7 +6200,7 @@ function applyGroup(g){const cr=S.create,K=knownContacts(),em=g.emails||{};S.gro
   if(!String(cr.name||"").trim()||cr.name===cr.autoName)cr.name=g.name;cr.autoName=g.name;}
 /* accueil v2 : les adversaires choisis (Duel / Multijoueur) remplissent la partie en préparation */
 function hmPrefill(){const H=S.hm;if(!H||!H.mode)return;const cr=S.create,K=knownContacts();if(crFriends().some(f=>String(f.name||"").trim()))return;
-  const em=n=>(K.find(k=>normS(k.name)===normS(n))||{}).email||"";
+  const xs=[H.duel].concat(H.multi||[]).filter(Boolean),em=n=>{const x=xs.find(y=>normS(y.name)===normS(n));return(x&&x.email)||(H.mail||{})[n]||(LS("bf_frmail")||{})[n]||(K.find(k=>normS(k.name)===normS(n))||{}).email||"";};
   if(H.mode==="duel"){if(!H.duel)return;const m=memberByName(H.duel.name),n=m?m.short:H.duel.name;cr.friends=[{name:n,email:em(n)}];cr.people=2;return;}
   const gx=H.multi.filter(x=>x.k==="g"&&groupById(x.id));if(gx.length){applyGroup(groupById(gx[0].id));const keep=new Set(gMem(gx[0]).map(normS));cr.friends=cr.friends.filter(f=>keep.has(normS(f.name)));}else cr.friends=[];
   const have=new Set(cr.friends.map(f=>normS(f.name)));const add=n=>{if(!n||isMeName(n)||have.has(normS(n)))return;have.add(normS(n));cr.friends.push({name:n,email:em(n)});};
@@ -6345,7 +6374,7 @@ case "kf":{const p=partyById(S.partyView);S.kf=Object.assign({},S.kf,{[p.id]:t.d
     /* accueil → Mes parties, avec le ticket choisi déjà ouvert (les anciennes pages de liste n'existent plus) */
     case "ntfOpen":{S.ntf=true;render();setTimeout(()=>{const x=document.querySelector(".ntf .ntfx");if(x)x.focus({preventScroll:true});},50);break;}
 case "ntfClose":{S.ntf=false;S.ntfSeen=true;ntfMarkRead();render();break;}
-    case "ntfParty":{S.ntf=false;S.ntfSeen=true;ntfMarkRead();S.stack=[];S.partyView=t.dataset.id;if(!partyById(t.dataset.id)){S.screen="parties";render();toast("La partie arrive… si elle n'apparaît pas, rouvre l'appli.");break;}S.screen="party";render();window.scrollTo(0,0);break;}
+    case "ntfParty":{S.ntf=false;S.ntfSeen=true;{const pid=t.dataset.id,sv=LS("bf_invseen")||{};sv[pid]=1;LS("bf_invseen",sv);Object.values(NOTIFS).forEach(n=>{if(n.pid===pid&&!n.read){n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});}});}S.stack=[];S.partyView=t.dataset.id;if(!partyById(t.dataset.id)){S.screen="parties";render();toast("La partie arrive… si elle n'apparaît pas, rouvre l'appli.");break;}S.screen="party";render();window.scrollTo(0,0);break;}
     case "ntfBack":{const n=t.dataset.n,m=me();m.friends=[...new Set((m.friends||[]).concat([n]))];saveFriends();if(t.dataset.uid)notify(t.dataset.uid,"friend",(m.name||"Ton pote")+" t'a ajouté à ses amis");render();toast(n+" ajouté à tes amis ✓");break;}
 case "ntfGo":{S.ntf=false;S.ntfSeen=true;S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dataset.k;render();window.scrollTo(0,0);break;}
 case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dataset.k;render();window.scrollTo(0,0);
@@ -6390,9 +6419,9 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "frShare":{const L=inviteLink(),txt=me().name+" t'invite sur Bet's Friends, l'appli de pronos entre potes : "+L;if(navigator.share){navigator.share({title:"Bet's Friends",text:txt,url:L}).catch(()=>{});}else copyText(txt,"Lien copié");break;}
     case "frSel":{const n=t.dataset.n,a=new Set(S.frSel||[]);a.has(n)?a.delete(n):a.add(n);S.frSel=[...a];render();break;}
     case "frSelAll":{const F=myFriends().map(f=>f.name);S.frSel=(S.frSel||[]).length===F.length?[]:F;render();break;}
-    case "frAdd":{const n=(t.dataset.n||"").trim();if(!n)break;const m=me();m.friends=[...new Set((m.friends||[]).concat([n]))];S.frQ="";saveFriends();{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"friend",(m.name||"Un pote")+" t'a ajouté à ses amis");}render();toast(n+" ajouté à tes amis ✓");break;}
-    case "frAddMail":{const e=t.dataset.e,n=e.split("@")[0];const m=me();m.friends=[...new Set((m.friends||[]).concat([n]))];S.frQ="";saveFriends();render();location.href=hmInvMail(n,e);break;}
-    case "frDuel":{const n=t.dataset.n,H=hmS();H.multi=[{k:memberByName(n)?"m":"inv",name:n}];H.mode="duel";H.duel=H.multi[0];H.validated=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast("Duel contre "+n+" : choisis ton terrain de jeu");break;}
+    case "frAdd":{const n=(t.dataset.n||"").trim();if(!n)break;const m=me();if(t.dataset.e){S.frMail=Object.assign(LS("bf_frmail")||{},{[n]:t.dataset.e});LS("bf_frmail",S.frMail);}m.friends=[...new Set((m.friends||[]).concat([n]))];S.frQ="";saveFriends();{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"friend",(m.name||"Un pote")+" t'a ajouté à ses amis");}render();toast(n+" ajouté à tes amis ✓");break;}
+    case "frAddMail":{const e=t.dataset.e,n=e.split("@")[0];S.frMail=Object.assign(LS("bf_frmail")||{},{[n]:e});LS("bf_frmail",S.frMail);const m=me();m.friends=[...new Set((m.friends||[]).concat([n]))];S.frQ="";saveFriends();render();location.href=hmInvMail(n,e);break;}
+    case "frDuel":{const n=t.dataset.n,H=hmS();H.multi=[{k:memberByName(n)?"m":"inv",name:n,email:(LS("bf_frmail")||{})[n]}];H.mode="duel";H.duel=H.multi[0];H.validated=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast("Duel contre "+n+" : choisis ton terrain de jeu");break;}
     case "frPlay":{const L=S.frSel||[];if(!L.length)break;const H=hmS();H.multi=L.map(n=>({k:memberByName(n)?"m":"inv",name:n}));const one=L.length===1;H.mode=one?"duel":"multi";H.duel=one?H.multi[0]:null;H.validated=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast(one?"Duel prêt : choisis ton terrain de jeu":"Partie à "+(L.length+1)+" : choisis ton terrain de jeu");break;}
     case "frGroup":go("group",{groupView:t.dataset.id});break;
     case "frNewGroup":S.frNew=true;render();setTimeout(()=>{const e=document.querySelector(".frsheet input");if(e)e.focus();},60);break;
@@ -6448,7 +6477,8 @@ case "mpTyp":{const f=flS(),v=t.dataset.v;if(f.typ===v)delete f.typ;else f.typ=v
       else if(k==="g"){const g=groupById(t.dataset.id);if(g&&!H.multi.some(x=>x.k==="g"&&x.id===g.id))H.multi.push({k:"g",id:g.id,name:g.name});}
       else{const nn=normS(t.dataset.name),gx=H.multi.find(x=>x.k==="g"&&(x.ex||[]).some(e=>normS(e)===nn));
         if(gx)gx.ex=gx.ex.filter(e=>normS(e)!==nn);
-        else if(!H.multi.some(x=>x.k!=="g"&&normS(x.name)===nn))H.multi.push({k:"m",name:t.dataset.name});}
+        else if(!H.multi.some(x=>x.k!=="g"&&normS(x.name)===nn))H.multi.push({k:"m",name:t.dataset.name,email:t.dataset.email||undefined});}
+      if(t.dataset.email){H.mail=H.mail||{};H.mail[t.dataset.name]=t.dataset.email;}
       H.q[ctx]="";H.mode=ctx;render();break;}
     case "hmInvite":{const H=hmS(),ctx=t.dataset.ctx,n=t.dataset.name.trim(),em=(t.dataset.email||"").trim();if(!n)break;H.mail=H.mail||{};if(em)H.mail[n]=em;
       if(ctx==="duel")H.duel={k:"inv",name:n,email:em||undefined};else if(!H.multi.some(x=>x.k!=="g"&&normS(x.name)===normS(n)))H.multi.push({k:"inv",name:n,email:em||undefined});
@@ -6616,7 +6646,7 @@ render();
   if(S.uid){try{db.collection("partypicks").where("uid","==",S.uid).onSnapshot(sn=>{let ch=false;sn.docs.forEach(d=>{const v=d.data();if(v&&v.pid&&v.player&&MYCLAIMS[v.pid]!==v.player){MYCLAIMS[v.pid]=v.player;ch=true;}});if(ch){applyParties();softRender();}},()=>{});}catch(_){}}
   try{db.collection("live").onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();if(d.id==="_meta"){LIVE_UPD=v.updated||null;return;}LIVE[d.id]=Object.assign({},LIVE[d.id],v);});if(!document.activeElement||!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))dataRender();},()=>{});}catch(_){}
   try{db.collection("groups").onSnapshot(sn=>{S.rawGroups=sn.docs.map(d=>Object.assign({id:d.id},d.data()));S.groups=S.rawGroups.filter(g=>!g.owner||!S.uid||g.owner===S.uid);if(["groups","group"].includes(S.screen))dataRender();},()=>{});}catch(_){}
-  db.collection("parties").onSnapshot(sn=>{S.rawParties=sn.docs.map(d=>Object.assign({id:d.id},d.data()));applyParties();if(["home","parties","party","groups","group"].includes(S.screen)&&!typing())dataRender();},()=>{});
+  db.collection("parties").onSnapshot(sn=>{S.rawParties=sn.docs.map(d=>Object.assign({id:d.id},d.data()));applyParties();setTimeout(partyRepair,0);if(["home","parties","party","groups","group"].includes(S.screen)&&!typing())dataRender();},()=>{});
 })();
 </script>
 </body>
