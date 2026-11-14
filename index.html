@@ -3432,7 +3432,7 @@ let PROV=false;
 function provResult(it){const L=LIVE[it.lid];if(!L||["FT","END"].includes(L.status))return null;const has=(L.winners&&L.winners.length)||L.sa!=null||L.winner;if(!has)return null;
   const save=LIVE[it.lid];let r=null;LIVE[it.lid]=Object.assign({},save,{status:"FT"});try{r=liveResult(it);}catch(e){r=null;}finally{LIVE[it.lid]=save;}if(r)r.prov=true;return r;}
 function scoreProv(p){PROV=true;try{return scoreParty(p);}finally{PROV=false;}}
-function liveResult(it){const L=LIVE[it.lid]||{},st=L.status||"NS";const sd=it.a&&it.b?[it.a,it.b]:null;
+function liveResult(it){const L=LIVE[it.lid]||{},st=L.status||"NS";if(L.ans&&st==="FT")return{sa:L.sa,sb:L.sb,line:L.line||"Terminé",ans:L.ans};const sd=it.a&&it.b?[it.a,it.b]:null;
   if(st==="END")return{pending:true,line:"Terminé · résultat en cours de mise à jour",ans:{}};
   if(st!=="FT")return null;
   const fc=FIND[it.lid.split("-")[0]];const sp=fc&&fc.sport?fc.sport.id:it.lid.slice(0,2)==="pl"?"foot":it.lid.slice(0,2)==="pm"?"tennis":(it.lid.slice(0,2)==="ad"||it.lid.slice(0,2)==="ww")?"golf":"f1";
@@ -3444,7 +3444,184 @@ function liveResult(it){const L=LIVE[it.lid]||{},st=L.status||"NS";const sd=it.a
   return{line:"Terminé",ans:{}};}
 
 const CACHE={};
-function subsOf(c){if(!CACHE[c.id]){CACHE[c.id]=c.build().map(su=>{/* golf : chaque jour et la compétition entière se règlent sur live/<comp>-r<N> */if(c.sport&&c.sport.id==="golf"&&!c.custom)su.items.forEach(i=>{if(!i.lid&&(i.golfDay||i.whole)){i.lid=c.id+"-r"+(i.whole?i.golfDays:i.golfDay);i.live=true;}});const ds=su.items.map(i=>+i.date);su.start=su.start||new Date(Math.min(...ds));su.end=su.end||new Date(Math.max(...ds));return su;});}return CACHE[c.id];}
+/* ===================================================================== DIRECT RÉEL (ESPN)
+   Un téléphone qui a l'app ouverte va chercher les vrais calendriers et les scores chez ESPN, les applique tout de suite
+   et les partage dans la base « live » : tout le monde voit les mêmes scores, points et classements.
+   - calendriers réels (foot, NBA, rugby) : doc live/cal_<compétition>
+   - résultats tennis, golf, F1 : un doc live/<lid> par match / jour / séance */
+const ESPN="https://site.api.espn.com/apis/site/v2/sports/";
+const FEED={pl:["soccer/eng.1","L",T.pl],liga:["soccer/esp.1","L",T.liga],seriea:["soccer/ita.1","L",T.serieA],buli:["soccer/ger.1","L",T.buli],l1:["soccer/fra.1","L",T.l1],jpl:["soccer/bel.1","L",T.jpl],
+  ucl:["soccer/uefa.champions","U",null],cdf:["soccer/fra.coupe_de_france","K",T.l1],dfb:["soccer/ger.dfb_pokal","K",T.buli],coppa:["soccer/ita.coppa_italia","K",T.serieA],rey:["soccer/esp.copa_del_rey","K",T.liga],
+  croky:["soccer/bel.cup","K",T.jpl],facup:["soccer/eng.fa","K",T.pl],nba:["basketball/nba","N",T.nba],top14:["rugby/270559","L",T.top14],six:["rugby/180659","S",T.six]};
+const RES_SP=["tennis","f1"];const LIVE_FROM=+new Date("2026-11-14T00:00:00");
+const LCAL={};let CAL_VER=0;const LNET={fail:0,ok:0,last:{},busy:{},err:""};
+/* noms ESPN → noms de l'app (logos, options de paris) */
+const ESPN_TEAM={"club brugge":"Club Bruges","cercle brugge ksv":"Cercle Bruges","cercle brugge":"Cercle Bruges","kaa gent":"La Gantoise","gent":"La Gantoise","kv mechelen":"Malines","mechelen":"Malines","sint truidense":"Saint-Trond","sint truiden":"Saint-Trond","oud heverlee leuven":"OH Louvain","kv kortrijk":"Courtrai","waasland beveren":"Beveren","sk beveren":"Beveren","standard liege":"Standard","royal charleroi sc":"Charleroi","raal la louviere":"La Louvière","racing genk":"Genk","krc genk":"Genk","union st gilloise":"Union SG","union saint gilloise":"Union SG","royale union saint gilloise":"Union SG","kvc westerlo":"Westerlo","lommel sk":"Lommel","zulte waregem":"Zulte Waregem","royal antwerp":"Antwerp",
+  "manchester city":"Man. City","manchester united":"Man. United","tottenham hotspur":"Tottenham","brighton hove albion":"Brighton","afc bournemouth":"Bournemouth","newcastle united":"Newcastle","leeds united":"Leeds","west ham united":"West Ham",
+  "barcelona":"FC Barcelone","sevilla":"Séville","valencia":"Valence","deportivo la coruna":"La Corogne","athletic club":"Athletic Bilbao","atletico madrid":"Atlético Madrid","internazionale":"Inter","inter milan":"Inter","as roma":"AS Rome","napoli":"Naples","bologna":"Bologne","como":"Côme","parma":"Parme","venezia":"Venise",
+  "borussia dortmund":"Dortmund","bayer leverkusen":"Leverkusen","borussia monchengladbach":"M'gladbach","eintracht frankfurt":"Francfort","sc freiburg":"Fribourg","hamburg sv":"Hambourg","1 fc koln":"Cologne","fc cologne":"Cologne","mainz":"Mayence","werder bremen":"Werder Brême","fc augsburg":"Augsbourg",
+  "paris saint germain":"Paris SG","paris fc":"Paris FC","olympique lyonnais":"Lyon","olympique de marseille":"Marseille","stade rennais":"Rennes","stade brestois 29":"Brest","copenhagen":"Copenhague","fc copenhagen":"Copenhague","slavia prague":"Slavia Prague","olympiacos":"Olympiakos",
+  "philadelphia 76ers":"Philadelphie","la clippers":"LA Clippers","los angeles clippers":"LA Clippers","los angeles lakers":"LA Lakers",
+  "section paloise":"Pau","stade toulousain":"Toulouse","stade rochelais":"La Rochelle","aviron bayonnais":"Bayonne","usa perpignan":"Perpignan","union bordeaux begles":"Bordeaux-Bègles","stade francais paris":"Stade Français","clermont auvergne":"Clermont","castres olympique":"Castres","montpellier herault":"Montpellier","rc toulon":"Toulon","lyon ou":"Lyon","us montauban":"Montauban",
+  "england":"Angleterre","ireland":"Irlande","scotland":"Écosse","wales":"Pays de Galles","italy":"Italie","france":"France"};
+const lvK=s=>normS(s).replace(/[^a-z0-9]+/g," ").trim();
+const LV_STOP=new Set(["fc","cf","ac","as","sc","sv","rc","afc","kv","kaa","kvc","krc","ksv","royal","club","de","la","le","the","sk","us","cd","ud","ss","ssc","vfb","vfl","tsg","bc","ogc","sco","rcd","1","04","07"]);
+function lvTeam(cid,name){const k=lvK(name);if(ESPN_TEAM[k])return ESPN_TEAM[k];const f=FEED[cid];
+  const L=f&&f[2]?f[2]:[].concat(T.pl,T.liga,T.serieA,T.buli,T.l1,T.jpl,T.ucl);const toks=x=>lvK(x).split(" ").filter(t=>t.length>2&&!LV_STOP.has(t));
+  const df={};L.forEach(n=>new Set(toks(n+" "+(TEAM_ALIAS[n]||""))).forEach(t=>df[t]=(df[t]||0)+1));
+  const mine=toks(name);let best=null,bs=0,tie=false;L.forEach(n=>{const ts=new Set(toks(n+" "+(TEAM_ALIAS[n]||"")));let s=0,k=0;mine.forEach(t=>{if(ts.has(t)){s+=1/(df[t]||1);k++;}});if(k)s+=.5*k/ts.size;if(s>bs){bs=s;best=n;tie=false;}else if(s===bs&&s>0)tie=true;});
+  return best&&!tie&&bs>=1?best:name;}
+/* noms de joueurs (tennis, golf, F1) : même personne si nom complet identique, ou même nom de famille + même initiale */
+function lvSame(a,b){const x=lvK(a),y=lvK(b);if(!x||!y)return false;if(x===y)return true;const xa=x.split(" "),ya=y.split(" ");if(xa[xa.length-1]!==ya[ya.length-1])return false;return xa.length===1||ya.length===1||xa[0][0]===ya[0][0];}
+function nmEq(v,x){const a=lvK(v),b=lvK(x);if(!a||!b)return false;if(a===b)return true;const bl=b.split(" ");return bl[bl.length-1]===a||b.endsWith(" "+a)||lvSame(v,x);}
+const etDay=d=>new Date(d).toLocaleDateString("en-CA",{timeZone:"America/New_York"}).replace(/-/g,"");
+const bxDay=d=>new Date(d).toLocaleDateString("en-CA",{timeZone:"Europe/Brussels"}).replace(/-/g,"");
+async function lvGet(path){const u=ESPN+path;const ac=typeof AbortController!=="undefined"?new AbortController():null;const to=setTimeout(()=>{try{ac&&ac.abort();}catch(_){}},15000);
+  try{const r=await fetch(u,{signal:ac?ac.signal:undefined,cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();LNET.ok++;LNET.err="";return j;}
+  catch(e){LNET.fail++;LNET.err=String(e&&e.message||e);throw e;}finally{clearTimeout(to);}}
+const lvNum=v=>{const n=parseFloat(v);return isNaN(n)?null:n;};
+const lvMin=s=>{const m=String(s||"").match(/(\d+)/);return m?+m[1]:null;};
+/* ---------- un match ESPN (foot, basket, rugby) → notre format ---------- */
+function lvEvent(cid,e){const kind=FEED[cid][1],sp=FEED[cid][0].split("/")[0],co=(e.competitions||[])[0]||{},st=(co.status||e.status||{}),ty=st.type||{};
+  const C=co.competitors||[],H=C.find(x=>x.homeAway==="home")||C[0]||{},A=C.find(x=>x.homeAway==="away")||C[1]||{};
+  const hn=lvTeam(cid,(H.team||{}).displayName||(H.team||{}).name||"?"),an=lvTeam(cid,(A.team||{}).displayName||(A.team||{}).name||"?");
+  const nba=sp==="basketball",a=nba?an:hn,b=nba?hn:an,CA=nba?A:H,CB=nba?H:A;
+  const s=/POSTPONED|CANCEL|SUSPEND|DELAY/.test(ty.name||"")?"PST":ty.state==="in"?"LIVE":ty.state==="post"?(ty.completed===false?"PST":"FT"):"NS";
+  const sa=lvNum(CA.score),sb=lvNum(CB.score);const rec=x=>{const r=(x.records||[]).find(r=>r.type==="total")||(x.records||[])[0];if(!r||!r.summary)return null;const n=String(r.summary).split("-").map(Number);return n.every(v=>!isNaN(v))?n.reduce((t,v)=>t+v,0):null;};
+  const o={i:String(e.id),d:e.date,a,b,s,sl:(e.season||{}).slug||"",ga:rec(CA),gb:rec(CB)};
+  if(s==="LIVE"||s==="FT"){o.x=sa;o.y=sb;const D=co.details||[],tid=x=>String(((x||{}).team||{}).id||""),ia=String((CA.team||{}).id||""),ib=String((CB.team||{}).id||"");
+    const side=d=>tid(d)===ia?a:tid(d)===ib?b:null;let line="";
+    if(s==="LIVE")line=(ty.shortDetail||st.displayClock||"En cours");
+    const ans={};
+    if(sa!=null&&sb!=null){
+      if(sp==="soccer"){ans.res=sa>sb?a:sa<sb?b:"Match nul";ans.score=sa+"-"+sb;ans.goals=sa+sb;ans.btts=sa&&sb?"Oui":"Non";
+        const G=D.filter(d=>d.scoringPlay);if(G.length||(sa+sb)===0){let ha=0,hb=0;G.forEach(d=>{const m=lvMin((d.clock||{}).displayValue);const t=side(d);if(m!=null&&m<=45&&!/^(4[6-9]|[5-9]\d)/.test(String((d.clock||{}).displayValue||""))){if(t===a)ha++;else if(t===b)hb++;}});if(G.length===sa+sb)ans.ht=ha+"-"+hb;
+          const sc=G.filter(d=>!d.ownGoal).map(d=>((d.athletesInvolved||[])[0]||{}).displayName).filter(Boolean);if(G.length===sa+sb){if(sc.length)ans.scorer=sc;if(G[0]&&!G[0].ownGoal&&sc[0])ans.first=sc[0];}
+          const gl=G.map(d=>{const n=((d.athletesInvolved||[])[0]||{}).shortName||((d.athletesInvolved||[])[0]||{}).displayName||"";return n+" "+String((d.clock||{}).displayValue||"");}).filter(x=>x.trim());if(gl.length)line=(line?line+" · ":"")+gl.join(", ");}
+        if(s==="FT"&&D.length){ans.red=D.some(d=>d.redCard)?"Oui":"Non";ans.pen=D.some(d=>d.penaltyKick)?"Oui":"Non";}
+        const cs=x=>{const v=(x.statistics||[]).find(t=>t.name==="wonCorners");return v?lvNum(v.displayValue!=null?v.displayValue:v.value):null;};const c1=cs(CA),c2=cs(CB);if(s==="FT"&&c1!=null&&c2!=null)ans.corners=c1+c2;}
+      else if(sp==="basketball"){ans.win=sa>sb?a:b;ans.margin=Math.abs(sa-sb);ans.total=sa+sb;const la=(CA.linescores||[]).map(x=>lvNum(x.value)),lb=(CB.linescores||[]).map(x=>lvNum(x.value));
+        if(la.length&&lb.length&&la[0]!=null&&lb[0]!=null&&la[0]!==lb[0])ans.q1=la[0]>lb[0]?a:b;if(s==="FT"&&la.length)ans.ot=la.length>4?"Oui":"Non";if(s==="LIVE"&&st.period)line="QT"+st.period+" · "+(st.displayClock||"");}
+      else if(sp==="rugby"){ans.win=sa>sb?a:sa<sb?b:"Match nul";ans.margin=Math.abs(sa-sb);
+        if(D.length){const tr=D.filter(d=>/try/i.test((d.type||{}).text||"")&&!/penalty try/i.test((d.type||{}).text||"")||/penalty try/i.test((d.type||{}).text||""));ans.tries=tr.length;if(tr[0])ans.try1=side(tr[0])||undefined;
+          const ta=tr.filter(d=>side(d)===a).length,tb=tr.filter(d=>side(d)===b).length;if(s==="FT"){ans.bonus=ta>=4||tb>=4?"Oui":"Non";ans.yellow=D.some(d=>/yellow/i.test((d.type||{}).text||""))?"Oui":"Non";ans.drop=D.some(d=>/drop/i.test((d.type||{}).text||""))?"Oui":"Non";}}}}
+    Object.keys(ans).forEach(k=>ans[k]===undefined&&delete ans[k]);o.n=ans;if(line)o.l=line;}
+  return o;}
+/* ---------- regroupement en journées / nuits / tours ---------- */
+const LV_SLUG={"league-phase":"Phase de ligue","knockout-round-playoffs":"Barrages","round-of-64":"32es de finale","round-of-32":"16es de finale","round-of-16":"8es de finale","quarterfinals":"Quarts de finale","semifinals":"Demi-finales","final":"Finale","third-round":"3e tour","fourth-round":"4e tour","fifth-round":"5e tour"};
+const lvFmt=d=>new Date(d).toLocaleDateString("fr-BE",{day:"numeric",month:"short"});
+function lvRounds(cid,E){const kind=FEED[cid][1];E.sort((x,y)=>new Date(x.d)-new Date(y.d));
+  if(kind==="N"){E.forEach(e=>{if(e.r)return;const n=new Date(+new Date(e.d)-12*3600e3),k=bxDay(n);e.r="n"+k;e.rn="Nuit du "+n.toLocaleDateString("fr-BE",{day:"numeric",month:"long",timeZone:"Europe/Brussels"});});return;}
+  /* numéro de journée : matchs déjà joués par chaque équipe (bilan ESPN) */
+  const gp={},seq={};E.forEach(e=>{if(e.ga!=null)gp[e.a]=Math.max(gp[e.a]||0,e.ga);if(e.gb!=null)gp[e.b]=Math.max(gp[e.b]||0,e.gb);});
+  [...new Set(E.flatMap(e=>[e.a,e.b]))].forEach(t=>{const L=E.filter(e=>(e.a===t||e.b===t)&&e.s!=="PST");const done=L.filter(e=>e.s==="FT").length;let i=(gp[t]!=null?gp[t]-done:0)+1;L.forEach(e=>{(seq[e.i]||(seq[e.i]={}))[t]=i++;});});
+  const md=e=>{const q=seq[e.i]||{},v=[q[e.a],q[e.b]].filter(x=>x!=null);return v.length?Math.round(v.reduce((s,x)=>s+x,0)/v.length):null;};
+  const cl=[];E.forEach(e=>{const t=+new Date(e.d),c=cl[cl.length-1];if(c&&t-c.t0<=3.5*864e5)c.L.push(e);else cl.push({t0:t,L:[e]});});
+  const per=Math.max(2,Math.round(new Set(E.flatMap(e=>[e.a,e.b])).size/2));
+  cl.forEach(c=>{const old=c.L.filter(e=>e.r);let r=null,rn=null;
+    if(old.length){const cnt={};old.forEach(e=>cnt[e.r]=(cnt[e.r]||0)+1);r=Object.keys(cnt).sort((x,y)=>cnt[y]-cnt[x])[0];rn=old.find(e=>e.r===r).rn;}
+    else{const sl=(c.L.find(e=>e.sl)||{}).sl||"";const lg=kind==="L"||kind==="S"||(kind==="U"&&sl==="league-phase");
+      if(lg){const ms=c.L.map(md).filter(x=>x!=null).sort((x,y)=>x-y),m=ms.length?ms[Math.floor(ms.length/2)]:null;
+        if(m!=null&&c.L.length>=Math.max(2,Math.ceil(per*.4))){r="r"+m;rn=(kind==="U"?"Phase de ligue · J":"Journée ")+m;}else{r="x"+bxDay(c.t0);rn=(m!=null?"Matchs en retard":"Matchs")+" · "+lvFmt(c.t0);}}
+      else{r="t"+bxDay(c.t0);rn=LV_SLUG[sl]||(kind==="K"?"Tour du "+lvFmt(c.t0):sl?sl.replace(/-/g," ").replace(/^./,x=>x.toUpperCase()):"Matchs du "+lvFmt(c.t0));}}
+    c.L.forEach(e=>{if(!e.r){e.r=r;e.rn=rn;}});});}
+/* calendrier réel → structure de l'app (journées → matchs) ; les tours futurs pas encore tirés restent en « affiches connues au tirage » */
+function calBuild(c){const K=LCAL[c.id],E=(K.ev||[]).slice().sort((x,y)=>new Date(x.d)-new Date(y.d)),nba=FEED[c.id][1]==="N",out=[],by={};
+  E.forEach(e=>{let su=by[e.r];if(!su){su=by[e.r]={id:e.r,name:e.rn||e.r,items:[]};out.push(su);}
+    su.items.push({id:"e"+e.i,label:nba?e.a+" @ "+e.b:e.a+" – "+e.b,a:e.a,b:e.b,date:new Date(e.d),live:true,lid:"E"+c.id+"~"+e.i,cid:c.id,real:true});});
+  const last=E.length?+new Date(E[E.length-1].d):0;let extra=[];try{extra=c.build().filter(su=>su.items.length&&su.items.every(i=>i.tbd)&&+new Date(su.start||su.items[0].date)>last);}catch(_){}
+  return out.concat(extra);}
+function calApply(cid,v,silent){if(!v||!v.ev)return;const cur=LCAL[cid];if(cur&&cur.h===v.h&&cur.ev.length===v.ev.length)return;LCAL[cid]=v;
+  v.ev.forEach(e=>{const lid="E"+cid+"~"+e.i,old=LIVE[lid];if(old&&old.manual)return;LIVE[lid]={status:e.s==="PST"?"NS":e.s,sa:e.x,sb:e.y,line:e.l||(e.s==="FT"&&e.x!=null?"Score final "+e.x+"-"+e.y:e.s==="PST"?"Match reporté":""),ans:e.n||null,winner:e.n&&(e.n.win||(e.n.res&&e.n.res!=="Match nul"?e.n.res:null))||undefined};});
+  delete CACHE[cid];CAL_VER++;try{localStorage.setItem("bf_cal_"+cid,JSON.stringify(v));}catch(_){}if(!silent)dataRender();}
+try{Object.keys(FEED).forEach(cid=>{const s=localStorage.getItem("bf_cal_"+cid);if(s)calApply(cid,JSON.parse(s),true);});}catch(_){}
+const lvHash=o=>{const s=JSON.stringify(o);let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return String(h);};
+function lvSave1(id,obj){if(!db)return Promise.resolve();try{obj=JSON.parse(JSON.stringify(obj));return Promise.resolve(db.collection("live").doc(id).set(obj)).catch(e=>{LNET.err="écriture : "+(e&&e.message||e);});}catch(e){LNET.err="écriture : "+(e&&e.message||e);return Promise.resolve();}}
+function lvMeta(){const s=new Date().toLocaleString("fr-BE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});LIVE_UPD=s;lvSave1("_meta",{updated:s,src:"ESPN"});}
+/* fusion d'un relevé ESPN dans le calendrier (rien n'est jamais retiré : les points déjà gagnés restent) */
+async function calFetch(cid,paths){const f=FEED[cid];const got=[];
+  for(const q of paths){try{const j=await lvGet(f[0]+"/scoreboard?"+q+(/dates=\d{6}$/.test(q)?"&limit=500":""));(j.events||[]).forEach(e=>{try{got.push(lvEvent(cid,e));}catch(_){}});}catch(e){if(!got.length&&paths.length===1)throw e;}}
+  const cur=LCAL[cid]||{ev:[]},by={};cur.ev.forEach(e=>by[e.i]=Object.assign({},e));
+  got.forEach(e=>{const o=by[e.i];by[e.i]=o?Object.assign(o,e,{r:o.r,rn:o.rn}):e;});
+  const E=Object.values(by);lvRounds(cid,E);E.forEach(e=>{if(e.n&&!Object.keys(e.n).length)delete e.n;});
+  const v={ev:E,upd:(paths.some(p=>/dates=\d{6}$/.test(p))||paths.length>=10)?new Date().toISOString():(cur.upd||new Date().toISOString())};v.h=lvHash(v.ev);
+  if(cur.h===v.h)return false;calApply(cid,v);await lvSave1("cal_"+cid,v);lvMeta();return true;}
+const ym=d=>{const x=new Date(d);return x.getFullYear()+String(x.getMonth()+1).padStart(2,"0");};
+function calMonths(first,cid){const n=new Date(+NOW_REAL()),L=[];if(cid&&FEED[cid][1]==="N"){for(let k=-2;k<=10;k++)L.push("dates="+etDay(+n+k*864e5));return L;}const a=new Date(n.getFullYear(),n.getMonth()-(first?1:0),1);for(let k=0;k<(first?3:2);k++){L.push("dates="+ym(new Date(a.getFullYear(),a.getMonth()+k,1)));}if(!first&&n.getDate()<8)L.unshift("dates="+ym(new Date(n.getFullYear(),n.getMonth()-1,1)));return L;}
+const NOW_REAL=()=>Date.now();
+/* ---------- tennis : résultats rattachés aux matchs de l'app (mêmes joueurs) ---------- */
+function lvTennis(j){const out=[];(j.events||[]).forEach(t=>(t.groupings||[]).forEach(g=>{if(!/singles/i.test(((g.grouping||{}).displayName)||""))return;(g.competitions||[]).forEach(m=>{const C=(m.competitors||[]).slice().sort((x,y)=>(x.order||0)-(y.order||0));if(C.length!==2)return;
+  const ty=(m.status||{}).type||{},nm=x=>((x.athlete||{}).displayName)||((x.team||{}).displayName)||"";
+  out.push({tn:t.name||"",round:((m.round||{}).displayName)||"",p:[nm(C[0]),nm(C[1])],w:C.findIndex(x=>x.winner===true),ls:C.map(x=>(x.linescores||[]).map(s=>({v:lvNum(s.value),tb:lvNum(s.tiebreak)}))),st:ty.state==="in"?"LIVE":ty.state==="post"?(/RETIRED|WALKOVER/.test(ty.name||"")||ty.completed?"FT":"PST"):"NS",wo:/WALKOVER/.test(ty.name||""),det:ty.shortDetail||""});});}));return out;}
+function lvTennisRes(it,m){const SD=sides(it);it={a:SD[0],b:SD[1]};const sw=lvSame(m.p[0],it.b)&&lvSame(m.p[1],it.a);const A=sw?1:0,B=sw?0:1,la=m.ls[A]||[],lb=m.ls[B]||[];const sets=[];
+  for(let k=0;k<Math.max(la.length,lb.length);k++){const x=(la[k]||{}).v,y=(lb[k]||{}).v;if(x==null||y==null)continue;sets.push([x,y]);}
+  const done=(x,y)=>(Math.max(x,y)>=6&&Math.abs(x-y)>=2)||(Math.max(x,y)===7&&Math.min(x,y)>=5);let sa=0,sb=0;sets.forEach(([x,y],k)=>{if(m.st==="FT"||k<sets.length-1||done(x,y)){if(x>y)sa++;else if(y>x)sb++;}});
+  const line=sets.map(([x,y],k)=>{const tb=(m.ls[x>y?B:A]||[])[k];return x+"-"+y+(Math.max(x,y)===7&&Math.min(x,y)===6&&tb&&tb.tb!=null?"("+tb.tb+")":"");}).join(" ");
+  const win=m.st==="FT"&&m.w>=0?(m.w===A?it.a:it.b):null;const o={status:m.st,sa,sb,line:line+(m.st==="LIVE"?" · en cours":"")+(m.wo?" · forfait":""),src:"espn"};if(win)o.winner=win;
+  const ans={};if(win)ans.win=win;if(m.st==="FT"&&!m.wo){ans.score=sa+"-"+sb;ans.sets=(sa+sb)+" sets";Object.assign(ans,tnAns(sets,[it.a,it.b]));}else if(sets.length&&done(sets[0][0],sets[0][1]))Object.assign(ans,{set1:sets[0][0]+"-"+sets[0][1],first:sets[0][0]>sets[0][1]?it.a:it.b});
+  o.ans=ans;return o;}
+/* ---------- golf : classement → résultat de chaque journée ---------- */
+const gpar=s=>{s=String(s==null?"":s).trim();if(s==="E")return 0;const n=parseInt(s,10);return isNaN(n)?null:n;};
+function lvGolf(c,j){const ev=(j.events||[]).find(e=>{const a=+new Date(e.date),b=+new Date(e.endDate||e.date)+864e5;const s=subsOf(c),d=s.flatMap(x=>x.items).map(i=>+i.date);return d.some(t=>t>=a-2*864e5&&t<=b+864e5)&&(lvK(e.name).split(" ").some(w=>w.length>3&&lvK(c.name).includes(w))||true);});if(!ev)return null;
+  const co=(ev.competitions||[])[0]||{},per=(co.status||{}).period||0,state=((co.status||ev.status||{}).type||{}).state,fin=state==="post";
+  const P=(co.competitors||[]).map(x=>{const ls=(x.linescores||[]).map(l=>({v:lvNum(l.value),p:gpar(l.displayValue)}));return{n:(x.athlete||{}).displayName||"",tot:gpar(x.score),ls};}).filter(x=>x.n);
+  const F=golfBase(c).map(x=>x[0]);const app=n=>F.find(x=>lvSame(x,n))||n;
+  /* par du parcours, déduit d'un joueur qui a fini ses tours */
+  let par=null;for(const x of P){const done=x.ls.filter(l=>l.v!=null&&l.v>50);if(done.length&&x.tot!=null&&done.length===x.ls.filter(l=>l.v!=null).length){const n=done.length;const p=(done.reduce((s,l)=>s+l.v,0)-x.tot)/n;if(Math.abs(p-Math.round(p))<.01&&p>=68&&p<=73){par=Math.round(p);break;}}}
+  const out={},days=Math.max(...subsOf(c).flatMap(s=>s.items).map(i=>i.golfDay||0),4);
+  for(let N=1;N<=days;N++){if(per<N&&!(fin&&N<=days))continue;const full=fin||per>N;const rows=P.map(x=>{let cum;if(!full&&N===per)cum=x.tot;else{let s=0,ok=true;for(let k=0;k<N;k++){const l=x.ls[k];if(!l||l.v==null||l.v<50){ok=false;break;}s+=l.p!=null?l.p:(par!=null?l.v-par:NaN);}cum=ok?s:null;}
+      const d=x.ls[N-1];return{n:app(x.n),cum,day:d&&d.v!=null&&d.v>50?d.v:null};}).filter(r=>r.cum!=null&&!isNaN(r.cum)).sort((a,b)=>a.cum-b.cum);
+    if(!rows.length)continue;const pos=r=>{const k=rows.findIndex(x=>x.cum===r.cum),t=rows.filter(x=>x.cum===r.cum).length>1;return(t?"T":"")+(k+1);};
+    const fmt=v=>v===0?"E":v>0?"+"+v:String(v);const board=rows.slice(0,full?rows.length:30).map(r=>[pos(r),r.n,fmt(r.cum),r.day!=null?String(r.day):""]);
+    const L={status:full?"FT":"LIVE",board,winners:rows.filter(r=>r.cum===rows[0].cum).map(r=>r.n),score:rows[0].cum,full,src:"espn"};
+    const dd=rows.filter(r=>r.day!=null);if(full&&dd.length){const lo=Math.min(...dd.map(r=>r.day));L.low={score:lo,players:dd.filter(r=>r.day===lo).map(r=>r.n)};L.sub70=dd.filter(r=>r.day<70).length;}
+    out[c.id+"-r"+N]=L;}
+  return out;}
+/* ---------- F1 : séances → pole / vainqueur ---------- */
+const F1_SES={Qual:"Qualifs",Race:"Course",Sprint:"Sprint",SS:"Qualifs sprint",SQ:"Qualifs sprint","Sprint Shootout":"Qualifs sprint","Sprint Qualifying":"Qualifs sprint"};
+/* ---------- quels matchs suivre maintenant ---------- */
+function lvItems(c){try{return subsOf(c).flatMap(su=>su.items.map(it=>[su,it]));}catch(_){return[];}}
+function lvActive(it,now){const t=+it.date;return t<=now+20*60e3&&t>=now-(it.dur||3)*3600e3-3*3600e3;}
+function lvStale(it,now){const L=LIVE[it.lid]||{};if(["FT","END"].includes(L.status)||L.manual)return false;const t=+it.date;return t<now-2*3600e3&&t>now-5*864e5;}
+function lvDue(key,ms){const t=LNET.last[key]||0;if(Date.now()-t<ms||LNET.busy[key])return false;LNET.last[key]=Date.now();return true;}
+async function lvRun(key,fn){LNET.busy[key]=1;try{await fn();}catch(e){}finally{LNET.busy[key]=0;}}
+function liveTick(){if(document.hidden)return;const now=Date.now();
+  /* 1. calendriers réels : premier relevé (3 mois), puis toutes les 12 h ; en direct : la journée en cours chaque minute */
+  Object.keys(FEED).forEach(cid=>{const c=FIND[cid];if(!c)return;const K=LCAL[cid],age=K&&K.upd?now-new Date(K.upd):Infinity;
+    if(age>12*3600e3){if(lvDue("full_"+cid,K?30*60e3:5*60e3))lvRun("cal_"+cid,()=>calFetch(cid,calMonths(!K,cid)));return;}
+    const E=K.ev||[],act=E.filter(e=>{const t=+new Date(e.d);return e.s==="LIVE"||(e.s==="NS"&&t<=now+15*60e3&&t>=now-4*3600e3);}),late=E.filter(e=>{const t=+new Date(e.d);return(e.s==="NS"||e.s==="LIVE")&&t<now-3*3600e3&&t>now-5*864e5;});
+    if(act.length&&lvDue("live_"+cid,55e3)){const ds=[...new Set(act.map(e=>etDay(e.d)))];lvRun("cal_"+cid,()=>calFetch(cid,ds.map(d=>"dates="+d)));}
+    else if(late.length&&lvDue("late_"+cid,10*60e3)){const ds=[...new Set(late.map(e=>etDay(e.d)))].slice(0,3);lvRun("cal_"+cid,()=>calFetch(cid,ds.map(d=>"dates="+d)));}});
+  /* 2. tennis */
+  const TN=[];SPORTS.find(s=>s.id==="tennis").comps.forEach(c=>lvItems(c).forEach(([su,it])=>{if(it.lid&&it.cid&&!it.tbd&&sides(it))TN.push([c,su,it]);}));
+  const tAct=TN.filter(([,,it])=>{const L=LIVE[it.lid]||{};return!["FT"].includes(L.status)&&!L.manual&&(Math.abs(+it.date-now)<14*3600e3||L.status==="LIVE");}),tLate=TN.filter(([,,it])=>lvStale(it,now));
+  const tDays=[...new Set(tAct.map(([,,it])=>etDay(Math.min(+it.date,now))).concat(tAct.length?[etDay(now)]:[]))];
+  const tGo=(days,key,ms)=>{if(!days.length||!lvDue(key,ms))return;lvRun(key,async()=>{const M=[];for(const d of days){try{M.push(...lvTennis(await lvGet("tennis/atp/scoreboard?dates="+d)));}catch(_){}}
+    let ch=false;TN.forEach(([c,su,it])=>{const sd=sides(it),m=M.find(m=>(lvSame(m.p[0],sd[0])&&lvSame(m.p[1],sd[1]))||(lvSame(m.p[0],sd[1])&&lvSame(m.p[1],sd[0])));if(!m||m.st==="NS"||m.st==="PST")return;const o=lvTennisRes(it,m),cur=LIVE[it.lid]||{};if(cur.manual)return;
+      if(lvHash(o)!==lvHash(Object.assign({},cur,{at:undefined}))){LIVE[it.lid]=o;lvSave1(it.lid,o);ch=true;}});
+    /* titre : vainqueur, finaliste, score de la finale */
+    TN.filter(([c])=>c.id==="atpf").slice(0,1).forEach(([c])=>{const fm=M.find(m=>/^final$/i.test(m.round)&&/finals/i.test(m.tn)&&m.st==="FT"&&m.w>=0);if(!fm)return;const W=fm.p[fm.w],Lo=fm.p[1-fm.w];
+      lvItems(c).forEach(([su,it])=>{if(it.id!=="wdc"||!it.lid)return;const sets=[];const la=fm.ls[fm.w]||[],lb=fm.ls[1-fm.w]||[];la.forEach((s,k)=>{if(s.v!=null&&lb[k]&&lb[k].v!=null)sets.push([s.v,lb[k].v]);});const sw=sets.filter(([x,y])=>x>y).length,sl=sets.length-sw;
+        const o={status:"FT",winner:W,line:"Vainqueur : "+W,ans:{win:W,final:Lo,fscore:sw+"-"+sl,undef:undefined},src:"espn"};delete o.ans.undef;if(!(LIVE[it.lid]||{}).manual){LIVE[it.lid]=o;lvSave1(it.lid,o);ch=true;}});});
+    if(ch){lvMeta();dataRender();}});};
+  if(tAct.length)tGo(tDays,"tn_live",90e3);else if(tLate.length)tGo([...new Set(tLate.map(([,,it])=>etDay(it.date)))].slice(0,4),"tn_late",10*60e3);
+  /* 3. golf */
+  SPORTS.find(s=>s.id==="golf").comps.forEach(c=>{if(c.custom)return;const I=lvItems(c).map(x=>x[1]).filter(i=>i.lid&&!i.whole);if(!I.length)return;const a=Math.min(...I.map(i=>+i.date)),b=Math.max(...I.map(i=>+i.date));
+    if(now<a-6*3600e3||now>b+3*864e5)return;if(I.every(i=>["FT"].includes((LIVE[i.lid]||{}).status)))return;const tour=/DP World/i.test(c.group||c.flag||"")||/dp world/i.test(c.flag||"")?"eur":/LIV/i.test(c.group||"")?"liv":"pga";
+    if(!lvDue("golf_"+c.id,now>=a&&now<=b+12*3600e3?3*60e3:15*60e3))return;lvRun("golf_"+c.id,async()=>{const R=lvGolf(c,await lvGet("golf/"+tour+"/scoreboard"));if(!R)return;let ch=false;
+      Object.keys(R).forEach(lid=>{const cur=LIVE[lid]||{};if(cur.manual)return;if(lvHash(R[lid])!==lvHash(cur)){LIVE[lid]=R[lid];lvSave1(lid,R[lid]);ch=true;}});if(ch){lvMeta();dataRender();}});});
+  /* 4. F1 */
+  const f1=FIND["f1-2026"];if(f1){const I=lvItems(f1).filter(([su,it])=>it.lid&&it.cid&&!/^(wdc|wcc|rook)$/.test(it.id));const act=I.filter(([,it])=>lvActive(it,now)||lvStale(it,now));
+    if(act.length&&lvDue("f1",lvActive(act[0][1],now)?2*60e3:15*60e3))lvRun("f1",async()=>{const j=await lvGet("racing/f1/scoreboard");let ch=false;
+      (j.events||[]).forEach(ev=>(ev.competitions||[]).forEach(s=>{const lab=F1_SES[((s.type||{}).abbreviation)||""]||F1_SES[((s.type||{}).text)||""];if(!lab)return;const t=+new Date(s.date||ev.date);
+        const m=I.find(([su,it])=>it.label===lab&&Math.abs(+it.date-t)<2*864e5);if(!m)return;const it=m[1],ty=((s.status||{}).type)||{};const C=(s.competitors||[]).slice().sort((x,y)=>(x.order||99)-(y.order||99));
+        const st=ty.state==="post"&&ty.completed!==false?"FT":ty.state==="in"?"LIVE":"NS";if(st==="NS")return;const w=C[0]&&((C[0].athlete||{}).displayName||(C[0].athlete||{}).fullName);
+        const opts=F1_FORM.map(x=>x[0]),nm=n=>opts.find(o=>lvSame(o,n))||n;const o={status:st,src:"espn"};if(st==="FT"&&w){o.winner=nm(w);o.line=(/Qualifs/.test(lab)?"Pole : ":"Vainqueur : ")+o.winner;o.ans=/Qualifs/.test(lab)?{pole:o.winner}:{win:o.winner};}else o.line="Séance en cours";
+        const cur=LIVE[it.lid]||{};if(cur.manual)return;if(lvHash(o)!==lvHash(cur)){LIVE[it.lid]=o;lvSave1(it.lid,o);ch=true;}}));if(ch){lvMeta();dataRender();}});}
+}
+function liveStart(){if(window._lvOn)return;window._lvOn=1;setTimeout(()=>{if(!LNET.ok&&LNET.fail)toast("⚠️ Scores en direct indisponibles pour l'instant ("+LNET.err+")");},25e3);setTimeout(liveTick,1500);setInterval(liveTick,20e3);document.addEventListener("visibilitychange",()=>{if(!document.hidden)setTimeout(liveTick,500);});}
+function resMark(c,su){if(!c.sport||!RES_SP.includes(c.sport.id)||c.custom)return;su.items.forEach(it=>{if(it.live||it.lid||it.tbd)return;if(+it.date>=LIVE_FROM){it.live=true;it.lid=c.id+"~"+su.id+"~"+it.id;it.cid=c.id;}});}
+function subsOf(c){if(!CACHE[c.id]){const RAW=(FEED[c.id]&&LCAL[c.id]&&LCAL[c.id].ev&&LCAL[c.id].ev.length)?calBuild(c):c.build();CACHE[c.id]=RAW.map(su=>{resMark(c,su);/* golf : chaque jour et la compétition entière se règlent sur live/<comp>-r<N> */if(c.sport&&c.sport.id==="golf"&&!c.custom)su.items.forEach(i=>{if(!i.lid&&(i.golfDay||i.whole)){i.lid=c.id+"-r"+(i.whole?i.golfDays:i.golfDay);i.live=true;}});const ds=su.items.map(i=>+i.date);su.start=su.start||new Date(Math.min(...ds));su.end=su.end||new Date(Math.max(...ds));return su;});}return CACHE[c.id];}
 const isDone=it=>it.custom?!!it.res:it.live?["FT","END"].includes(liveSt(it)):+it.date<+NOW-(it.dur||2.5)*3600e3;
 function subStatus(su){if(su.items.every(isDone))return["done","Terminé"];if(su.items.some(i=>canPickIt(i)))return["open","Ouvert"];return["live","En cours"];}
 
@@ -5171,14 +5348,14 @@ function defaultCfg(cat,f){return{formula:f,bets:BETS[cat].map(([id,,,p,fs])=>({
 function normCfg(d,cat){const by={};(d.bets||[]).forEach(b=>by[b.id]=b);const base=defaultCfg(cat,d.formula==="M"?"C":d.formula||"C");
   return{formula:d.formula||"C",bets:base.bets.map(b=>by[b.id]?Object.assign({},b,by[b.id]):Object.assign(b,{on:false})),custom:d.custom||[]};}
 const ROWS_MEMO=new WeakMap();
-function rowsOfParty(p){const sig=(p.full?"F":"")+p.comp+"|"+(p.createdAt||"")+"|"+(p.full?"":(p.items||[]).join(","));const m=ROWS_MEMO.get(p);if(m&&m.sig===sig)return m.rows;const rows=rowsOfParty0(p);ROWS_MEMO.set(p,{sig,rows});return rows;}
+function rowsOfParty(p){const sig=CAL_VER+(p.full?"F":"")+p.comp+"|"+(p.createdAt||"")+"|"+(p.full?"":(p.items||[]).join(","));const m=ROWS_MEMO.get(p);if(m&&m.sig===sig)return m.rows;const rows=rowsOfParty0(p);ROWS_MEMO.set(p,{sig,rows});return rows;}
 function rowsOfParty0(p){
   const c=FIND[p.comp],sp=c.sport,subs=subsOf(c);
   const TT={f1_course:"Toutes les courses",f1_qualifs:"Toutes les qualifs",f1_sprint:"Tous les sprints",f1_sq:"Toutes les qualifs sprint",f1_wdc:"Champion pilotes",f1_wcc:"Champion constructeurs",f1_rook:"Meilleur débutant",tennis_title:"Vainqueur du tournoi",tennis_group:"Vainqueurs de groupe",tennis_round:"Tous les tours",tennis_final:"La finale",golf_round:"Toutes les journées",golf_win:"Le dernier jour",golf_top:"Les tops 10",ryder:"Toutes les sessions",foot_ko:"Matchs à élimination",long:"Paris de long terme"};
   if(p.full){const from=p.createdAt?+new Date(p.createdAt)-2*3600e3:-Infinity;const out=[];
     subs.forEach(su=>su.items.forEach(it=>{if(+it.date<from&&!/^(wdc|wcc|rook)$/.test(it.id))return;out.push({key:su.id+"/"+it.id,title:it.label,sub:(su.name===it.label?"":su.name+" · ")+fmtD(it.date)+(it.tbd?"":" · "+fmtT(it.date)),cat:catKey(sp,it),it});}));
     return out;}
-  return p.items.map(key=>{const[sid,iid]=key.split("/");const su=subs.find(s=>s.id===sid);const it=su&&su.items.find(i=>i.id===iid);return it?{key,title:it.label,sub:(su.name===it.label?"":su.name+" · ")+fmtD(it.date)+(it.tbd||it.custom?"":" · "+fmtT(it.date)),cat:catKey(sp,it),it}:null;}).filter(Boolean);
+  return p.items.map(key=>{const[sid,iid]=key.split("/");let su=subs.find(s=>s.id===sid);let it=su&&su.items.find(i=>i.id===iid);if(!it){su=subs.find(s=>s.items.some(i=>i.id===iid));it=su&&su.items.find(i=>i.id===iid);}return it?{key,title:it.label,sub:(su.name===it.label?"":su.name+" · ")+fmtD(it.date)+(it.tbd||it.custom?"":" · "+fmtT(it.date)),cat:catKey(sp,it),it}:null;}).filter(Boolean);
 }
 function cfgSummary(cfg,cat){if(!cfg)return null;const d=cat?normCfg(cfg,cat):cfg;const on=d.bets.filter(b=>b.on);const n=on.length+(d.custom||[]).length;const pts=on.reduce((a,b)=>a+b.pts,0)+(d.custom||[]).reduce((a,b)=>a+b.pts,0);return{n,pts,f:FORMULAS.find(x=>x[0]===d.formula)[1]};}
 
@@ -5422,7 +5599,7 @@ function scoreParty(p){
       const stO=id=>(PK[id]||{})[row.key+"|"+b.id+"@odd"];
       if(t==="multi"){const T=Array.isArray(truth)?truth:[truth];picks.forEach(([id,v])=>{let w=0,g=0;(Array.isArray(v)?v:[v]).forEach(x=>{if(T.some(y=>norm(y)===norm(x))){w+=ptsW(c,row.it,b,x,fixedOdd(stO(id),x));g++;}});addP(id,w,g>0);});return;}
       if(t==="number"){const ds=picks.map(([id,v])=>[id,Math.abs(+v-+truth)]);const best=Math.min(...ds.map(x=>x[1]));ds.forEach(([id,d])=>{if(d===best){tot[id].pts+=b.pts;per[row.key][id]=(per[row.key][id]||0)+b.pts;if(d===0)tot[id].good++;}});return;}
-      picks.forEach(([id,v])=>{if(Array.isArray(truth)?truth.some(x=>norm(x)===norm(v)):norm(v)===norm(truth)){const w=ptsW(c,row.it,b,v,fixedOdd(stO(id),v));tot[id].pts+=w;tot[id].good++;per[row.key][id]=(per[row.key][id]||0)+w;if(b.id==="score")tot[id].exact++;}});
+      picks.forEach(([id,v])=>{if((Array.isArray(truth)?truth:[truth]).some(x=>t==="text"?nmEq(v,x):norm(x)===norm(v))){const w=ptsW(c,row.it,b,v,fixedOdd(stO(id),v));tot[id].pts+=w;tot[id].good++;per[row.key][id]=(per[row.key][id]||0)+w;if(b.id==="score")tot[id].exact++;}});
     });});
   const rows=Object.values(tot).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||a.name.localeCompare(b.name));
   return{rows,done,total,per};
@@ -6893,7 +7070,7 @@ render();
   const applyParties=()=>{S.parties=(S.rawParties||[]).filter(p=>!p.archived).filter(partyVisible).filter(realParty).map(fillParty);ppSync();S.parties.forEach(ensureJoined);};S.reapply=applyParties;
   /* mes propres docs partypicks : je retrouve une partie même si l'organisateur a changé mon e-mail */
   if(S.uid){try{db.collection("partypicks").where("uid","==",S.uid).onSnapshot(sn=>{let ch=false;sn.docs.forEach(d=>{const v=d.data();if(v&&v.pid&&v.player&&MYCLAIMS[v.pid]!==v.player){MYCLAIMS[v.pid]=v.player;ch=true;}});if(ch){applyParties();softRender();}},()=>{});}catch(_){}}
-  try{db.collection("live").onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();if(d.id==="_meta"){LIVE_UPD=v.updated||null;return;}LIVE[d.id]=Object.assign({},LIVE[d.id],v);});if(!document.activeElement||!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))dataRender();},()=>{});}catch(_){}
+  try{db.collection("live").onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();if(d.id==="_meta"){LIVE_UPD=v.updated||null;return;}if(d.id.indexOf("cal_")===0){calApply(d.id.slice(4),v,true);return;}LIVE[d.id]=Object.assign({},LIVE[d.id],v);});if(!document.activeElement||!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))dataRender();},()=>{});}catch(_){}liveStart();
   try{db.collection("groups").onSnapshot(sn=>{S.rawGroups=sn.docs.map(d=>Object.assign({id:d.id},d.data()));S.groups=S.rawGroups.filter(g=>!g.owner||!S.uid||g.owner===S.uid);if(["groups","group"].includes(S.screen))dataRender();},()=>{});}catch(_){}
   db.collection("parties").onSnapshot(sn=>{S.rawParties=sn.docs.map(d=>Object.assign({id:d.id},d.data()));applyParties();setTimeout(partyRepair,0);if(["home","parties","party","groups","group"].includes(S.screen)&&!typing())dataRender();},()=>{});
 })();
