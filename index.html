@@ -3066,6 +3066,8 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 @keyframes pcnewglow{0%,100%{box-shadow:0 0 0 2px #F1DDA8,0 0 18px rgba(243,214,140,.35)}50%{box-shadow:0 0 0 2px #F1DDA8,0 0 34px rgba(243,214,140,.75)}}
 @media (prefers-reduced-motion:reduce){.pcnew{animation:none}}
 .invrow{overflow:hidden;max-width:100%}.invt{flex:1 1 0!important;min-width:0!important}.invt small{flex:1 1 0;min-width:0}
+.pftest{margin-top:28px;padding:14px;border-radius:18px;border:1.5px solid rgba(217,182,106,.6);background:rgba(199,160,74,.08)}
+.pftest b{display:block;color:#F3E0A6;font-size:15px}.pftest small{display:block;font-size:12.5px;color:#C9B98E;margin:4px 0 10px}
 </style>
 </head>
 <body>
@@ -4508,6 +4510,43 @@ function pfAuto(now){clearTimeout(S._pfT);const run=()=>{const d=S.pfDraft||Obje
   if(now)run();else S._pfT=setTimeout(run,700);}
 function saveProfile(){const d=S.pfDraft||Object.assign({},me());if(!String(d.name||"").trim())return toast("Écris le nom affiché.");if(!String(d.pseudo||"").trim())return toast("Choisis un pseudo.");
   const doc=pfDoc(d);applyProfile(doc);S.pfDraft=Object.assign({},me());pfWrite(doc).then(ok=>{render();if(ok)toast("Profil enregistré ✓");});}
+
+/* ===================================================================== PARTIES DE TEST (matchs déjà joués, classements, en cours, à venir) */
+function seedPick(p,row,b,type,truth,rnd,good){const opts=(()=>{try{return defaultOpts(p,row.key,row.cat,b.id)||[];}catch(_){return[];}})();
+  const pickOpt=()=>opts.length?opts[Math.floor(rnd()*opts.length)]:null;
+  if(type==="choice"){if(truth!=null&&rnd()<good)return truth;return pickOpt()||truth;}
+  if(type==="yesno"){if(truth!=null&&rnd()<good+.15)return truth;return rnd()<.5?"Oui":"Non";}
+  if(type==="score"){if(truth!=null&&rnd()<good*.45)return truth;return Math.floor(rnd()*4)+"-"+Math.floor(rnd()*3);}
+  if(type==="number"){const t=+truth;if(!isNaN(t)){if(rnd()<good*.5)return String(t);return String(Math.max(0,t+Math.round((rnd()-.5)*4)));}return String(Math.floor(rnd()*5));}
+  if(type==="rank"){const L=(Array.isArray(truth)?truth.slice():opts.slice(0,3));if(!L.length)return null;if(rnd()<good*.6)return L;return L.slice().sort(()=>rnd()-.5);}
+  if(type==="multi"){const L=Array.isArray(truth)?truth:opts.slice(0,3);return L.length?L.slice(0,2):null;}
+  return null;}
+function seedParty(def,pls){const c=FIND[def.comp];if(!c)return null;const subs=subsOf(c),items=[];
+  def.subs.forEach(sid=>{const su=subs.find(x=>x.id===sid);if(su)su.items.forEach(i=>items.push(su.id+"/"+i.id));});
+  const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const p={id,name:"🧪 "+def.name,comp:def.comp,full:false,items,people:pls.length,amount:def.amount,split:def.split,owner:S.uid||"me",createdAt:new Date(Date.now()-def.age*864e5).toISOString(),test:true,players:pls,emails:pls.map(x=>x.email).filter(Boolean),uids:pls.map(x=>x.uid).filter(Boolean),invited:{},picks:{}};
+  const skill={};pls.forEach((pl,i)=>skill[pl.id]=[.62,.45,.35,.5,.28][i%5]);
+  rowsOfParty(p).forEach(row=>{if(!row.it)return;const su=subs.find(s=>s.id===row.key.split("/")[0]),res=resultOf(c,su,row.it),cfg=normCfg(defaultCfg(row.cat,"C"),row.cat),open=!res;
+    pls.forEach((pl,pi)=>{const rnd=rng(hs(id+row.key+pl.id));
+      if(open&&(pl.id===p.owner||rnd()<.5))return; /* à venir : il te reste des pronos à faire, les potes en ont déjà fait une partie */
+      if(!open&&rnd()<.06)return; /* parfois un oubli */
+      const m=p.picks[pl.id]||(p.picks[pl.id]={});
+      cfg.bets.forEach((b,bi)=>{if(!b.on)return;const type=BETS[row.cat][bi][2];if(type==="text")return;const truth=res&&res.ans?res.ans[b.id]:null;const v=seedPick(p,row,b,type,truth,rnd,skill[pl.id]);if(v!=null)m[row.key+"|"+b.id]=v;});});});
+  return p;}
+async function seedTests(){if(S.seeding)return;S.seeding=true;render();
+  const others=MEMBERS.filter(m=>m.uid&&m.uid!==S.uid).slice(0,4).map(m=>({id:"u_"+m.uid,name:m.short,uid:m.uid}));
+  const bots=["Robot Max","Robot Léa","Robot Sam"].slice(0,Math.max(0,4-others.length)).map((n,i)=>({id:"bot"+i,name:n,fake:true}));
+  const pls=[{id:S.uid||"me",name:"Toi"}].concat(others,bots);
+  const defs=[{name:"Terminée · Jupiler J8 à J10",comp:"jpl",subs:["r8","r9","r10"],amount:5,split:[70,30],age:30},
+    {name:"En cours · Jupiler J11 à J13",comp:"jpl",subs:["r11","r12","r13"],amount:5,split:[50,30,20],age:12},
+    {name:"En cours · Premier League J8 à J10",comp:"pl",subs:["r8","r9","r10"],amount:10,split:[70,30],age:20},
+    {name:"Terminée · F1 fin de saison",comp:"f1-2026",subs:["gp16","gp17","gp18","gp19"],amount:5,split:[100],age:40},
+    {name:"À venir · Jupiler J14",comp:"jpl",subs:["r14"],amount:2,split:[100],age:0}];
+  let ok=0,ko=0;
+  for(const d of defs){const p=seedParty(d,pls);if(!p)continue;const doc=Object.assign({},p);delete doc.id;
+    if(db){try{await db.doc("parties/"+p.id).set(doc);ok++;others.forEach(o=>notify(o.uid,"party",(myLabel()||"Ton pote")+" t'invite à la partie « "+p.name+" »",{pid:p.id}));}catch(_){ko++;}}else{S.parties.push(p);S.rawParties=(S.rawParties||[]).concat([p]);ok++;}}
+  S.seeding=false;S.seedMsg=ko?`${ok} partie(s) créée(s), ${ko} refusée(s) par la base.`:`${ok} parties de test créées${others.length?" avec "+others.map(o=>o.name).join(", "):""}${bots.length?" (+ "+bots.length+" robots)":""}. Va voir « Mes parties ».`;render();toast(ko?"Création partielle":"Parties de test créées ✓");}
+
 /* remise à zéro des données de test : parties, pronos, messages, groupes (comptes et profils gardés) */
 async function purgeAll(){if(!db)return toast("Pas de connexion à la base.");S.purging=true;S.purgeMsg="";render();let ok=0,ko=0;
   const del=async ref=>{try{await ref.delete();ok++;}catch(_){ko++;}};
@@ -4574,6 +4613,7 @@ function vProfile(){
    <h2 class="pfh">Mon lien d'invitation</h2>
    <div class="pfcard pflink"><span>${esc(link.replace(/^https?:\/\//,""))}</span><button type="button" class="pfpl" data-act="frShare">Partager</button></div>
    <button type="button" class="btn ghost block pfsave" data-act="pfSave">Enregistrer maintenant</button>
+   <div class="pftest"><b>🧪 Parties de test</b><small>Crée 5 parties avec des matchs déjà joués, des classements, des parties en cours et à venir, avec tes amis inscrits (complétées par des robots).</small>${S.seedMsg?`<p class="pfpm">${esc(S.seedMsg)}</p>`:""}<button type="button" class="btn block" data-act="seedTests"${S.seeding?" disabled":""}>${S.seeding?"Création en cours…":"🧪 Créer des parties de test"}</button></div>
    ${db&&S.uid?`<div class="pfdanger"><b>Remise à zéro (test)</b><small>Efface toutes les parties, tous les pronos, les messages et les groupes de l'appli, pour tout le monde. Les comptes et les profils sont gardés.</small>${S.purgeMsg?`<p class="pfpm">${esc(S.purgeMsg)}</p>`:""}<button type="button" class="btn block pfpurge${S.purgeArm?" arm":""}" data-act="purgeAll"${S.purging?" disabled":""}>${S.purging?"Effacement en cours…":S.purgeArm?"⚠️ Touche encore pour TOUT effacer":"🗑️ Tout effacer"}</button></div>`:""}
    </div>`;
   return h;
@@ -6502,6 +6542,7 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "frNewGroup":S.frNew=true;render();setTimeout(()=>{const e=document.querySelector(".frsheet input");if(e)e.focus();},60);break;
     case "frNewClose":S.frNew=false;render();break;
     case "frNewGo":{S.ngSel=(S.frSel||[]).slice();if(!(S.ngName||"").trim())return toast("Donne un nom au groupe.");if(!S.ngSel.length)S.ngSel=[];S.frNew=false;S.frSel=[];const nm=S.ngName.trim(),mem=S.ngSel;const g={id:"g"+Date.now().toString(36),name:nm.slice(0,40),members:["Toi"].concat(mem.filter(x=>x.toLowerCase()!=="toi")).slice(0,50),parties:[],owner:S.uid||null,createdAt:new Date().toISOString()};S.groups=(S.groups||[]).concat([g]);g.members.forEach(n=>{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"group",(me().name||"Ton pote")+" t'a ajouté au groupe « "+g.name+" »",{gid:g.id});});S.ngName="";S.ngSel=[];if(db){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>toast("Enregistrement impossible."));}S.groupView=g.id;go("group");toast("Groupe créé ✓");break;}
+    case "seedTests":seedTests();break;
     case "purgeAll":{if(S.purging)break;if(!S.purgeArm){S.purgeArm=true;render();setTimeout(()=>{if(S.purgeArm&&!S.purging){S.purgeArm=false;render();}},6000);break;}S.purgeArm=false;purgeAll();break;}
     case "pfSave":saveProfile();break;
     case "mAdd":{const ctx=t.dataset.ctx,n=t.dataset.name.trim();if(!n)break;if(ctx==="ng"){S.ngSel=(S.ngSel||[]).concat([n]);}else{const g=groupById(S.groupView);if(g.members.some(x=>normS(x)===normS(n)))return toast(n+" est déjà dans le groupe");g.members=g.members.concat([n]);if(db&&!g.demo){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>{});}toast(n+" ajouté au groupe");}S["mq_"+ctx]="";render();break;}
