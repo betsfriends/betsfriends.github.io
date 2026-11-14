@@ -3068,6 +3068,18 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .invrow{overflow:hidden;max-width:100%}.invt{flex:1 1 0!important;min-width:0!important}.invt small{flex:1 1 0;min-width:0}
 .pftest{margin-top:28px;padding:14px;border-radius:18px;border:1.5px solid rgba(217,182,106,.6);background:rgba(199,160,74,.08)}
 .pftest b{display:block;color:#F3E0A6;font-size:15px}.pftest small{display:block;font-size:12.5px;color:#C9B98E;margin:4px 0 10px}
+/* nouveau groupe : nom, puis membres, puis création */
+.ngsheet{max-height:calc(100dvh - 60px);overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 96px)!important}
+.nglab{display:flex;align-items:center;gap:8px;margin:14px 0 8px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#C9B98E}
+.nglab span{font-size:12px;letter-spacing:0;padding:1px 8px;border-radius:999px;background:var(--goldg);color:#1A1406}
+.ngsheet .frchips{margin:0 0 10px}.ngsheet .chip2 button{background:none;border:0;color:#E6CF96;font-weight:900;margin-left:4px;padding:0 2px}
+.nglist{display:grid;gap:6px;margin-bottom:10px}
+.ngrow{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:14px;border:1px solid rgba(199,160,74,.3);background:rgba(255,248,230,.04);color:#FFF6E2;text-align:left}
+.ngrow b{font-size:15px}.ngrow.on{border-color:#D9B66A;background:linear-gradient(90deg,rgba(199,160,74,.22),rgba(199,160,74,.05))}
+.ngrow.on .frchk{background:var(--goldg);border-color:#F1DDA8}
+.ngq{margin-bottom:6px}.ngres{display:grid;gap:6px;margin-bottom:12px}
+.ngsheet .btn:disabled{opacity:.45}
+.gboardall{border:1.5px solid #D9B66A!important;background:linear-gradient(160deg,rgba(199,160,74,.14),rgba(0,0,0,.25))!important;box-shadow:0 0 20px rgba(199,160,74,.2)}
 </style>
 </head>
 <body>
@@ -3222,16 +3234,21 @@ function golfTour(t0,sub,n,extra){return{id:"tour",name:"Toute la compétition",
 function ryder(){return()=>[["Vendredi",D(2027,9,17)],["Samedi",D(2027,9,18)],["Dimanche",D(2027,9,19)]].map((x,i)=>({id:"d"+i,name:x[0],items:(i<2?[["Foursomes (matin)",8],["Fourballs (après-midi)",13]]:[["Les 12 simples",12]]).map((s,j)=>{const dt=new Date(x[1]);dt.setHours(s[1]);return{id:"s"+j,label:s[0],sub:"Europe – États-Unis",date:dt};})}));}
 
 /* ATP Finals 2026 : tableau VIRTUEL (qualifiés + mieux placés à la Race), à remplacer par le vrai tirage */
-const ATPF_A=["Alexander Zverev","Flavio Cobolli","Frances Tiafoe","Rafael Jódar"],ATPF_B=["Carlos Alcaraz","Ben Shelton","Daniil Medvedev","Arthur Fils"];
+/* ATP Finals 2026 (Turin, Inalpi Arena) : tirage du 12 nov. — groupe John McEnroe et groupe Ivan Lendl ; programme officiel des 15 et 16 nov.
+   journées 3 à 6 : affiches fixées après chaque tour (gagnant contre gagnant, perdant contre perdant) */
+const ATPF_A=["Alexander Zverev","Ben Shelton","Arthur Fils","Rafael Jódar"],ATPF_B=["Carlos Alcaraz","Daniil Medvedev","Flavio Cobolli","Frances Tiafoe"];
+const ATPF_GN={A:"groupe John McEnroe",B:"groupe Ivan Lendl"};
 function atpfBuild(){
-  const sn=n=>n.split(" ").slice(-1)[0];
-  const rr=g=>[[[0,3],[1,2]],[[0,2],[1,3]],[[0,1],[2,3]]].map(r=>r.map(([i,j])=>[g[i],g[j]]));
-  const A=rr(ATPF_A),B=rr(ATPF_B),days=[];
-  [[A,0,"A"],[B,0,"B"],[A,1,"A"],[B,1,"B"],[A,2,"A"],[B,2,"B"]].forEach(([G,r,gl],k)=>{const d=D(2026,11,15+k);
-    days.push({id:"j"+k,name:["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi"][k]+" · groupe "+gl,sub:"Phase de groupes · journée "+(r+1),items:G[r].map(([p,q],m)=>{const dt=new Date(d);dt.setHours(m?20:14,m?30:0);return{id:"m"+m,label:sn(p)+" – "+sn(q),sub:p+" contre "+q+" · groupe "+gl,date:dt};})});});
-  days.push({id:"sf",name:"Demi-finales",sub:"Samedi 21 novembre",items:[{id:"m0",label:"1er groupe A – 2e groupe B",sub:"Demi-finale 1",date:D(2026,11,21,14,0)},{id:"m1",label:"1er groupe B – 2e groupe A",sub:"Demi-finale 2",date:D(2026,11,21,20,30)}]});
-  days.push({id:"f",name:"Finale",sub:"Dimanche 22 novembre",items:[{id:"m0",label:"La finale",sub:"Inalpi Arena, Turin",date:D(2026,11,22,18,0)}]});
-  days.push({id:"season",name:"Paris du tournoi",sub:"Réglés après la finale",items:[{id:"wdc",label:"Vainqueur des ATP Finals",sub:"Pari de long terme",date:D(2026,11,22,18,0)},{id:"wcc",label:"Vainqueur du groupe A",sub:"Pari de long terme",date:D(2026,11,20,20,30)},{id:"rook",label:"Vainqueur du groupe B",sub:"Pari de long terme",date:D(2026,11,20,20,30)}]});
+  const sn=n=>n.split(" ").slice(-1)[0],G={A:ATPF_A,B:ATPF_B},days=[];
+  const M=(id,p,q,g,dt)=>({id,label:sn(p)+" – "+sn(q),sub:p+" contre "+q+" · "+ATPF_GN[g],date:dt});
+  const T=(id,g,n,dt)=>({id,label:"Match "+n+" · "+ATPF_GN[g],sub:"Affiche fixée après le tour précédent",date:dt,tbd:true});
+  days.push({id:"j0",name:"Dimanche 15 · "+ATPF_GN.A,sub:"Phase de groupes · 1re journée",items:[M("m0","Alexander Zverev","Rafael Jódar","A",D(2026,11,15,14,0)),M("m1","Ben Shelton","Arthur Fils","A",D(2026,11,15,20,30))]});
+  days.push({id:"j1",name:"Lundi 16 · "+ATPF_GN.B,sub:"Phase de groupes · 1re journée",items:[M("m0","Carlos Alcaraz","Frances Tiafoe","B",D(2026,11,16,14,0)),M("m1","Daniil Medvedev","Flavio Cobolli","B",D(2026,11,16,20,30))]});
+  [["j2","Mardi 17","A",17,"2e"],["j3","Mercredi 18","B",18,"2e"],["j4","Jeudi 19","A",19,"3e"],["j5","Vendredi 20","B",20,"3e"]].forEach(([id,dn,g,d,r])=>
+    days.push({id,name:dn+" · "+ATPF_GN[g],sub:"Phase de groupes · "+r+" journée (programme à confirmer)",items:[T("m0",g,1,D(2026,11,d,14,0)),T("m1",g,2,D(2026,11,d,20,30))]}));
+  days.push({id:"sf",name:"Demi-finales",sub:"Samedi 21 novembre",items:[{id:"m0",label:"1er McEnroe – 2e Lendl",sub:"Demi-finale 1",date:D(2026,11,21,14,0),tbd:true},{id:"m1",label:"1er Lendl – 2e McEnroe",sub:"Demi-finale 2",date:D(2026,11,21,20,30),tbd:true}]});
+  days.push({id:"f",name:"Finale",sub:"Dimanche 22 novembre",items:[{id:"m0",label:"La finale",sub:"Inalpi Arena, Turin",date:D(2026,11,22,18,0),tbd:true}]});
+  days.push({id:"season",name:"Paris du tournoi",sub:"Réglés après la finale",items:[{id:"wdc",label:"Vainqueur des ATP Finals",sub:"Pari de long terme",date:D(2026,11,22,18,0)},{id:"wcc",label:"Vainqueur du groupe John McEnroe",sub:"Pari de long terme",date:D(2026,11,19,20,30)},{id:"rook",label:"Vainqueur du groupe Ivan Lendl",sub:"Pari de long terme",date:D(2026,11,20,20,30)}]});
   return days;
 }
 /* ===================================================================== CYCLISME */
@@ -3264,7 +3281,7 @@ const SPORTS=[
   ]},
  {id:"tennis",name:"Tennis",acc:"#DDF246",bg:"radial-gradient(rgba(255,255,255,.08) 1px,transparent 1.6px) 0 0/6px 6px,#C8562E",body:"#3A1607",icon:"tennis",
   comps:[
-   {id:"atpf",group:"Fin de saison 2026",name:"ATP Finals",flag:"Turin",desc:"15 – 22 nov. 2026 · tableau virtuel, 8 joueurs",build:atpfBuild},
+   {id:"atpf",group:"Fin de saison 2026",name:"ATP Finals",flag:"Turin",desc:"15 – 22 nov. 2026 · groupes McEnroe et Lendl, 8 joueurs",build:atpfBuild},
    {id:"dc26",group:"Fin de saison 2026",name:"Coupe Davis · Final 8",flag:"Bologne",desc:"23 – 29 nov. 2026 · 8 nations",build:tbdRounds([["Quarts de finale","2026-11-24T16:00","2026-11-26T22:00","Les 4 quarts de finale"],["Demi-finales","2026-11-27T16:00","2026-11-28T22:00","Les 2 demi-finales"],["Finale","2026-11-29T16:00","2026-11-29T22:00","La finale"]])},
    {id:"ngf26",group:"Fin de saison 2026",name:"Next Gen ATP Finals",flag:"Djeddah",desc:"7 – 13 déc. 2026 · 8 joueurs de 20 ans et moins",build:tbdRounds([["Phase de groupes","2026-12-07T14:00","2026-12-11T22:00","Les matchs de poule"],["Demi-finales","2026-12-12T16:00","2026-12-12T22:00","Les 2 demi-finales"],["Finale","2026-12-13T18:00","2026-12-13T22:00","La finale"]])},
    {id:"ao",group:"Grands Chelems 2027",name:"Open d'Australie",flag:"Melbourne",desc:"Janvier 2027 · 128 joueurs",build:slam(D(2027,1,18),7)},
@@ -3476,7 +3493,7 @@ function pageHead(title,sub,back){const n=title.replace(/<[^>]+>/g,"").length;re
 function urgency(p){if(!p||p.free)return null;let t=Infinity;try{rowsOfParty(p).forEach(r=>{if(r.it&&itemState(p,r)==="open")t=Math.min(t,(p.state||{})[r.key]==="open"?+r.it.date:closeAt(r.it));});}catch(e){return null;}if(t===Infinity)return null;const h=(t-+NOW)/36e5;if(h>24)return null;return h<=1?"Ferme très bientôt":"Ferme dans "+Math.round(h)+" h";}
 const urgIc=p=>{const u=urgency(p);return u?`<span class="urg" title="${u}" aria-label="${u}">⏰</span>`:"";};
 /* évents mis en avant (accueil « Nouveautés » + onglet Évents « À la une ») : [compétition, journée, badge, titre, nombre, dates] */
-const NEWS=[["st26",null,"Cette semaine","ATP 250 Stockholm","12 matchs en 16es","8 – 14 nov."],["f1-2026","gp20","Maintenant dispo","GP du Brésil","2 sessions","7 – 8 nov."],["atpf",null,"Dans 8 jours","ATP Finals","15 matchs","15 – 22 nov."],["ucl","r5","Ouvert","Ligue des champions · J5","18 matchs","24 – 26 nov."],["six",null,"Nouveau","Six Nations 2027","15 matchs","Fév. – mars"],["dpw",null,"Cette semaine","DP World Tour Championship","4 tours","12 – 15 nov."]];
+const NEWS=[["st26",null,"Cette semaine","ATP 250 Stockholm","12 matchs en 16es","8 – 14 nov."],["atpf",null,"Groupes connus","ATP Finals · Turin","McEnroe & Lendl","15 – 22 nov."],["ucl","r5","Ouvert","Ligue des champions · J5","18 matchs","24 – 26 nov."],["six",null,"Nouveau","Six Nations 2027","15 matchs","Fév. – mars"],["dpw",null,"Cette semaine","DP World Tour Championship","4 tours","12 – 15 nov."]];
 /* onglet Évents : à la une, en direct, filtres quand / sport, agenda par semaine */
 function compSpan(c){const ds=[];let n=0;try{subsOf(c).forEach(su=>su.items.forEach(i=>{if(/^(wdc|wcc|rook)$/.test(i.id)||i.tbd)return;ds.push(+i.date);n++;}));}catch(e){}if(!ds.length)return null;return{a:Math.min(...ds),b:Math.max(...ds),n};}
 function vEvents(){const now=+NOW,day=864e5,F=S.evF||"hot",SP=S.evS||"";
@@ -4401,7 +4418,40 @@ function vCreate(){
 const allGroups=()=>{const mine=(S.groups||[]).slice(),ids=new Set(mine.map(g=>g.id)),pids=new Set((S.parties||[]).map(p=>p.id));
   (S.rawGroups||[]).forEach(g=>{if(ids.has(g.id))return;if((g.parties||[]).some(id=>pids.has(id))||(S.parties||[]).some(p=>p.group===g.id))mine.push(g);});return mine;};
 const groupById=id=>allGroups().find(g=>g.id===id);
-function groupParties(g){const ids=new Set(g.parties||[]);return allParties().filter(p=>ids.has(p.id)||p.group===g.id);}
+/* ===== groupes : une partie appartient au groupe si elle y a été créée OU si ses joueurs sont exactement les membres du groupe ===== */
+function gKeyName(n){if(isMeName(n)||normS(n)===normS(myLabel()))return"u:"+(S.uid||"me");const m=memberByName(n);return m&&m.uid?"u:"+m.uid:"n:"+normS(n);}
+function gKeyPl(p,pl){if(pl.id===p.owner)return"u:"+p.owner;if(pl.uid)return"u:"+pl.uid;if(S.uid&&pl.id===S.uid)return"u:"+S.uid;const m=memberByName(pl.name);return m&&m.uid?"u:"+m.uid:"n:"+normS(pl.name);}
+function gSameCrew(g,p){if(!p||p.free||!p.players||!(g.members||[]).length)return false;const A=new Set((g.members||[]).map(gKeyName)),B=new Set(rawPlayers(p).filter(x=>!x.fake).map(x=>gKeyPl(p,x)));return A.size===B.size&&[...A].every(k=>B.has(k));}
+/* classement général du groupe : tous les points de toutes ses parties (en cours et terminées) */
+function generalBoard(g){const tot={},nameOf={};const add=(k,n)=>{if(!tot[k])tot[k]={k,name:n,pts:0,ev:0,live:0,wins:0,exact:0};return tot[k];};
+  (g.members||[]).forEach(n=>add(gKeyName(n),n));let nP=0,nLive=0;
+  groupParties(g).forEach(p=>{if(p.free)return;let sc;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(e){return;}if(!sc.done)return;nP++;const fin=isClosed(p)||sc.done===sc.total;if(!fin)nLive++;
+    const pl=rawPlayers(p);sc.rows.forEach((r,i)=>{const x=pl.find(y=>y.id===r.id)||{id:r.id,name:r.name};const k=gKeyPl(p,x);const t=add(k,r.name);if(isMeName(t.name)||k==="u:"+(S.uid||"me"))t.name="Toi";t.pts+=r.pts;t.exact+=r.exact||0;fin?t.ev++:t.live++;if(fin&&i===0&&r.pts>0)t.wins++;});});
+  return{nP,nLive,rows:Object.values(tot).sort((a,b)=>b.pts-a.pts||b.wins-a.wins||a.name.localeCompare(b.name))};}
+function generalBoardHTML(g){const B=generalBoard(g),me="u:"+(S.uid||"me");
+  return`<div class="pad" style="margin-top:12px"><div class="card board gboardall"><div class="bh"><b class="sbh"><i>🏆</i>Classement général</b><span class="muted">${B.nP} partie${B.nP>1?"s":""}${B.nLive?" · "+B.nLive+" en cours":""}</span></div>
+   ${B.nP?B.rows.map((r,i)=>`<div class="br${r.k===me?" me":""}">${r.pts?medalIcon(i+1,34):`<span class="rk">${i+1}</span>`}<span class="nm">${esc(r.name)}<small>${r.ev} terminée${r.ev>1?"s":""}${r.live?" · "+r.live+" en cours":""} · ${r.wins} gagnée${r.wins>1?"s":""}${r.exact?" · "+r.exact+" score"+(r.exact>1?"s":"")+" exact"+(r.exact>1?"s":""):""}</small></span>${r.wins?`<span class="gn">🏆 ${r.wins}</span>`:""}<span class="pt">${r.pts}<small>pts</small></span></div>`).join("")
+     :`<p class="muted" style="font-size:13px;margin:4px 0 0">Pas encore de résultat : le classement apparaît dès le premier match terminé d'une partie du groupe.</p>`}
+   <p class="muted" style="font-size:12px;margin:10px 0 0">Tous les points de toutes les parties du groupe, en cours (provisoire) et terminées. 🏆 = parties gagnées.</p></div></div>`;}
+/* fenêtre « Nouveau groupe » : on choisit les membres AVANT de créer */
+function ngFriends(){return myFriends();}
+function ngSheet(){const sel=S.frSel||[],q=(S.ngQ||"").trim(),F=ngFriends(),have=new Set(sel.map(normS));
+  const res=q?findMembers(q,["Toi"].concat(sel)).filter(m=>!isMeName(m.short)).slice(0,5):[];
+  const mail=q&&HM_MAILRX.test(q)?emailMember(q):null;
+  return`<div class="sheetbg" data-act="frNewClose"></div><div class="sheet2 frsheet ngsheet"><h3>Nouveau groupe</h3>
+   <label class="nglab">1 · Nom du groupe</label><input class="inp" data-ng="name" value="${esc(S.ngName||"")}" placeholder="Nom du groupe, ex. : La coloc" maxlength="40">
+   <label class="nglab">2 · Les membres <span>${sel.length}</span></label>
+   <div class="frchips">${sel.length?sel.map(n=>`<span class="chip2">${esc(n)}<button type="button" data-act="ngDel" data-n="${esc(n)}" aria-label="Retirer ${esc(n)}">✕</button></span>`).join(""):'<span class="muted" style="font-size:13px">Coche au moins un ami.</span>'}</div>
+   ${F.length?`<div class="nglist">${F.map(f=>{const on=have.has(normS(f.name));return`<button type="button" class="ngrow${on?" on":""}" data-act="frSel" data-n="${esc(f.name)}" aria-pressed="${on}"><span class="frchk">${on?"✓":""}</span>${frAv(f,32)}<b>${esc(f.full)}</b></button>`;}).join("")}</div>`:""}
+   <input class="inp ngq" data-ngq="1" value="${esc(q)}" placeholder="Ajouter quelqu'un : prénom, @pseudo ou e-mail" autocomplete="off">
+   <div class="ngres" id="ngres">${ngResults()}</div>
+   <button type="button" class="btn block" data-act="frNewGo"${sel.length&&(S.ngName||"").trim()?"":" disabled"}>Créer le groupe${sel.length?" ("+(sel.length+1)+" membres)":""}</button><button type="button" class="btn ghost block" style="margin-top:8px" data-act="frNewClose">Annuler</button></div>`;}
+function ngResults(){const q=(S.ngQ||"").trim();if(!q)return"";const sel=S.frSel||[];
+  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em)return`<button type="button" class="hmrow" data-act="ngAdd" data-n="${esc(em.short)}">${avatar(em,30)}<span><b>${esc(em.name)}</b><small>Inscrit</small></span><i>+</i></button>`;return`<button type="button" class="hmrow inv" data-act="ngAdd" data-n="${esc(hmMailName(q))}" data-e="${esc(q)}"><span class="hmgi">✉️</span><span><b>Ajouter ${esc(q)}</b><small>Pas encore inscrit</small></span><i>+</i></button>`;}
+  const res=findMembers(q,["Toi"].concat(sel)).filter(m=>!isMeName(m.short)).slice(0,5);
+  return res.map(m=>`<button type="button" class="hmrow" data-act="ngAdd" data-n="${esc(m.short)}">${avatar(m,30)}<span><b>${esc(m.name)}</b><small>@${esc(m.pseudo)}</small></span><i>+</i></button>`).join("")+(res.some(m=>normS(m.short)===normS(q))?"":`<button type="button" class="hmrow inv" data-act="ngAdd" data-n="${esc(q.replace(/^@/,""))}"><span class="hmgi">✉️</span><span><b>Ajouter « ${esc(q.replace(/^@/,""))} »</b><small>Pas encore inscrit</small></span><i>+</i></button>`);}
+
+function groupParties(g){const ids=new Set(g.parties||[]);return allParties().filter(p=>ids.has(p.id)||p.group===g.id||gSameCrew(g,p));}
 /* classement d'un sport dans le groupe : points de ce sport seulement (on n'additionne jamais des sports différents) */
 function sportBoard(g,sid){
   const tot={};g.members.forEach(n=>tot[n]={name:n,pts:0,ev:0,wins:0,exact:0});let n=0;
@@ -4459,7 +4509,7 @@ function vGroup(){
   return h+groupBody(g);}
 /* contenu d'un groupe (réutilisé dans le ticket du groupe) */
 function groupBody(g){const ps=groupParties(g);let h="";
-  h+=creditsCard(g)+sportBoardsHTML(g);
+  h+=generalBoardHTML(g)+creditsCard(g)+sportBoardsHTML(g);
   const bySport={};ps.forEach(p=>{const k=sportOfParty(p);(bySport[k]=bySport[k]||[]).push(p);});
   h+=`<div class="group">Les parties</div>`;
   if(!ps.length)h+=`<p class="empty">Pas encore de partie dans ce groupe.</p>`;
@@ -4644,7 +4694,7 @@ function vFriends(){
    <div class="frgroups">${gs.map(g=>`<button type="button" class="frg" data-act="frGroup" data-id="${esc(g.id)}">${groupAv(g)}<span><b>${esc(g.name)}</b><small>${(g.members||[]).length} membre${(g.members||[]).length>1?"s":""}</small></span><i aria-hidden="true">›</i></button>`).join("")}
     <button type="button" class="frg new" data-act="frNewGroup"><span class="gav">＋</span><span><b>Créer un groupe</b><small>${sel.size?sel.size+" ami"+(sel.size>1?"s":"")+" sélectionné"+(sel.size>1?"s":""):"Sélectionne des amis, ou ajoute-les ensuite"}</small></span><i aria-hidden="true">›</i></button></div>
   </div>`;
-  if(S.frNew)h+=`<div class="sheetbg" data-act="frNewClose"></div><div class="sheet2 frsheet"><h3>Nouveau groupe</h3><input class="inp" data-ng="name" value="${esc(S.ngName||"")}" placeholder="Nom du groupe, ex. : La coloc" maxlength="40"><div class="frchips">${[...sel].map(n=>`<span class="chip2">${esc(n)}</span>`).join("")||'<span class="muted" style="font-size:13px">Aucun ami sélectionné : tu pourras en ajouter ensuite.</span>'}</div><button type="button" class="btn block" data-act="frNewGo">Créer le groupe</button><button type="button" class="btn ghost block" style="margin-top:8px" data-act="frNewClose">Annuler</button></div>`;
+  if(S.frNew)h+=ngSheet();
   if(sel.size)h+=`<div class="frbar"><span><b>${sel.size}</b> sélectionné${sel.size>1?"s":""}</span><button type="button" class="btn ghost" data-act="frNewGroup">👥 Groupe</button><button type="button" class="btn" data-act="frPlay">▶ Jouer</button></div>`;
   return h;
 }
@@ -6540,8 +6590,10 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "frPlay":{const L=S.frSel||[];if(!L.length)break;const H=hmS();H.multi=L.map(n=>({k:memberByName(n)?"m":"inv",name:n}));const one=L.length===1;H.mode=one?"duel":"multi";H.duel=one?H.multi[0]:null;H.validated=true;H.keepWho=true;S.frSel=[];S.stack=[];S.screen="home";render();window.scrollTo(0,0);toast(one?"Duel prêt : choisis ton terrain de jeu":"Partie à "+(L.length+1)+" : choisis ton terrain de jeu");break;}
     case "frGroup":go("group",{groupView:t.dataset.id});break;
     case "frNewGroup":S.frNew=true;render();setTimeout(()=>{const e=document.querySelector(".frsheet input");if(e)e.focus();},60);break;
-    case "frNewClose":S.frNew=false;render();break;
-    case "frNewGo":{S.ngSel=(S.frSel||[]).slice();if(!(S.ngName||"").trim())return toast("Donne un nom au groupe.");if(!S.ngSel.length)S.ngSel=[];S.frNew=false;S.frSel=[];const nm=S.ngName.trim(),mem=S.ngSel;const g={id:"g"+Date.now().toString(36),name:nm.slice(0,40),members:["Toi"].concat(mem.filter(x=>x.toLowerCase()!=="toi")).slice(0,50),parties:[],owner:S.uid||null,createdAt:new Date().toISOString()};S.groups=(S.groups||[]).concat([g]);g.members.forEach(n=>{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"group",(me().name||"Ton pote")+" t'a ajouté au groupe « "+g.name+" »",{gid:g.id});});S.ngName="";S.ngSel=[];if(db){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>toast("Enregistrement impossible."));}S.groupView=g.id;go("group");toast("Groupe créé ✓");break;}
+    case "frNewClose":S.frNew=false;S.ngQ="";render();break;
+    case "ngAdd":{const n=(t.dataset.n||"").trim();if(!n)break;S.frSel=[...new Set((S.frSel||[]).concat([n]))];if(t.dataset.e){S.frMail=Object.assign(LS("bf_frmail")||{},{[n]:t.dataset.e});LS("bf_frmail",S.frMail);}S.ngQ="";render();break;}
+    case "ngDel":S.frSel=(S.frSel||[]).filter(x=>x!==t.dataset.n);render();break;
+    case "frNewGo":{S.ngSel=(S.frSel||[]).slice();if(!(S.ngName||"").trim())return toast("Donne un nom au groupe.");if(!S.ngSel.length)return toast("Choisis au moins un membre.");S.ngQ="";S.frNew=false;S.frSel=[];const nm=S.ngName.trim(),mem=S.ngSel;const g={id:"g"+Date.now().toString(36),name:nm.slice(0,40),members:["Toi"].concat(mem.filter(x=>x.toLowerCase()!=="toi")).slice(0,50),parties:[],owner:S.uid||null,createdAt:new Date().toISOString()};S.groups=(S.groups||[]).concat([g]);g.members.forEach(n=>{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"group",(me().name||"Ton pote")+" t'a ajouté au groupe « "+g.name+" »",{gid:g.id});});S.ngName="";S.ngSel=[];if(db){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>toast("Enregistrement impossible."));}S.groupView=g.id;go("group");toast("Groupe créé ✓");break;}
     case "seedTests":seedTests();break;
     case "purgeAll":{if(S.purging)break;if(!S.purgeArm){S.purgeArm=true;render();setTimeout(()=>{if(S.purgeArm&&!S.purging){S.purgeArm=false;render();}},6000);break;}S.purgeArm=false;purgeAll();break;}
     case "pfSave":saveProfile();break;
@@ -6708,6 +6760,8 @@ document.addEventListener("input",e=>{
   if(t.dataset.hq){const H=hmS(),ctx=t.dataset.hq;H.q[ctx]=t.value;const r=document.getElementById("hmr-"+ctx);if(r)r.innerHTML=hmResults(ctx);return;}
   if(t.dataset.mq){S["mq_"+t.dataset.mq]=t.value;const pos=t.selectionStart;render();const e=document.querySelector('[data-mq="'+t.dataset.mq+'"]');if(e){e.focus();try{e.setSelectionRange(pos,pos);}catch(_){}}return;}
   if(t.dataset.sq){S.sq=t.value;const pos=t.selectionStart;render();const e=document.getElementById("sq");if(e){e.focus();try{e.setSelectionRange(pos,pos);}catch(_){}}return;}
+  if(t.dataset.ngq){S.ngQ=t.value;const r=document.getElementById("ngres");if(r)r.innerHTML=ngResults();return;}
+  if(t.dataset.ng==="name"&&S.frNew){S.ngName=t.value;const b=document.querySelector("[data-act=frNewGo]");if(b)b.disabled=!(t.value.trim()&&(S.frSel||[]).length);return;}
   if(t.dataset.frq){S.frQ=t.value;const r=document.getElementById("frres");if(r)r.innerHTML=frResults();return;}
   if(t.dataset.pf){if(!S.pfDraft)S.pfDraft=Object.assign({},me());S.pfDraft[t.dataset.pf]=t.value;pfAuto();return;}
 
