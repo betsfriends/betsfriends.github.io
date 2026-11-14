@@ -3997,7 +3997,11 @@ function vEvents(){const now=+NOW,day=864e5,F=S.evF||"hot",SP=S.evS||"";
 /* couleurs de chaque sport, les mêmes que les tickets de la page Sports */
 const SP_TK={foot:["#1E7A3A","#062A1C","rgba(46,204,113,.45)"],tennis:["#B5532A","#3A1607","rgba(255,140,80,.5)"],f1:["#8E1B1B","#16070A","rgba(255,70,60,.45)"],golf:["#3B7A3F","#0F2A12","rgba(243,224,166,.4)"],velo:["#B8901F","#2A1E05","rgba(255,226,120,.45)"],basket:["#B8682A","#2A1709","rgba(255,154,60,.45)"],rugby:["#1B5A3D","#0B2117","rgba(233,220,195,.35)"],free:["#5A4512","#1E1606","rgba(243,224,166,.45)"]};
 /* v36 : « Résultats » = au moins un match TERMINÉ (un match en direct reste dans Live tant qu'il n'est pas fini) */
-function hasResult(p){try{if(p.free)return isClosed(p);return rowsOfParty(p).some(r=>r.it&&itemState(p,r)==="done");}catch(e){return false;}}
+function hasResult(p){try{if(p.free)return isClosed(p);return rowsOfParty(p).some(r=>r.it&&(itemState(p,r)==="done"||matchOver(r.it)));}catch(e){return false;}}
+/* v41 : match fini mais résultat officiel pas encore arrivé → il va quand même dans « Résultats » (résultat en attente), jamais nulle part */
+function matchOver(it){if(!it||it.tbd)return false;const now=+NOW,t=+it.date;if(!(t<=now))return false;
+  if(it.live){const st=liveSt(it);if(st==="LIVE")return false;if(st==="FT"||st==="END")return true;return now>t+(it.dur||2.5)*3600e3;}
+  return now>t+(it.dur||2.5)*3600e3;}
 function hasPlayed(p){try{if(p.free)return isClosed(p);return isClosed(p)||rowsOfParty(p).some(r=>r.it&&["done","closed","live"].includes(itemState(p,r)));}catch(e){return false;}}
 /* Paris pris : au moins un prono fait et encore modifiable, même s'il reste d'autres pronos à faire */
 function readyParties(D){return D.all.filter(p=>{try{return!p.free&&!isClosed(p)&&rowsOfParty(p).some(r=>r.it&&itemState(p,r)==="open"&&hasSaved(p,r.key));}catch(e){return false;}});}
@@ -4823,7 +4827,7 @@ function matchHTML(i){const sd=sides(i);if(!sd)return esc(i.label);const sep=i.l
 const TEST_OPEN={"ww26-r4":true,"sp26-r":true};
 const testOpen=i=>!!(i&&i.lid&&TEST_OPEN[i.lid]&&!i.whole);
 /* nouvelle partie : un match / une séance / un tour se choisit jusqu'à 2 h avant son début (exception : Stockholm, jusqu'au début de la finale le 14 nov. à 13h) */
-const LOCK_NEW=2*3600e3,LOCK_EX={st26:"2026-11-14T12:15:00Z"};
+const LOCK_NEW=2*3600e3,LOCK_EX={st26:"2026-11-14T12:15:00Z",/* v42 : Ligue des nations de ce soir (14 nov.) — pronos et nouvelles parties ouverts jusqu'au coup d'envoi pile */unl:"2026-11-14T23:59:00Z"};
 const stLate=i=>!!(i&&i._c==="st26"&&!i.tbd&&Date.now()<+new Date("2026-11-14T12:15:00Z"));
 const lockOf=(cid,t)=>{const ex=LOCK_EX[cid];return ex&&(t==null?Date.now():t)<+new Date(ex)?0:LOCK_NEW;};
 function selOpen(i){if(!i||isDone(i))return false;if(stLate(i))return true;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
