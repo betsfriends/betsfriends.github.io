@@ -3114,6 +3114,15 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .tksort button{text-transform:uppercase;letter-spacing:.06em;font-weight:900}
 .sufoot:has(.sufix){animation:none!important;transform:none!important;opacity:1!important;filter:none!important}
 .sufix .sugo{font-size:clamp(15px,4.6vw,19px)!important;white-space:nowrap;padding:14px 16px!important;min-height:54px}
+/* tuiles v2 : pastille d'échéance en haut à droite, statut à gauche, classement à droite, hauteurs égales */
+.pcard.ntile{position:relative;justify-content:space-between!important;padding:16px 16px 14px!important}
+.ntile .ntt{padding-right:48px}
+.ntile .ntw{font-size:15.5px!important;font-weight:700!important}
+.ntile .ntm{width:100%;justify-content:space-between;margin-top:auto!important;padding-top:6px}
+.ntile .ntl{display:flex;gap:6px;min-height:22px;align-items:center}
+.ntile .ntrk{margin-left:auto}
+.ntile .ntu{position:absolute!important;top:10px;right:10px;z-index:2;display:grid;place-items:center;width:42px;height:42px;padding:0;border-radius:50%;font-size:12.5px;font-weight:900;color:#fff!important;border:2px solid rgba(255,255,255,.85)!important;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.ntile .ntu.u-o{background:#E07B1F}.ntile .ntu.u-r{background:#D9372B}
 </style>
 </head>
 <body>
@@ -3803,6 +3812,8 @@ function mpFit(){const n=document.querySelector("#app .mpevn");if(!n)return;cons
 document.addEventListener("input",e=>{const t=e.target;if(!t||t.tagName!=="INPUT")return;const im=t.getAttribute("inputmode");
   if(im==="numeric"){const v=t.value.replace(/\D+/g,"");if(v!==t.value){const p=t.selectionStart;t.value=v;try{t.setSelectionRange(Math.max(0,p-1),Math.max(0,p-1));}catch(_){}}}
   else if(t.dataset.mp&&/E = par/.test(t.placeholder||"")){const v=t.value.toUpperCase().replace(/[^0-9E\-+]/g,"");if(v!==t.value)t.value=v;}},true);
+function ntEqual(){document.querySelectorAll(".pclist").forEach(L=>{const T=[...L.querySelectorAll(":scope>.ntile")];if(!T.length)return;if(!T.some(x=>x.offsetParent))return;T.forEach(x=>x.style.removeProperty("min-height"));const m=Math.max(...T.map(x=>x.getBoundingClientRect().height));if(m>20)T.forEach(x=>x.style.setProperty("min-height",Math.ceil(m)+"px","important"));});}
+if(!window._ntEqOn){window._ntEqOn=1;let q=0;const k=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;ntEqual();});};const go=()=>{const a=document.getElementById("app");if(!a){setTimeout(go,100);return;}new MutationObserver(k).observe(a,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});};go();addEventListener("resize",k);addEventListener("transitionend",k,true);addEventListener("animationend",k,true);document.addEventListener("click",()=>{setTimeout(k,60);setTimeout(k,700);},true);try{document.fonts.ready.then(k);}catch(_){}}
 function hfFit(){const c=document.querySelector(".mpform #h3card");if(!c)return;const b=c.querySelector(".hfb"),sc=b&&b.querySelector(".hfscroll");
   if(!c.classList.contains("flipped")||!b||!sc){if(c.style.getPropertyValue("height"))c.style.removeProperty("height");return;}
   const need=Math.ceil(b.clientHeight-sc.clientHeight+sc.scrollHeight+(c.getBoundingClientRect().height-b.clientHeight)+2),h=Math.max(290,need)+"px";if(c.style.getPropertyValue("height")!==h)c.style.setProperty("height",h,"important");}
@@ -4614,7 +4625,7 @@ function seedPick(p,row,b,type,truth,rnd,good){const opts=(()=>{try{return defau
 function seedParty(def,pls){const c=FIND[def.comp];if(!c)return null;const subs=subsOf(c),items=[];
   def.subs.forEach(sid=>{const su=subs.find(x=>x.id===sid);if(su)su.items.forEach(i=>items.push(su.id+"/"+i.id));});
   const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-  const p={id,name:"🧪 "+def.name,comp:def.comp,full:false,items,people:pls.length,amount:def.amount,split:def.split,owner:S.uid||"me",createdAt:new Date(Date.now()-def.age*864e5).toISOString(),test:true,players:pls,emails:pls.map(x=>x.email).filter(Boolean),uids:pls.map(x=>x.uid).filter(Boolean),invited:{},picks:{}};
+  const p={id,name:def.name,comp:def.comp,full:false,items,people:pls.length,amount:def.amount,split:def.split,owner:S.uid||"me",createdAt:new Date(Date.now()-def.age*864e5).toISOString(),test:true,players:pls,emails:pls.map(x=>x.email).filter(Boolean),uids:pls.map(x=>x.uid).filter(Boolean),invited:{},picks:{}};
   const skill={};pls.forEach((pl,i)=>skill[pl.id]=[.62,.45,.35,.5,.28][i%5]);
   rowsOfParty(p).forEach(row=>{if(!row.it)return;const su=subs.find(s=>s.id===row.key.split("/")[0]),res=resultOf(c,su,row.it),cfg=normCfg(defaultCfg(row.cat,"C"),row.cat),open=!res;
     pls.forEach((pl,pi)=>{const rnd=rng(hs(id+row.key+pl.id));
@@ -4627,11 +4638,11 @@ async function seedTests(){if(S.seeding)return;S.seeding=true;render();
   const others=MEMBERS.filter(m=>m.uid&&m.uid!==S.uid).slice(0,8).map(m=>({id:"u_"+m.uid,name:m.short,uid:m.uid})),bots=[];
   if(!others.length){S.seeding=false;S.seedMsg="Aucun autre inscrit trouvé : il faut que Dorothée et David se soient connectés au moins une fois avec la nouvelle version, puis réessaie.";render();return;}
   const pls=[{id:S.uid||"me",name:"Toi"}].concat(others);
-  const defs=[{name:"Terminée · Jupiler J8 à J10",comp:"jpl",subs:["r8","r9","r10"],amount:5,split:[70,30],age:30},
-    {name:"En cours · Jupiler J11 à J13",comp:"jpl",subs:["r11","r12","r13"],amount:5,split:[50,30,20],age:12},
-    {name:"En cours · Premier League J8 à J10",comp:"pl",subs:["r8","r9","r10"],amount:10,split:[70,30],age:20},
-    {name:"Terminée · F1 fin de saison",comp:"f1-2026",subs:["gp16","gp17","gp18","gp19"],amount:5,split:[100],age:40},
-    {name:"À venir · Jupiler J14",comp:"jpl",subs:["r14"],amount:2,split:[100],age:0}];
+  const defs=[{name:"Jupiler J8 à J10",comp:"jpl",subs:["r8","r9","r10"],amount:5,split:[70,30],age:30},
+    {name:"Jupiler J11 à J13",comp:"jpl",subs:["r11","r12","r13"],amount:5,split:[50,30,20],age:12},
+    {name:"Premier League J8 à J10",comp:"pl",subs:["r8","r9","r10"],amount:10,split:[70,30],age:20},
+    {name:"F1 fin de saison",comp:"f1-2026",subs:["gp16","gp17","gp18","gp19"],amount:5,split:[100],age:40},
+    {name:"Jupiler J14",comp:"jpl",subs:["r14"],amount:2,split:[100],age:0}];
   let ok=0,ko=0;
   for(const d of defs){const p=seedParty(d,pls);if(!p)continue;const doc=Object.assign({},p);delete doc.id;
     if(db){try{await db.doc("parties/"+p.id).set(doc);ok++;others.forEach(o=>notify(o.uid,"party",(myLabel()||"Ton pote")+" t'invite à la partie « "+p.name+" »",{pid:p.id}));}catch(_){ko++;}}else{S.parties.push(p);S.rawParties=(S.rawParties||[]).concat([p]);ok++;}}
@@ -4996,16 +5007,17 @@ function tkClose(bx){if(!bx.classList.contains("torn")||bx.classList.contains("t
 /* ===== tuiles « Prono en attente » / « Prono fait… » : titre, avec qui, statut, urgence, classement provisoire ===== */
 /* échéance = fermeture du prochain prono que TU n'as pas encore fait dans la partie */
 function myDue(p){let t=Infinity;try{todoRows(p).forEach(r=>{const c=closeAt(r.it);if(c<t)t=c;});}catch(_){}return t;}
-function urgMark(p){const t=myDue(p);if(t===Infinity)return null;const h=(t-+NOW)/36e5;if(h>72)return null;if(h<=2)return["H−2","r"];if(h<=24)return["J−1","o"];if(h<=48)return["J−2","g"];return["J−3","b"];}
+function urgMark(p){const t=myDue(p);if(t===Infinity)return null;const h=(t-+NOW)/36e5;if(h>24)return null;if(h<=2)return["H−2","r"];return["J−1","o"];}
 /* « En cours » dès qu'un joueur a fait au moins un prono, ou qu'un prono est fermé ou terminé ; sinon aucun statut */
 function tileStarted(p){try{const PK=picksOf(p);if(Object.values(PK).some(m=>m&&Object.values(m).some(v=>v!=null&&v!==""&&!(Array.isArray(v)&&!v.some(Boolean)))))return true;return rowsOfParty(p).some(r=>r.it&&itemState(p,r)!=="open");}catch(_){return false;}}
 function withWhom(p){let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameCrew(x,p))||null;}catch(_){}}if(g)return"Tu joues avec « "+g.name+" »";let pl=[];try{const mine=myId(p);pl=playersOf(p).filter(x=>x.id!==mine&&!isMeName(x.name));}catch(_){}
   if(!pl.length)return"Tu joues seul pour l'instant";if(pl.length===1)return"Tu joues avec "+pl[0].name;return"Tu joues avec "+pl.length+" amis";}
-function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,st=tileStarted(p);
+const tileTitle=n=>String(n||"").replace(/^\s*🧪\s*/,"").replace(/^(En cours|Terminée|À venir)\s*·\s*/i,"");
+function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,fin=D.sec.done.includes(p),st=!fin&&tileStarted(p);
   let nPl=0;try{nPl=playersOf(p).length;}catch(_){}
   return`<button type="button" class="pcard pc2 ntile pcsu pcsp sp-${sid}${S.justNew&&S.justNew.id===p.id?" pcnew":""}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span>
-   <b class="ntt">${esc(p.name)}</b><span class="ntw">${esc(withWhom(p))}</span>
-   ${st||u||r?`<span class="ntm">${st?`<span class="ntst">En cours</span>`:""}${u?`<span class="ntu u-${u[1]}">${u[0]}</span>`:""}${r?`<span class="ntrk">${r.rank}${r.rank>1?"e":"er"} sur ${r.n||nPl} — provisoire</span>`:""}</span>`:""}</button>`;}
+   ${u?`<span class="ntu u-${u[1]}" title="Échéance de ton prochain prono">${u[0]}</span>`:""}<b class="ntt">${esc(tileTitle(p.name))}</b><span class="ntw">${esc(withWhom(p))}</span>
+   <span class="ntm"><span class="ntl">${st?`<span class="ntst">En cours</span>`:""}</span>${r?`<span class="ntrk">${r.rank}${r.rank>1?"e":"er"} sur ${r.n||nPl}${fin?"":" — provisoire"}</span>`:""}</span></button>`;}
 
 function vParties(){
   const D=partiesData(),f=S.pf||null;
@@ -5051,7 +5063,7 @@ function vParties(){
   /* ticket : clic → il se déchire, le talon tombe, la partie droite prend toute la largeur et montre les parties en grand (plus de page à part) */
   const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir les ${n} parties"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
   const SP_ORD=["foot","tennis","f1","golf","rugby","velo","basket","free"],SP_NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",velo:"Cyclisme",basket:"Basket",free:"Pari libre"};
-  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;const T=p=>(k==="pending"||k==="ready")?ntile(p,k,D):pcard(p);
+  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;const T=p=>(k==="pending"||k==="ready"||k==="done")?ntile(p,k,D):pcard(p);
     if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist">${h}</div>`;}
     return`<div class="pclist">${list.map(T).join("")}</div>`;};
   /* tri (pas un filtre) : toutes les parties restent, seul l'ordre change — par urgence (fermeture la plus proche) ou par classement (ta meilleure place d'abord) */
@@ -6139,6 +6151,12 @@ function suCfgDoc(){const rows=suRows().filter(r=>r.on&&BETS[r.cat]),cfg={},n={}
   rows.forEach(r=>{const o=s.own[r.key];if(o||n[r.cat]===1)cfg[r.key]=JSON.parse(JSON.stringify(o||suGen(r.cat)));});
   return Object.keys(cfg).length?cfg:null;}
 /* départ depuis le bouton or (accueil) ou depuis une sélection faite ailleurs */
+/* Évents / Sports : choisir un évent ouvre directement sa page (comme depuis l'accueil) */
+function evOpen(cid,btn){const c=FIND[cid];if(!c)return;const H=hmS();
+  Object.assign(H,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null,keepWho:false});
+  H.sport=c.sport.id;H.flowOn=true;H.fromTab=S.screen;const co=(typeof FL_C!=="undefined"?FL_C:[]).find(x=>(x.comps||[]).includes(cid));H.fl={comp:cid,intl:false};if(co)H.fl.c=co.id;
+  S._flPK=undefined;S._flPV=undefined;S.sel={comp:cid,full:false,items:{}};suStart(btn);}
+function evFlowClear(){const H=hmS();if(!H.fromTab)return;Object.assign(H,{sport:null,flowOn:false,fl:{},fromTab:null,validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null});S._flPK=undefined;S._flPV=undefined;S.sel={comp:null,full:false,items:{}};}
 function suStart(btn){const H=hmS(),f=flS();
   if(H.flowOn&&f.comp){if(S.sel.comp!==f.comp)S.sel={comp:f.comp,full:false,items:{}};if(f.mode==="all"&&!f.intl)S.sel.full=true;
     if(false){let L=flItems().filter(([su,i])=>canPickIt(i));if(f.h2h)L=L.filter(([su,i])=>{const sd=sides(i);return sd&&sd.every(x=>(f.teams||[]).includes(x));});L.forEach(([su,i])=>{S.sel.items[su.id+"/"+i.id]=1;});}}
@@ -6392,7 +6410,7 @@ function suAct(a,t){const s=suS();
 function busyUI(){return !!(window._tkF||window._touching||document.querySelector(".prowbox.tkmove,.prowbox.closing,.vtmove,.morphov"));}
 function dataRender(){if(window._drT)return;const go=()=>{window._drT=null;if(busyUI()){window._drT=setTimeout(go,250);return;}render();};go();}
 if(!window._touchOn){window._touchOn=1;const on=()=>{clearTimeout(window._touchT);window._touching=1;},off=()=>{clearTimeout(window._touchT);window._touchT=setTimeout(()=>{window._touching=0;},400);};addEventListener("touchstart",on,{passive:true,capture:true});addEventListener("touchend",off,{passive:true,capture:true});addEventListener("touchcancel",off,{passive:true,capture:true});}
-function render(){if(S.justNew&&(S.screen!=="parties"||Date.now()-S.justNew.t>120000))S.justNew=null;try{requestAnimationFrame(()=>{h3Fit();flFit();h3cwSync();ensureCreateVisible();});let nh=document.getElementById("ntfHost");if(!nh){nh=document.createElement("div");nh.id="ntfHost";document.body.appendChild(nh);}const wasOpen=nh.dataset.open==="1";nh.innerHTML=S.ntf?ntfPop():"";nh.classList.toggle("ntfstill",!!S.ntf&&wasOpen);nh.dataset.open=S.ntf?"1":"0";document.documentElement.style.overflow=S.ntf?"hidden":"";}catch(e){}
+function render(){if(["events","sports","sport"].includes(S.screen)&&S.hm&&S.hm.fromTab)evFlowClear();if(S.justNew&&(S.screen!=="parties"||Date.now()-S.justNew.t>120000))S.justNew=null;try{requestAnimationFrame(()=>{h3Fit();flFit();h3cwSync();ensureCreateVisible();});let nh=document.getElementById("ntfHost");if(!nh){nh=document.createElement("div");nh.id="ntfHost";document.body.appendChild(nh);}const wasOpen=nh.dataset.open==="1";nh.innerHTML=S.ntf?ntfPop():"";nh.classList.toggle("ntfstill",!!S.ntf&&wasOpen);nh.dataset.open=S.ntf?"1":"0";document.documentElement.style.overflow=S.ntf?"hidden":"";}catch(e){}
   const md=document.getElementById("mdefs");if(md&&!md.firstChild)md.innerHTML=MEDAL_DEFS;
   const v={home:vHome,events:vEvents,sports:vSports,sport:vSport,comp:vComp,rounds:vRounds,clubs:vClubs,sub:vSub,match:vMatch,free:vFree,create:vCreate,parties:vParties,party:vParty,groups:vFriends,group:vGroup,bet:vBet,profile:vProfile,search:vSearch,member:vMember,custom:vCustom,cfg:vCfg,setup:vSetup,mpick:vMpick,pay:vPay}[S.screen]||vHome;
   const _pd=document.getElementById("tkpad"),_ph=_pd?_pd.style.height:"",_y=window.scrollY,_sk=S.screen+"|"+(S.partyView||"")+"|"+(S.comp||"")+"|"+(S.sport||""),_same=render._sk===_sk;render._sk=_sk;
@@ -6682,7 +6700,7 @@ case "mpH2HX":{const f=flS();f.teams=[];f.h2h=false;mpAuto();const y=scrollY;ren
 case "mpTyp":{const f=flS(),v=t.dataset.v;if(f.typ===v)delete f.typ;else f.typ=v;mpAuto();const y=scrollY;render();scrollTo(0,y);break;}
     case "suTab":{suS().tab=t.dataset.t;render();const w=document.querySelector("#app .sutabw");if(w&&w.getBoundingClientRect().top<70)w.scrollIntoView({block:"start"});break;}
     case "tab":{const k=t.dataset.tab,bs=[...document.querySelectorAll("#tabs [data-tab]")],i0=bs.findIndex(x=>x.getAttribute("aria-current")==="page"),i1=bs.indexOf(t.closest("[data-tab]")||t);
-      const doTab=()=>{S.stack=[];S.pf=null;S.pfOpen=null;S.ptOpen=null;S.morphFrom=null;S.pfStack=[];S.groupCtx=null;S.fromGroup=false;if(k==="home")S.screen="home";else if(k==="sports")S.screen="sports";else if(k==="free")S.screen="free";else if(k==="groups")S.screen="groups";else if(k==="events")S.screen="events";else S.screen="parties";render();window.scrollTo(0,0);};if(i0!==i1&&i0>=0&&i1>=0)pageDim(doTab);else doTab();break;}
+      const doTab=()=>{evFlowClear();S.stack=[];S.pf=null;S.pfOpen=null;S.ptOpen=null;S.morphFrom=null;S.pfStack=[];S.groupCtx=null;S.fromGroup=false;if(k==="home")S.screen="home";else if(k==="sports")S.screen="sports";else if(k==="free")S.screen="free";else if(k==="groups")S.screen="groups";else if(k==="events")S.screen="events";else S.screen="parties";render();window.scrollTo(0,0);};if(i0!==i1&&i0>=0&&i1>=0)pageDim(doTab);else doTab();break;}
     case "clearSel":S.sel={comp:null,full:false,items:{}};render();toast("Sélection annulée");break;
     case "h3Flip":{const H=hmS(),c=t.dataset.ctx;if(c!=="multi"&&H.validated&&H.mode&&H.mode!==c)break;H.mode=c;H.flip=c;H.flipAnim=true;render();requestAnimationFrame(()=>requestAnimationFrame(()=>{H.flipAnim=false;const el=document.getElementById("h3card"),g=document.getElementById("h3grid");if(el)el.classList.add("flipped");if(g){g.classList.add("wide");const r=g.querySelector("section:last-child");if(r&&!g.classList.contains("solo"))r.inert=true;}setTimeout(()=>{const q=document.getElementById("h3q-"+c);if(q)q.focus({preventScroll:true});},620);}));break;}
     case "h3Unflip":{{const H0=hmS();if(H0.flip==="multi"||H0.mode){const L0=H0.multi,one=L0.length===1&&L0[0].k!=="g";if(L0.length){H0.mode=one?"duel":"multi";H0.duel=one?L0[0]:null;}else{H0.mode="multi";H0.duel=null;}}}const H=hmS(),el=document.getElementById("h3card"),g=document.getElementById("h3grid"),has=H.mode==="duel"?!!H.duel:H.multi.length>0,ok=t.classList.contains("hfok")&&has;
@@ -6739,11 +6757,11 @@ case "hmGx":{const H=hmS(),x=H.multi[+t.dataset.i];if(x&&x.k==="g"){x.ex=(x.ex||
     case "hmGo":{hmS().mode=t.dataset.ctx;const e=document.getElementById("hm-terrain");if(e)e.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"});break;}
     case "scrollSports":case "newParty":go("sports");break;
     case "sport":go("sport",{sport:t.dataset.id});break;
-    case "comp":{S.showPast=false;const cd=S.screen==="sports"&&t.closest(".pcard"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&(cd.closest(".prowbox.open .pflip")||cd.closest(".vtk.open"));
+    case "comp":{if(["events","sports","sport"].includes(S.screen)&&FIND[t.dataset.comp]){evOpen(t.dataset.comp,t);break;}S.showPast=false;const cd=S.screen==="sports"&&t.closest(".pcard"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&(cd.closest(".prowbox.open .pflip")||cd.closest(".vtk.open"));
       S.morphFrom=cd&&bx?{pid:t.dataset.comp,pf:bx.dataset.k,y:window.scrollY,scr:"sports",to:"comp"}:null;const bgH=bg?bg.outerHTML:"";
       if(cd)document.body.classList.add("mcomp");else document.body.classList.remove("mcomp");
       window._mSrc=cd?mBgOf(cd):null;go("comp",{sport:FIND[t.dataset.comp].sport.id,comp:t.dataset.comp});if(r0)heroMorph(r0,bgH);break;}
-    case "sub":{/* journée / étape depuis un ticket ouvert de la compétition : même animation que les cartes (la tuile monte à vide, puis l'en-tête apparaît d'un coup) */
+    case "sub":{if(["events","sports","sport"].includes(S.screen)&&FIND[t.dataset.comp]){evOpen(t.dataset.comp,t);break;}/* journée / étape depuis un ticket ouvert de la compétition : même animation que les cartes (la tuile monte à vide, puis l'en-tête apparaît d'un coup) */
       const cd=S.screen==="comp"&&t.closest(".rw"),bx=cd&&cd.closest(".prowbox.open .pflip"),r0=bx&&cd.getBoundingClientRect(),y=window.scrollY;
       const bgH=r0?`<span class="pcbg"><span style="position:absolute;inset:0;background:${getComputedStyle(cd).background.replace(/"/g,"'")}"></span></span>`:"";
       if(r0)document.body.classList.add("mcomp");
