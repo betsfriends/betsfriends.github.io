@@ -4534,9 +4534,9 @@ function seedParty(def,pls){const c=FIND[def.comp];if(!c)return null;const subs=
       cfg.bets.forEach((b,bi)=>{if(!b.on)return;const type=BETS[row.cat][bi][2];if(type==="text")return;const truth=res&&res.ans?res.ans[b.id]:null;const v=seedPick(p,row,b,type,truth,rnd,skill[pl.id]);if(v!=null)m[row.key+"|"+b.id]=v;});});});
   return p;}
 async function seedTests(){if(S.seeding)return;S.seeding=true;render();
-  const others=MEMBERS.filter(m=>m.uid&&m.uid!==S.uid).slice(0,4).map(m=>({id:"u_"+m.uid,name:m.short,uid:m.uid}));
-  const bots=["Robot Max","Robot Léa","Robot Sam"].slice(0,Math.max(0,4-others.length)).map((n,i)=>({id:"bot"+i,name:n,fake:true}));
-  const pls=[{id:S.uid||"me",name:"Toi"}].concat(others,bots);
+  const others=MEMBERS.filter(m=>m.uid&&m.uid!==S.uid).slice(0,8).map(m=>({id:"u_"+m.uid,name:m.short,uid:m.uid})),bots=[];
+  if(!others.length){S.seeding=false;S.seedMsg="Aucun autre inscrit trouvé : il faut que Dorothée et David se soient connectés au moins une fois avec la nouvelle version, puis réessaie.";render();return;}
+  const pls=[{id:S.uid||"me",name:"Toi"}].concat(others);
   const defs=[{name:"Terminée · Jupiler J8 à J10",comp:"jpl",subs:["r8","r9","r10"],amount:5,split:[70,30],age:30},
     {name:"En cours · Jupiler J11 à J13",comp:"jpl",subs:["r11","r12","r13"],amount:5,split:[50,30,20],age:12},
     {name:"En cours · Premier League J8 à J10",comp:"pl",subs:["r8","r9","r10"],amount:10,split:[70,30],age:20},
@@ -4613,7 +4613,7 @@ function vProfile(){
    <h2 class="pfh">Mon lien d'invitation</h2>
    <div class="pfcard pflink"><span>${esc(link.replace(/^https?:\/\//,""))}</span><button type="button" class="pfpl" data-act="frShare">Partager</button></div>
    <button type="button" class="btn ghost block pfsave" data-act="pfSave">Enregistrer maintenant</button>
-   <div class="pftest"><b>🧪 Parties de test</b><small>Crée 5 parties avec des matchs déjà joués, des classements, des parties en cours et à venir, avec tes amis inscrits (complétées par des robots).</small>${S.seedMsg?`<p class="pfpm">${esc(S.seedMsg)}</p>`:""}<button type="button" class="btn block" data-act="seedTests"${S.seeding?" disabled":""}>${S.seeding?"Création en cours…":"🧪 Créer des parties de test"}</button></div>
+   <div class="pftest"><b>🧪 Parties de test</b><small>Crée 5 parties avec des matchs déjà joués, des classements, des parties en cours et à venir, avec les vrais inscrits (Dorothée, David…).</small>${S.seedMsg?`<p class="pfpm">${esc(S.seedMsg)}</p>`:""}<button type="button" class="btn block" data-act="seedTests"${S.seeding?" disabled":""}>${S.seeding?"Création en cours…":"🧪 Créer des parties de test"}</button></div>
    ${db&&S.uid?`<div class="pfdanger"><b>Remise à zéro (test)</b><small>Efface toutes les parties, tous les pronos, les messages et les groupes de l'appli, pour tout le monde. Les comptes et les profils sont gardés.</small>${S.purgeMsg?`<p class="pfpm">${esc(S.purgeMsg)}</p>`:""}<button type="button" class="btn block pfpurge${S.purgeArm?" arm":""}" data-act="purgeAll"${S.purging?" disabled":""}>${S.purging?"Effacement en cours…":S.purgeArm?"⚠️ Touche encore pour TOUT effacer":"🗑️ Tout effacer"}</button></div>`:""}
    </div>`;
   return h;
@@ -5392,7 +5392,7 @@ function playersOf(p){const pl=rawPlayers(p);if(!isMemberView(p))return pl;const
 function joinedOf(p,pl){return!!(pl&&(pl.id===p.owner||(PP[p.id]||{})[pl.id]||pl.uid));}
 /* pronos effectifs : ceux du document de la partie + ceux de chaque pote (son doc partypicks gagne pour lui) */
 function picksOf(p){const base=(p&&p.picks)||{},pp=p&&PP[p.id];if(!pp)return base;const out=Object.assign({},base);
-  Object.keys(pp).forEach(id=>{const d=pp[id];if(d&&d.picks&&id!==p.owner)out[id]=d.picks;});return out;}
+  Object.keys(pp).forEach(id=>{const d=pp[id];if(d&&d.picks&&id!==p.owner)out[id]=Object.assign({},base[id]||{},d.picks);});return out;}
 function syncEmails(p){if(!p.players)return;const pp=PP[p.id]||{};
   p.players=p.players.map(x=>{const d=pp[x.id];return d&&d.uid&&!x.uid&&x.id!==p.owner?Object.assign({},x,{uid:d.uid}):x;});
   p.emails=[...new Set(p.players.map(x=>normEmail(x.email)).filter(Boolean))];}
