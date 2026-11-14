@@ -3252,6 +3252,20 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .chhead span{flex:1;min-width:0;display:flex;flex-direction:column}.chhead span b{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chhead span small{font-size:12px;color:var(--muted)}
 .chhead .back{font-size:26px;line-height:1;color:#fff;background:rgba(255,255,255,.08)}
 .chgo{color:var(--lime);font-weight:800;font-size:13px;white-space:nowrap}
+
+/* ===== v38 : pronos en direct ===== */
+.lvv{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.02em;padding:3px 8px;border-radius:999px;margin-right:6px;white-space:nowrap;vertical-align:middle}
+.lvv.win{background:rgba(70,200,120,.18);color:#58D68D;border:1px solid rgba(88,214,141,.45)}
+.lvv.lose{background:rgba(230,70,70,.15);color:#F07070;border:1px solid rgba(240,112,112,.45);text-decoration:line-through;text-decoration-thickness:1px}
+.lvv.open{background:rgba(255,181,71,.12);color:#FFC46B;border:1px solid rgba(255,181,71,.4)}
+.rcs{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:2px}
+.projc{border-color:rgba(243,224,166,.45)!important;background:linear-gradient(160deg,rgba(90,69,18,.45),rgba(30,22,6,.6))!important}
+.projh{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#F3E0A6}
+.projme{margin-top:6px;font-size:16px;color:#FFF6E2}.projme b{color:#F3E0A6}
+.projl{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.projl span{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.06);font-size:13px;font-weight:700}
+.projl span.me{background:rgba(243,224,166,.18);color:#F3E0A6}
+.projl i{font-style:normal;font-weight:900;color:var(--muted)}.projl b{font-family:var(--display);font-size:16px}
 </style>
 </head>
 <body>
@@ -3563,7 +3577,15 @@ function tnAns(sets,sd){if(!sets||!sets.length)return{};const o={set1:sets[0][0]
 /* classement provisoire : on fait « comme si » l'état en direct était le résultat final */
 let PROV=false;
 function provResult(it){const L=LIVE[it.lid];if(!L||["FT","END"].includes(L.status))return null;const has=(L.winners&&L.winners.length)||L.sa!=null||L.winner;if(!has)return null;
-  const save=LIVE[it.lid];let r=null;LIVE[it.lid]=Object.assign({},save,{status:"FT"});try{r=liveResult(it);}catch(e){r=null;}finally{LIVE[it.lid]=save;}if(r)r.prov=true;return r;}
+  const save=LIVE[it.lid];let r=null;let fx={status:"FT"};
+  /* v38 tennis : « si ça finit comme ça » = celui qui mène dans le set en cours gagne ce set (et le match si c'était décisif) */
+  try{if(L.sa!=null&&L.sb!=null&&sides(it)&&/en cours/.test(String(L.line||""))){const cur=tnSets(String(L.line).replace(/·.*$/,""),null,null),last=cur[cur.length-1];const fin=([a,b])=>(Math.max(a,b)>=6&&Math.abs(a-b)>=2)||(Math.max(a,b)===7&&Math.min(a,b)>=5);
+    if(last&&!fin(last)&&last[0]!==last[1]){fx.sa=L.sa+(last[0]>last[1]?1:0);fx.sb=L.sb+(last[1]>last[0]?1:0);fx.line=cur.slice(0,-1).map(x=>x.join("-")).join(" ");}
+    else if(L.sa===L.sb){return null;}}}catch(_){}
+  LIVE[it.lid]=Object.assign({},save,fx);try{r=liveResult(it);}catch(e){r=null;}finally{LIVE[it.lid]=save;}if(r)r.prov=true;
+  /* v38 : les sets déjà terminés comptent déjà (score du 1er / 2e set, vainqueur du 1er set) */
+  try{const sd=sides(it);if(r&&r.ans&&sd&&L.sa!=null){const ds=tnDoneSets(it);if(ds[0]&&r.ans.set1==null){r.ans.set1=ds[0].join("-");r.ans.first=ds[0][0]>ds[0][1]?sd[0]:sd[1];}if(ds[1]&&r.ans.set2==null)r.ans.set2=ds[1].join("-");}}catch(_){}
+  return r;}
 function scoreProv(p){PROV=true;try{return scoreParty(p);}finally{PROV=false;}}
 function liveResult(it){const L=LIVE[it.lid]||{},st=L.status||"NS";if(L.ans&&st==="FT")return{sa:L.sa,sb:L.sb,line:L.line||"Terminé",ans:L.ans};const sd=it.a&&it.b?[it.a,it.b]:null;
   if(st==="END")return{pending:true,line:"Terminé · résultat en cours de mise à jour",ans:{}};
@@ -6445,6 +6467,31 @@ function rankMove(p,r){if(p.full||!r.it)return{};const d=+r.it.date;
   const after=sub(t=>t<=d),before=sub(t=>t<d),pos=(rows,id)=>{const me=rows.find(x=>x.id===id);return 1+rows.filter(x=>x.pts>me.pts).length;},out={};
   after.forEach(x=>{out[x.id]={rank:pos(after,x.id),tot:x.pts,mv:before.some(y=>y.pts>0)?pos(before,x.id)-pos(after,x.id):0};});return out;}
 function stageWinner(p,r,sc){const per=sc.per[r.key];if(!per)return null;const pl=playersOf(p);let best=0,who=[];pl.forEach(x=>{const v=per[x.id]||0;if(v>best){best=v;who=[x.name];}else if(v===best&&v>0)who.push(x.name);});return best?{names:who,pts:best}:null;}
+/* ===================================================================== v38 : PRONOS EN DIRECT — déjà gagné / déjà perdu / encore en jeu
+   Tennis : on essaie toutes les fins de match encore possibles (en sets) ; un prono juste dans toutes = gagné, dans aucune = perdu.
+   Foot : règles sûres (score exact dépassé, les deux équipes ont marqué, nombre de buts dépassé). Sinon : en jeu. */
+function tnFinals(c,it){const L=LIVE[it.lid]||{};if(L.sa==null||L.sb==null)return null;const bo=["ao","rg","wim","uso"].includes(c.id)?5:3,N=Math.ceil(bo/2),out=[];
+  for(let y=L.sb;y<N;y++)if(L.sa<=N)out.push([N,y]);for(let x=L.sa;x<N;x++)if(L.sb<=N)out.push([x,N]);
+  return out.map(([x,y])=>{const save=LIVE[it.lid];let r=null;LIVE[it.lid]={status:"FT",sa:x,sb:y,line:""};try{r=liveResult(it);}catch(_){}finally{LIVE[it.lid]=save;}return r&&r.ans||{};});}
+function tnDoneSets(it){const L=LIVE[it.lid]||{};const sets=tnSets(String(L.line||"").replace(/·.*$/,""),null,null);const done=sets.filter(([a,b])=>(Math.max(a,b)>=6&&Math.abs(a-b)>=2)||(Math.max(a,b)===7&&Math.min(a,b)>=5));return done;}
+function liveVerdict(c,r,b,t,v){if(v==null||v===""||!c||!r.it||!r.it.live||liveSt(r.it)!=="LIVE")return null;const sp=c.sport.id,L=LIVE[r.it.lid]||{},sd=sides(r.it);
+  try{if(sp==="tennis"&&sd){
+      /* manches déjà jouées : 1er set, 2e set, vainqueur du 1er set */
+      const ds=tnDoneSets(r.it);if(["set1","set2","first"].includes(b.id)){const k=b.id==="set2"?1:0;if(ds.length>k){const tr=b.id==="first"?(ds[0][0]>ds[0][1]?sd[0]:sd[1]):ds[k][0]+"-"+ds[k][1];return betGood(t,tr,v)?"win":"lose";}return"open";}
+      const F=tnFinals(c,r.it);if(!F||!F.length)return"open";const T=F.map(a=>a[b.id]);if(T.some(x=>x==null))return"open";const ok=T.map(x=>betGood(t,x,v));return ok.every(Boolean)?"win":ok.some(Boolean)?"open":"lose";}
+    if(sp==="foot"&&sd&&L.sa!=null){const a=+L.sa,bb=+L.sb;
+      if(b.id==="score"){const m=String(v).match(/(\d+)\s*-\s*(\d+)/);if(m&&(a>+m[1]||bb>+m[2]))return"lose";return"open";}
+      if(b.id==="btts"){if(a>0&&bb>0)return norm(v)==="oui"?"win":"lose";return"open";}
+      if(b.id==="goals"&&(t==="exactnum"||t==="number")){if(a+bb>gNum(v))return"lose";return"open";}
+      return"open";}}catch(_){}
+  return"open";}
+const LVV={win:["✓ Gagné","win"],lose:["✕ Perdu","lose"],open:["⏳ En jeu","open"]};
+function lvvTag(k){const x=LVV[k];return x?`<span class="lvv ${x[1]}">${x[0]}</span>`:"";}
+/* « Si ça finit comme ça » : classement provisoire de la partie avec le score en direct */
+function projLine(p){let sc=null;try{sc=scoreProv(p);}catch(_){return"";}if(!sc||!sc.rows||!sc.rows.length)return"";const me=myId(p),R=sc.rows.slice().sort((a,b)=>b.pts-a.pts);
+  const rk=id=>1+R.filter(x=>x.pts>(R.find(y=>y.id===id)||{pts:0}).pts).length,mine=R.find(x=>x.id===me);
+  const nm=x=>x.id===me?"Toi":esc(x.name||"?");
+  return`<div class="pad" style="margin-top:12px"><div class="card projc"><div class="projh">🔮 Si ça finit comme ça</div>${mine?`<div class="projme">Tu serais <b>${rk(me)}${rk(me)>1?"e":"er"}</b> avec <b>${mine.pts} pts</b></div>`:""}<div class="projl">${R.slice(0,5).map(x=>`<span class="${x.id===me?"me":""}"><i>${rk(x.id)}</i>${nm(x)}<b>${x.pts}</b></span>`).join("")}</div></div></div>`;}
 function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div><button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button></div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
   const mine=R.board.find(x=>x.pl.id===me);let place=1;const ranks=R.board.map((x,i)=>{if(i&&x.pts<R.board[i-1].pts)place=i+1;return place;});const myPlace=ranks[R.board.indexOf(mine)];
   const arrow=m=>m>0?`<span class="mvup">▲${m}</span>`:m<0?`<span class="mvdn">▼${-m}</span>`:`<span class="mveq">=</span>`;
@@ -6475,7 +6522,8 @@ function vBet(){
   if(locked&&onAir)h+=`<div class="pad"><div class="lockban" style="border-color:#B23A30">● <span><b style="color:#E5534B">En direct</b> Score mis à jour automatiquement · tes pronos sont figés.</span></div></div>`;
   else if(locked)h+=`<div class="pad"><div class="lockban" style="border-color:${st==="done"?"var(--line)":"#FFB547"}">${st==="done"?"🏁":"🔒"} <span><b>${st==="done"?"Match terminé":"Paris fermés"}</b> ${st==="done"?(res&&res.pending?"Le résultat arrive automatiquement · les points seront calculés tout seuls.":res?esc(res.line)+(gain!=null?` · tu marques <b style="color:var(--lime)">+${gain} pts</b>`:""):""):"Le match a commencé ou l'organisateur a fermé les paris. Tes pronos sont figés."}</span></div></div>`;
   if(locked&&st!=="done"){const pls=playersOf(p),pk=picksOf(p);const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text");
-    h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh"><b>${esc(d[1])}</b><span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${pls.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v)):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
+    if(onAir)h+=projLine(p);
+    h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh"><b>${esc(d[1])}</b><span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${pls.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v)):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
   let qn=0;h+=`<div class="pad" style="margin-top:12px"><div class="qlist">${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
      if(locked&&t==="text"&&!has)return"";
      qn++;return`<section class="qcard${has?" has":""}${!has&&(S.missHi||[]).includes(r.key+"|"+b.id)?" miss":""}"><header class="qh"><span class="qn">${has&&!locked?"✓":qn}</span><span class="ql"><b>${esc(label)}</b>${has?`<small>Ton choix : <em>${esc(tnL(r,b.id,mv))}</em>${(()=>{if(Array.isArray(mv)){const fo=myVal(p,r.key+"|"+b.id+"@odd");const l=mv.map(x=>{const o=fixedOdd(fo,x)||oddFor(c,r.it,"top10",x);return o?esc(x.split(" ").slice(-1)[0])+" "+ptsW(c,r.it,b,x,o)+" pts":"";}).filter(Boolean);return l.length?" · si T10 : "+l.join(", "):"";}const od=fixedOdd(myVal(p,r.key+"|"+b.id+"@odd"),mv)||oddFor(c,r.it,b.id,mv);return od?` · cote ${od.toFixed(2)} → <em>${ptsW(c,r.it,b,mv,od)} pts</em> si gagné`:"";})()}</small>`:`<small class="qto">À choisir</small>`}${truth!=null?`<small>Réponse : ${esc(Array.isArray(truth)?truth.join(", "):tnL(r,b.id,truth))} ${good?"✓":"✗"}</small>`:""}</span><span class="qp">${ODD_BETS.has(b.id)&&!c.custom?`${b.pts} pt${b.pts>1?"s":""} × cote`:`${b.pts} pt${b.pts>1?"s":""}`}</span></header>${betInput(p,r,b,t,label,ro)}</section>`;}).join("")}</div>
