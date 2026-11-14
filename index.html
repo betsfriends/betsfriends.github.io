@@ -4693,11 +4693,12 @@ function matchHTML(i){const sd=sides(i);if(!sd)return esc(i.label);const sep=i.l
 const TEST_OPEN={"ww26-r4":true,"sp26-r":true};
 const testOpen=i=>!!(i&&i.lid&&TEST_OPEN[i.lid]&&!i.whole);
 /* nouvelle partie : un match / une séance / un tour se choisit jusqu'à 2 h avant son début (exception : Stockholm, jusqu'au début de la finale le 14 nov. à 13h) */
-const LOCK_NEW=2*3600e3,LOCK_EX={st26:"2026-11-14T12:00:00Z"};
+const LOCK_NEW=2*3600e3,LOCK_EX={st26:"2026-11-14T12:15:00Z"};
+const stLate=i=>!!(i&&i._c==="st26"&&!i.tbd&&Date.now()<+new Date("2026-11-14T12:15:00Z"));
 const lockOf=(cid,t)=>{const ex=LOCK_EX[cid];return ex&&(t==null?Date.now():t)<+new Date(ex)?0:LOCK_NEW;};
-function selOpen(i){if(!i||isDone(i))return false;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
+function selOpen(i){if(!i||isDone(i))return false;if(stLate(i))return true;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
 const compOpenNew=(c,sid)=>{try{return subsOf(c).some(su=>(!sid||su.id===sid)&&su.items.some(selOpen));}catch(_){return false;}};
-const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)));
+const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)));
 /* les pronos se ferment au coup d'envoi de chaque match / session */
 const CLOSE_MS=0,closeAt=i=>+i.date-CLOSE_MS;
 const canPickIt=i=>!isDone(i)&&(lateOk(i)||(closeAt(i)>+NOW&&(!i.live||liveSt(i)==="NS")));
