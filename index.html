@@ -6184,7 +6184,7 @@ function addPlayerPrice(p){const free=p.people-playersOf(p).length;if(free>0)ret
    Chaque réouverture / refermeture manuelle par l'organisateur est inscrite dans la partie (p.rlog) avec l'heure, l'auteur
    et l'état du match à ce moment-là. Tous les joueurs la voient sur la carte du match. */
 /* v46 : bouton « Rouvrir les paris » pour l'organisateur (carte du match, page du match, salon des lives) */
-function reopenBtn(p,r){const paid=!lateOk(r.it)&&+r.it.date<=+NOW&&LATE.reopen>0;return`<button type="button" class="reobtn" data-act="reopenQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}"><span class="reoi">🔓</span><span><b>Rouvrir les paris</b><small>Un pote a oublié ? Tout le monde verra la réouverture${paid?" · "+eur(LATE.reopen):""}</small></span></button>`;}
+function reopenBtn(p,r){const paid=false;return`<button type="button" class="reobtn" data-act="reopenQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}"><span class="reoi">🔓</span><span><b>Rouvrir les paris</b><small>Un pote a oublié ? Tout le monde verra la réouverture${paid?" · "+eur(LATE.reopen):""}</small></span></button>`;}
 function rlogAdd(p,k,r,act){const it=r&&r.it,L=it&&it.live?(LIVE[it.lid]||{}):{},sd=it?sides(it):null;
   const sc=L.status==="LIVE"&&L.sa!=null?(L.sa+"-"+L.sb):"";const e={k,act,at:new Date().toISOString(),by:myLabel()||"L'organisateur",t:r?r.title:"",st:it&&+it.date<=+NOW?(L.status==="LIVE"?"live":"after"):"before",sc,min:L.minute||""};
   p.rlog=(p.rlog||[]).concat([e]).slice(-200);}
@@ -6268,7 +6268,7 @@ function myBetsTab(p,sc){
     /* v46 : bouton très visible pour l'organisateur — rouvrir / refermer les paris de ce match */
     if(isOwner(p)&&!p.free&&st==="closed")acts.push(reopenBtn(p,r));
     if(isOwner(p)&&!p.free&&st==="open"&&(p.state||{})[r.key]==="open")acts.push(`<button type="button" class="mini" data-act="lockQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}">🔒 Refermer les paris</button>`);
-    if(own&&st!=="done"&&!(st==="open"&&(p.state||{})[r.key]!=="open"))acts.push(st==="open"?`<button type="button" class="mini" data-act="lockItem" data-key="${esc(r.key)}">Refermer les paris</button>`:`<button type="button" class="mini warn" data-act="reopenItem" data-key="${esc(r.key)}">Rouvrir les paris${!lateOk(r.it)&&+r.it.date<=+NOW?" · "+eur(LATE.reopen):""}</button>`);
+    if(own&&st!=="done"&&!(st==="open"&&(p.state||{})[r.key]!=="open"))acts.push(st==="open"?`<button type="button" class="mini" data-act="lockItem" data-key="${esc(r.key)}">Refermer les paris</button>`:`<button type="button" class="mini warn" data-act="reopenItem" data-key="${esc(r.key)}">Rouvrir les paris</button>`);
     if(own&&c.custom&&!r.it.res)acts.push(`<button type="button" class="mini warn" data-act="cuDelGame" data-key="${esc(r.key)}">${S.delArmG===r.key?"Confirmer la suppression":"Supprimer"}</button>`);
     /* carte de match : l'affiche en grand, l'état en petit, les joueurs en écus dorés */
     const sd=sides(r.it),sc0=res&&res.sa!=null?res:(kind==="live"&&L.sa!=null?{sa:L.sa,sb:L.sb}:null),d0=new Date(r.it.date);
@@ -6375,7 +6375,7 @@ function adminRow(p,c,subs,r,g){const it=r.it,su=subs.find(x=>x.id===r.key.split
   const score=res&&res.sa!=null?scoreHTML(it,res):(L.sa!=null&&sides(it))?scoreHTML(it,{sa:L.sa,sb:L.sb}):sides(it)?matchHTML(it):esc(r.title);
   const acts=[];
   if(g==="open"&&man==="open")acts.push(`<button type="button" class="mini" data-act="lockItem" data-key="${esc(r.key)}">🔒 Refermer les paris</button>`);
-  if(g==="closed")acts.push(`<button type="button" class="mini warn" data-act="reopenItem" data-key="${esc(r.key)}">🔓 Rouvrir les paris${!lateOk(it)&&past?" · "+eur(LATE.reopen):""}</button>`);
+  if(g==="closed")acts.push(`<button type="button" class="mini warn" data-act="reopenItem" data-key="${esc(r.key)}">🔓 Rouvrir les paris</button>`);
   if(c.custom){if(past||it.res)acts.push(`<button type="button" class="mini go" data-act="betOne" data-key="${esc(r.key)}">${it.res?"✏️ Modifier le résultat":"🏁 Encoder le résultat"}</button>`);
     if(!it.res)acts.push(`<button type="button" class="mini warn" data-act="cuDelGame" data-key="${esc(r.key)}">${S.delArmG===r.key?"Confirmer la suppression":"Supprimer le match"}</button>`);}
   else if(it.live&&past&&!(S.resEdit===r.key))acts.push(`<button type="button" class="mini go" data-act="resEdit" data-key="${esc(r.key)}">${lv==="FT"?"✏️ Corriger le résultat":"🏁 Encoder le résultat"}</button>`);
@@ -7229,7 +7229,8 @@ document.addEventListener("click",e=>{
     case "lockItem":{const p=partyById(S.partyView);if((p.state||{})[t.dataset.key]!=="open"){toast("Les paris se ferment tout seuls au coup d'envoi.");break;}p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});rlogAdd(p,t.dataset.key,rowsOfParty(p).find(x=>x.key===t.dataset.key),"close");savePartyDoc(p,"Paris fermés");break;}
     case "reopenQuick":S.partyView=t.dataset.id;/* falls through */
     case "reopenItem":{const p=partyById(S.partyView),k=t.dataset.key,r=rowsOfParty(p).find(x=>x.key===k);const apply=()=>{p.state=Object.assign({},p.state,{[k]:"open"});rlogAdd(p,k,r,"open");};
-      if(r&&r.it&&!lateOk(r.it)&&+r.it.date<=+NOW){S.pay={title:"Rouvrir les paris",detail:r.title+" a déjà commencé : la réouverture est payante.",amount:LATE.reopen,what:"Réouverture · "+r.title,apply};render();}else{apply();savePartyDoc(p,"Paris rouverts");}break;}
+      /* v47 : la réouverture est toujours gratuite (on ne repaie jamais une partie) */
+      apply();savePartyDoc(p,"Paris rouverts");break;}
     case "addPlayer":{const p=partyById(S.partyView),nm=(S.npName||"").trim(),em=p.demo?"":normEmail(S.npEmail);if(!nm)return toast("Écris le prénom du joueur.");if(rawPlayers(p).some(x=>x.name.toLowerCase()===nm.toLowerCase()))return toast("Ce prénom est déjà dans la partie.");
       if(em&&!okEmail(em))return toast("Cette adresse e-mail n'a pas l'air valide.");if(em&&rawPlayers(p).some(x=>normEmail(x.email)===em))return toast("Cette adresse est déjà utilisée dans la partie.");
       const pr=addPlayerPrice(p);const apply=()=>{const np=p.demo?{id:"pl"+Date.now().toString(36),name:nm.slice(0,24),local:true}:Object.assign({id:rid(),name:nm.slice(0,24)},em?{email:em}:{});p.players=rawPlayers(p).concat([np]);p.people=Math.max(p.people,p.players.length);S.npName="";S.npEmail="";};
