@@ -4830,9 +4830,11 @@ const testOpen=i=>!!(i&&i.lid&&TEST_OPEN[i.lid]&&!i.whole);
 const LOCK_NEW=2*3600e3,LOCK_EX={st26:"2026-11-14T12:15:00Z",/* v42 : Ligue des nations de ce soir (14 nov.) — pronos et nouvelles parties ouverts jusqu'au coup d'envoi pile */unl:"2026-11-14T23:59:00Z"};
 const stLate=i=>!!(i&&i._c==="st26"&&!i.tbd&&Date.now()<+new Date("2026-11-14T12:15:00Z"));
 const lockOf=(cid,t)=>{const ex=LOCK_EX[cid];return ex&&(t==null?Date.now():t)<+new Date(ex)?0:LOCK_NEW;};
-function selOpen(i){if(!i||isDone(i))return false;if(stLate(i))return true;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
+function selOpen(i){if(!i||isDone(i))return false;if(stLate(i)||unlLate(i))return true;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
 const compOpenNew=(c,sid)=>{try{return subsOf(c).some(su=>(!sid||su.id===sid)&&su.items.some(selOpen));}catch(_){return false;}};
-const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)));
+/* v44 : Ligue des nations, les 2 matchs de 18:00 (14 nov.) restent ouverts aux pronos jusqu'à 18:15 */
+const unlLate=i=>!!(i&&i._c==="unl"&&!i.tbd&&+new Date(i.date)===+new Date("2026-11-14T17:00:00Z")&&Date.now()<+new Date("2026-11-14T17:15:00Z"));
+const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)||unlLate(i)));
 /* les pronos se ferment au coup d'envoi de chaque match / session */
 const CLOSE_MS=0,closeAt=i=>+i.date-CLOSE_MS;
 const canPickIt=i=>!isDone(i)&&(lateOk(i)||(closeAt(i)>+NOW&&(!i.live||liveSt(i)==="NS")));
@@ -5570,7 +5572,7 @@ function tkClose(bx){if(!bx.classList.contains("torn")||bx.classList.contains("t
 /* échéance = fermeture du prochain prono que TU n'as pas encore fait dans la partie */
 function myDue(p){let t=Infinity;try{todoRows(p).forEach(r=>{const c=closeAt(r.it);if(c<t)t=c;});}catch(_){}return t;}
 /* v36 : décompte vers le 1er match à pronostiquer — « J−1 » toute la veille (jusqu'à 23:59, heure de Bruxelles), puis le jour du match « H−x » heure par heure (H−18 à minuit pour un match à 18:00, puis H−17, H−16…) */
-function urgMark(p){if(myDue(p)===Infinity)return null;let k=Infinity;try{todoRows(p).forEach(r=>{const d=+r.it.date;if(d<k)k=d;});}catch(_){}if(k===Infinity)return null;
+function urgMark(p){if(myDue(p)===Infinity)return null;let k=Infinity;const now0=+NOW;try{rowsOfParty(p).forEach(r=>{if(!r.it||r.it.tbd||isDone(r.it))return;const d=+r.it.date;if(d>now0&&d<k)k=d;});}catch(_){}if(k===Infinity)return null;
   const now=+NOW,day=bxDay(k),today=bxDay(now),tomorrow=bxDay(now+864e5);
   if(k<=now)return null;if(day===today){const h=Math.max(1,Math.ceil((k-now)/36e5));return["H−"+h,h<=2?"r":"o"];}
   if(day===tomorrow)return["J−1","o"];return null;}
@@ -5921,7 +5923,9 @@ function defaultOpts(p,key,cat,betId){
 const optsOf=(b,p,key,cat)=>{const def=defaultOpts(p,key,cat,b.id);let o=b.opts!=null?b.opts.split("\n").map(x=>x.trim()).filter(Boolean):def;
   /* un match entre deux joueurs / équipes : un réglage commun ne doit jamais proposer d'autres noms que les deux adversaires */
   if(!String(key).startsWith("all:")){let sd=null;try{const it=findItem(p,key);sd=it&&sides(it);}catch(e){}
-    if(sd&&def.length===sd.length&&def.every(x=>sd.includes(x))){const f=o.filter(x=>sd.includes(x));o=f.length?f:sd;}}
+    if(sd&&def.length===sd.length&&def.every(x=>sd.includes(x))){const f=o.filter(x=>sd.includes(x));o=f.length?f:sd;}
+    /* v43 : un réglage fait pour « tous les matchs » garde des libellés génériques → sur un vrai match, on montre les deux équipes (et leurs vraies cotes) */
+    if(sd){const H=/^victoire (à|a) domicile$|^domicile$|^équipe 1$/i,A=/^victoire (à|a) l.ext(é|e)rieur$|^ext(é|e)rieur$|^équipe 2$/i;o=o.map(x=>H.test(x)?sd[0]:A.test(x)?sd[1]:x).filter((x,i,a)=>a.indexOf(x)===i);}}
   return o;};
 
 /* ===================================================================== PRIX DE LA PARTIE (grille de départ, à ajuster)
@@ -6597,6 +6601,9 @@ function vBet(){
   if(st==="done"&&res&&!res.pending&&one)return vRecap(p,r,res,cfg,c);
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
+  /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
+  try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.id===me?"Toi":x.name,st:done?"in":"wait"};});
+    h+=`<div class="pad" style="margin-top:12px"><div class="card ptacc whop">${bubRow(L,"ont joué ce match")}</div></div>`;}}catch(_){}
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
   else if(c.custom&&+r.it.date<=+NOW&&!r.it.res)h+=`<div class="pad"><div class="lockban" style="border-color:#FFB547">⏳ <span><b>En attente du résultat</b> L'organisateur doit encoder le score de ce match.</span></div></div>`;
   if(locked&&onAir)h+=`<div class="pad"><div class="lockban" style="border-color:#B23A30">● <span><b style="color:#E5534B">En direct</b> Score mis à jour automatiquement · tes pronos sont figés.</span></div></div>`;
@@ -7070,7 +7077,7 @@ function suAct(a,t){const s=suS();
     case "suPts":{const d=suCfgOf(t.dataset.s);if(!d)return true;const b=d.bets[+t.dataset.i];b.pts=Math.max(1,Math.min(20,b.pts+(+t.dataset.d)));render();return true;}
     case "suCreate":{const cr=S.create,sp_=({"100":[100],"70-30":[70,30],"50-30-20":[50,30,20],"40-30-20-10":[40,30,20,10],"perso":cr.custom})[cr.split]||[100];
       if(!suRows().some(r=>r.on)){toast("Coche au moins un match.");return true;}if(sp_.reduce((a,b)=>a+(+b||0),0)!==100){toast("La répartition doit faire 100 %.");return true;}
-      if(!(cr.amount>0)){toast("Indique une mise par joueur.");return true;}cr.err="";s.paying=false;go("pay");return true;}
+      if(!(cr.amount>0)){toast("Indique une mise par joueur.");return true;}cr.err="";s.paying=false;/* v43 : on fige les paris réglés AVANT le paiement */try{S._suCfg=suCfgDoc();}catch(_){S._suCfg=null;}go("pay");return true;}
     case "suPm":if(!s.paying){s.pm=t.dataset.v;render();}return true;
     case "suPay":{if(s.paying)return true;s.paying=true;S.create.err="";render();setTimeout(async()=>{S._suPaid=true;try{await saveParty();}finally{S._suPaid=false;if(S.su){S.su.paying=false;if(S.screen==="pay")render();}}},1100);return true;}}
   return false;}
@@ -7145,6 +7152,8 @@ async function saveParty(){
     doc.emails=doc.players.map(x=>x.email).filter(Boolean);doc.invited={};}
   if(S.groupCtx){const g=grp;if(g){doc.group=g.id;const ng=Object.assign({},g,{parties:(g.parties||[]).concat([id])});if(!g.demo&&myGroup(g)){S.groups=(S.groups||[]).map(x=>x.id===g.id?ng:x);if(db){const d=Object.assign({},ng);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>{});}}else g.parties=ng.parties;}}
   if(S.su&&["setup","pay"].includes(S.screen)){const cfg=suCfgDoc();if(cfg)doc.cfg=cfg;}
+  /* v43 : les paris réglés avant le paiement sont ceux de la partie, quel que soit l'écran au moment où elle est créée */
+  if(!doc.cfg&&!isFree&&S._suCfg)doc.cfg=S._suCfg;if(doc.cfg)S._suCfg=null;
   if(db){try{await db.doc("parties/"+id).set(doc);}catch(e){cr.err=e&&e.code==="invalid_argument"?"Enregistrement refusé : il faut un accès Éditeur à l'appli.":"Enregistrement impossible, réessaie.";return render();}}
   else S.parties.push(Object.assign({id},doc));
   (doc.players||[]).forEach(pl=>{if(pl.uid)notify(pl.uid,"party",(me().name||"Ton pote")+" t'invite à la partie « "+doc.name+" »",{pid:id});});
