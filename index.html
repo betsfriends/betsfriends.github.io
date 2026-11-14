@@ -4698,8 +4698,8 @@ const lockOf=(cid,t)=>{const ex=LOCK_EX[cid];return ex&&(t==null?Date.now():t)<+
 function selOpen(i){if(!i||isDone(i))return false;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
 const compOpenNew=(c,sid)=>{try{return subsOf(c).some(su=>(!sid||su.id===sid)&&su.items.some(selOpen));}catch(_){return false;}};
 const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)));
-/* les paris se ferment tout seuls 2 h avant le début de chaque match / session */
-const CLOSE_MS=2*36e5,closeAt=i=>+i.date-CLOSE_MS;
+/* les pronos se ferment au coup d'envoi de chaque match / session */
+const CLOSE_MS=0,closeAt=i=>+i.date-CLOSE_MS;
 const canPickIt=i=>!isDone(i)&&(lateOk(i)||(closeAt(i)>+NOW&&(!i.live||liveSt(i)==="NS")));
 function vMatch(){
   const c=FIND[S.comp],sp=c.sport,su=subsOf(c).find(s=>s.id===S.sub),it=su&&su.items.find(i=>i.id===S.mitem);if(!it)return vSub();
@@ -6909,7 +6909,7 @@ document.addEventListener("click",e=>{
     case "ptab":S.ptab=t.dataset.t;if(S.ptab==="chat")chatSubscribe(partyById(S.partyView));render();if(S.ptab==="chat")chatScroll();break;
     case "chatSend":{const i=document.querySelector("[data-chat]");chatSend(i?i.value:S.chatDraft);break;}
     case "chatQuick":chatSend(t.dataset.v);break;
-    case "lockItem":{const p=partyById(S.partyView);if((p.state||{})[t.dataset.key]!=="open"){toast("Les paris se ferment tout seuls 2 h avant le début.");break;}p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});savePartyDoc(p,"Paris fermés");break;}
+    case "lockItem":{const p=partyById(S.partyView);if((p.state||{})[t.dataset.key]!=="open"){toast("Les paris se ferment tout seuls au coup d'envoi.");break;}p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});savePartyDoc(p,"Paris fermés");break;}
     case "reopenItem":{const p=partyById(S.partyView),k=t.dataset.key,r=rowsOfParty(p).find(x=>x.key===k);const apply=()=>{p.state=Object.assign({},p.state,{[k]:"open"});};
       if(r&&r.it&&!lateOk(r.it)&&+r.it.date<=+NOW){S.pay={title:"Rouvrir les paris",detail:r.title+" a déjà commencé : la réouverture est payante.",amount:LATE.reopen,what:"Réouverture · "+r.title,apply};render();}else{apply();savePartyDoc(p,"Paris rouverts");}break;}
     case "addPlayer":{const p=partyById(S.partyView),nm=(S.npName||"").trim(),em=p.demo?"":normEmail(S.npEmail);if(!nm)return toast("Écris le prénom du joueur.");if(rawPlayers(p).some(x=>x.name.toLowerCase()===nm.toLowerCase()))return toast("Ce prénom est déjà dans la partie.");
