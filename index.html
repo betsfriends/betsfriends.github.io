@@ -3301,6 +3301,21 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 
 /* ===== v40 : pastille de messages non lus sur l'onglet Chat ===== */
 #tabs .tbdot{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#E5352B;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 0 0 2px #050816;line-height:1}
+
+/* ===== v45 : salon des lives par match ===== */
+.lrwhere{font-size:12.5px;color:#F3E0A6;font-weight:700;min-width:0}
+.lrtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.lrtabs::-webkit-scrollbar{display:none}
+.lrtab{flex:none;border-radius:999px;border:1.5px solid rgba(243,224,166,.45);background:transparent;color:#F3E0A6;font-weight:800;font-size:13px;padding:8px 14px}
+.lrtab.on{background:linear-gradient(135deg,#EED9AA 0%,#C7A04A 48%,#9C7432 100%);color:#2A0705;border-color:transparent}
+.lrone{font-size:13px;font-weight:800;color:#F3E0A6;text-transform:uppercase;letter-spacing:.05em}
+.lrx>.lrmine{font-size:14px;color:var(--muted)}.lrx>.lrmine em{font-style:normal;color:#F3E0A6;font-weight:800}
+
+/* ===== v46 : bouton Rouvrir les paris ===== */
+.reobtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:16px;padding:14px 16px;border:0;cursor:pointer;background:linear-gradient(135deg,#EED9AA 0%,#C7A04A 48%,#9C7432 100%);color:#1A1206;box-shadow:0 8px 22px -10px rgba(199,160,74,.8),0 0 0 1px rgba(255,236,190,.4) inset;margin-top:10px}
+.reobtn .reoi{font-size:26px;line-height:1}
+.reobtn b{display:block;font-size:17px;font-weight:900}
+.reobtn small{display:block;font-size:12px;font-weight:700;opacity:.8;margin-top:2px}
+.reobtn:active{transform:scale(.98)}
 </style>
 </head>
 <body>
@@ -4119,7 +4134,7 @@ function hmTerrain(){const L=[["foot","Foot"],["tennis","Tennis"],["f1","F1"],["
   return`<section class="hterr" id="hm-terrain"><h2>Choisis ton <em>terrain de jeu</em></h2><div class="hspg">${L.map(([id,n])=>`<button type="button" class="hsp" ${id==="free"?'data-act="tab" data-tab="free"':`data-act="sport" data-id="${id}"`} aria-label="${esc(n)}">${HM_SP[id]}<span>${esc(n)}</span></button>`).join("")}</div></section>`;}
 function hmBanner(){
   /* v36 : pendant un direct (et seulement à ce moment-là), la bannière devient un lien vers la partie en direct */
-  let LV=[];try{LV=liveRowsAll();}catch(e){}
+  let LV=[];try{LV=liveMatches().map(m=>m.rows[0]);}catch(e){}
   if(LV.length){const i0=(S.hbI||0)%LV.length;return`<div class="hbn hblive" role="region" aria-label="En direct dans tes parties">${LV.map(({p,r},i)=>{const it=r.it,L0=LIVE[it.lid]||{},c=FIND[p.comp],sd=sides(it),sc=sd&&L0.sa!=null?` ${L0.sa}-${L0.sb}`:"";
       return`<button type="button" class="hbs${i===i0?" on":""}" data-act="liveRoom" tabindex="${i===i0?0:-1}"><span class="hblv"><i></i>LIVE</span>${c?compBadge(c,20):""}<b>${esc(sd?(shortSides(it)||sd).join(" – "):it.label||p.name)}${esc(sc)}</b><small>Suivre →</small></button>`;}).join("")}</div>`;}
   let L=[];try{L=HOT();}catch(e){}if(!L.length)return"";const i0=(S.hbI||0)%L.length;
@@ -5037,8 +5052,7 @@ function vChatRoom(){const p=partyById(S.chatParty||S.partyView);if(!p)return vC
   return`<div class="chhead"><button type="button" class="back" data-act="back" aria-label="Retour">‹</button>${c?compBadge(c,34):`<span class="prfree">🥂</span>`}<span><b>${esc(g?g.name:p.name)}</b><small>${esc(g?p.name:(c?c.name:"Pari libre"))}</small></span><button type="button" class="link chgo" data-act="party" data-id="${esc(p.id)}">Voir la partie</button></div>${chatTab(p,true)}`;}
 /* ===================================================================== v39 : SALON DES LIVES
    Le ticket Live mène toujours ici. 1 seul event : déjà déplié. Plusieurs : on déplie celui qu'on veut, les autres restent sur la page. */
-function lrKey(p,r){return p.id+"|"+r.key;}
-function lrIsOpen(A,k){S.lrOpen=S.lrOpen||{};if(k in S.lrOpen)return S.lrOpen[k];return A.length===1;}
+function lrIsOpen(n,k){S.lrOpen=S.lrOpen||{};if(k in S.lrOpen)return S.lrOpen[k];return n===1;}
 function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),pls=playersOf(p),pk=picksOf(p),me=myId(p);
   const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text")
     /* seulement les paris où au moins un joueur a un prono */
@@ -5046,20 +5060,23 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
   if(!qs.length)return`<p class="muted" style="margin:4px 2px">Aucun prono enregistré sur ce match.</p>`;
   return`<h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh"><b>${esc(d[1])}</b><span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${pls.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;const ph=bubImg(personOf(p,pl));
     return`<div class="rcp${pl.id===me?" me":""}"><span class="rcn"><i class="lrav">${ph||esc(String(pl.name||"?").charAt(0).toUpperCase())}</i>${esc(pl.id===me?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc((()=>{const sd0=sides(r.it),sh=shortSides(r.it),ix=sd0?sd0.indexOf(v):-1;return ix>=0&&sh?sh[ix]:tnL(r,b.id,v);})()):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}`;}
-function lrCard(p,r,open){const c=FIND[p.comp],it=r.it,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},g=partyGroup(p),k=lrKey(p,r),sv=srvSide(it),short=shortSides(it)||sd;
+function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},k=m.k,sv=srvSide(it),short=shortSides(it)||sd;
+  S.lrSel=S.lrSel||{};let sel=m.rows.find(x=>x.p.id===S.lrSel[k])||m.rows[0];const p=sel.p,r=sel.r;
   const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${esc(short[k2])}${sv===k2?SRV_BALL:""}</b>${natOf(sd[k2])&&!CLUB[sd[k2]]?`<span class="mhf">${FLAG[natOf(sd[k2])]||""}</span>`:""}</div>`;
   const center=`<div class="mhc"><span class="mhlive">● EN DIRECT</span>${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}<small>${esc(L.minute||(sp==="tennis"?"":L.line)||"")}</small></div>`;
   const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>${sp==="tennis"?tnGrid(sd,L.line,true):""}`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
-  const mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
+  const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
   let h=`<div class="lrc${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
-    <span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b><small>${esc(g?g.name+" · "+p.name:p.name)}</small></span><i class="lrchev" aria-hidden="true">${open?"▴":"▾"}</i></span>
+    <span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b><small>${esc(it.label||"")}</small></span><i class="lrchev" aria-hidden="true">${open?"▴":"▾"}</i></span>
     <span class="lrbody mh-${sp}">${body}</span>
-    <span class="lrfoot">${mine?`<span class="lrmine">Ton prono : <em>${mine}</em></span>`:""}<span class="lrcta">${open?"Refermer":"Voir les paris"}</span></span></button>`;
-  if(open){h+=`<div class="lrx">${rawPlayers(p).length>1?`<div class="card ptacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}${projLine(p).replace('<div class="pad" style="margin-top:12px">','<div>')}${liveBetsHTML(p,r,c)}<button type="button" class="btn ghost block" data-act="party" data-id="${esc(p.id)}">Ouvrir la partie</button></div>`;}
+    <span class="lrfoot"><span class="lrwhere">${where}</span><span class="lrcta">${open?"Refermer":"Voir les paris"}</span></span></button>`;
+  if(open){const mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
+    h+=`<div class="lrx">${m.rows.length>1?`<div class="lrtabs" role="tablist">${m.rows.map(x=>`<button type="button" role="tab" class="lrtab${x===sel?" on":""}" aria-selected="${x===sel}" data-act="lrPick" data-k="${esc(k)}" data-p="${esc(x.p.id)}">${esc(partyLabel(x.p))}</button>`).join("")}</div>`:`<div class="lrone">${esc(partyLabel(p))}</div>`}
+      ${isOwner(p)&&!p.free&&itemState(p,r)==="closed"?reopenBtn(p,r):""}${mine?`<div class="lrmine">Ton prono : <em>${mine}</em></div>`:""}${rawPlayers(p).length>1?`<div class="card ptacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}${projLine(p).replace('<div class="pad" style="margin-top:12px">','<div>')}${liveBetsHTML(p,r,c)}<button type="button" class="btn ghost block" data-act="party" data-id="${esc(p.id)}">Ouvrir la partie « ${esc(partyLabel(p))} »</button></div>`;}
   return h+`</div>`;}
-function vLiveRoom(){const A=liveRowsAll();let h=pageHead("LE SALON <b>DES LIVES</b>",A.length?A.length+" événement"+(A.length>1?"s":"")+" en direct dans tes parties":"Rien en direct pour l'instant");
-  if(!A.length)return h+`<p class="empty">Aucun match en direct en ce moment. Le salon s'anime dès qu'un match de tes parties commence.</p>`;
-  return h+`<div class="lrlist">${A.map(({p,r})=>lrCard(p,r,lrIsOpen(A,lrKey(p,r)))).join("")}</div>`;}
+function vLiveRoom(){const M=liveMatches();let h=pageHead("LE SALON <b>DES LIVES</b>",M.length?M.length+" match"+(M.length>1?"s":"")+" en direct dans tes parties":"Rien en direct pour l'instant");
+  if(!M.length)return h+`<p class="empty">Aucun match en direct en ce moment. Le salon s'anime dès qu'un match de tes parties commence.</p>`;
+  return h+`<div class="lrlist">${M.map(m=>lrCard(m,lrIsOpen(M.length,m.k))).join("")}</div>`;}
 function vGroup(){
   const g=groupById(S.groupView);if(!g)return vGroups();
   const ps=groupParties(g);
@@ -5597,12 +5614,16 @@ function lvTkScore(it){const L=LIVE[it.lid]||{},sd=shortSides(it),sv=srvSide(it)
   if(sd&&L.sa!=null){const nm=k=>`<b class="lvn">${esc(sd[k])}${sv===k?SRV_BALL:""}</b><span class="lvs">${esc(String(k?L.sb:L.sa))}</span>`;return`<span class="lvm">${nm(0)}${nm(1)}</span>`;}
   if(sd)return`<span class="lvm"><b class="lvn">${esc(sd[0])}</b><span class="lvs">–</span><b class="lvn">${esc(sd[1])}</b><span class="lvs">–</span></span>`;
   const lead=(L.winners&&L.winners[0])||L.winner||"";return`<span class="lvm1"><b class="lvn">${esc(it.label||"")}</b>${lead?`<small class="lvg">En tête : ${esc(lead)}${L.score!=null?" ("+esc(String(L.score))+")":""}</small>`:""}</span>`;}
-function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const{p,r}=A[0],it=r.it,L=LIVE[it.lid]||{},c=FIND[p.comp],g=partyGroup(p),sid=sportOfParty(p);
+/* v45 : un match joué dans plusieurs parties = UN seul match en direct */
+function liveMatches(){const by={},out=[];liveRowsAll().forEach(x=>{const k=x.r.it.lid||x.r.key;if(!by[k]){by[k]={k,it:x.r.it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}by[k].rows.push(x);});return out;}
+/* nom lisible d'une partie : son groupe, sinon « avec Alexandre, Maxime », sinon son nom */
+function partyLabel(p){const g=partyGroup(p);if(g)return g.name;const me=myId(p);const o=playersOf(p).filter(x=>x.id!==me&&!x.fake).map(x=>x.name);return o.length?"avec "+o.slice(0,3).join(", ")+(o.length>3?"…":""):p.name;}
+function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();const{p,r}=A[0],it=r.it,L=LIVE[it.lid]||{},c=FIND[p.comp],g=partyGroup(p),sid=sportOfParty(p);
   const extra=A.length-1,mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
   const when=[L.minute,sid==="tennis"&&L.line?String(L.line).replace(/\s*·\s*en cours$/,""):"",sid!=="tennis"&&!L.minute&&L.line?L.line:""].filter(Boolean).join(" · ");
-  if(A.length>1)return`<div class="prowbox hlvb hlvn"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
-   <button type="button" class="lvR lvRn" data-act="liveRoom"><span class="lvbig"><b class="lvn2">${A.length}</b><span class="lvs2">événements<br>en live</span></span><span class="lvgo">Entrer dans le salon des lives →</span></button></div>`;
-  return`<div class="prowbox hlvb" data-live="${esc(p.id)}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b>${extra>0?`<small>+ ${extra} autre${extra>1?"s":""} live</small>`:""}</button>
+  if(MM.length>1)return`<div class="prowbox hlvb hlvn"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
+   <button type="button" class="lvR lvRn" data-act="liveRoom"><span class="lvbig"><b class="lvn2">${MM.length}</b><span class="lvs2">matchs<br>en live</span></span><span class="lvgo">Entrer dans le salon des lives →</span></button></div>`;
+  return`<div class="prowbox hlvb" data-live="${esc(p.id)}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b>${MM[0].rows.length>1?`<small>dans ${MM[0].rows.length} parties</small>`:""}</button>
    <button type="button" class="lvR" data-act="liveRoom"><span class="lvc">${SPEM[sid]||""} ${esc(c?c.name:"")}${g?" · "+esc(g.name):""}</span>${lvTkScore(it)}${when||mine?`<span class="lvx">${esc(when)}${when&&mine?" · ":""}${mine?"ton prono : "+mine:""}</span>`:""}<span class="lvgo">Suivre le match en direct →</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
 function vParties(){
   const D=partiesData(),f=S.pf||null;
@@ -6162,6 +6183,8 @@ function addPlayerPrice(p){const free=p.people-playersOf(p).length;if(free>0)ret
 /* ===================================================================== v36 : HISTORIQUE DES RÉOUVERTURES (anti-triche)
    Chaque réouverture / refermeture manuelle par l'organisateur est inscrite dans la partie (p.rlog) avec l'heure, l'auteur
    et l'état du match à ce moment-là. Tous les joueurs la voient sur la carte du match. */
+/* v46 : bouton « Rouvrir les paris » pour l'organisateur (carte du match, page du match, salon des lives) */
+function reopenBtn(p,r){const paid=!lateOk(r.it)&&+r.it.date<=+NOW&&LATE.reopen>0;return`<button type="button" class="reobtn" data-act="reopenQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}"><span class="reoi">🔓</span><span><b>Rouvrir les paris</b><small>Un pote a oublié ? Tout le monde verra la réouverture${paid?" · "+eur(LATE.reopen):""}</small></span></button>`;}
 function rlogAdd(p,k,r,act){const it=r&&r.it,L=it&&it.live?(LIVE[it.lid]||{}):{},sd=it?sides(it):null;
   const sc=L.status==="LIVE"&&L.sa!=null?(L.sa+"-"+L.sb):"";const e={k,act,at:new Date().toISOString(),by:myLabel()||"L'organisateur",t:r?r.title:"",st:it&&+it.date<=+NOW?(L.status==="LIVE"?"live":"after"):"before",sc,min:L.minute||""};
   p.rlog=(p.rlog||[]).concat([e]).slice(-200);}
@@ -6242,6 +6265,9 @@ function myBetsTab(p,sc){
     const orgL=own?`<span class="orgline" style="color:${cs?"#FFB547":"var(--pink)"}">⚙️ ${cs?`${ownC?"Réglage de ce match":"Réglage commun"} · ${cs.f} · ${cs.n} paris`:"Paris à régler (réglage par défaut)"}</span>`:"";
     const acts=[];if(can)acts.push(`<button type="button" class="bigact ${pl?"green":"orange"}" data-act="betOne" data-key="${esc(r.key)}">${pl?"Modifier mon prono":"Faire mon prono"}</button>`);
     if(own&&st==="open")acts.push(`<button type="button" class="mini" data-act="cfg" data-key="${esc(r.key)}">⚙️ Régler les paris</button>`);
+    /* v46 : bouton très visible pour l'organisateur — rouvrir / refermer les paris de ce match */
+    if(isOwner(p)&&!p.free&&st==="closed")acts.push(reopenBtn(p,r));
+    if(isOwner(p)&&!p.free&&st==="open"&&(p.state||{})[r.key]==="open")acts.push(`<button type="button" class="mini" data-act="lockQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}">🔒 Refermer les paris</button>`);
     if(own&&st!=="done"&&!(st==="open"&&(p.state||{})[r.key]!=="open"))acts.push(st==="open"?`<button type="button" class="mini" data-act="lockItem" data-key="${esc(r.key)}">Refermer les paris</button>`:`<button type="button" class="mini warn" data-act="reopenItem" data-key="${esc(r.key)}">Rouvrir les paris${!lateOk(r.it)&&+r.it.date<=+NOW?" · "+eur(LATE.reopen):""}</button>`);
     if(own&&c.custom&&!r.it.res)acts.push(`<button type="button" class="mini warn" data-act="cuDelGame" data-key="${esc(r.key)}">${S.delArmG===r.key?"Confirmer la suppression":"Supprimer"}</button>`);
     /* carte de match : l'affiche en grand, l'état en petit, les joueurs en écus dorés */
@@ -6602,6 +6628,7 @@ function vBet(){
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
   /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
+  if(isOwner(p)&&!p.free&&itemState(p,r)==="closed")h+=`<div class="pad" style="margin-top:12px">${reopenBtn(p,r)}</div>`;
   try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.id===me?"Toi":x.name,st:done?"in":"wait"};});
     h+=`<div class="pad" style="margin-top:12px"><div class="card ptacc whop">${bubRow(L,"ont joué ce match")}</div></div>`;}}catch(_){}
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
@@ -7192,12 +7219,15 @@ document.addEventListener("click",e=>{
     case "optDone":S.optEdit=null;render();break;
     case "ptab":S.ptab=t.dataset.t;if(S.ptab==="chat")chatSubscribe(partyById(S.partyView));render();if(S.ptab==="chat")chatScroll();break;
     case "liveRoom":S.lrOpen={};go("lives");break;
-    case "lrTog":{const k=t.dataset.k,A=liveRowsAll();S.lrOpen=S.lrOpen||{};S.lrOpen[k]=!lrIsOpen(A,k);render();if(S.lrOpen[k]){const el=document.getElementById("lr-"+k.replace(/[^\w-]/g,"_"));if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),60);}break;}
+    case "lockQuick":{const p=partyById(t.dataset.id);if(!p)break;S.partyView=p.id;p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});rlogAdd(p,t.dataset.key,rowsOfParty(p).find(x=>x.key===t.dataset.key),"close");savePartyDoc(p,"Paris refermés");break;}
+    case "lrPick":{S.lrSel=S.lrSel||{};S.lrSel[t.dataset.k]=t.dataset.p;render();break;}
+    case "lrTog":{const k=t.dataset.k,A=liveMatches();S.lrOpen=S.lrOpen||{};S.lrOpen[k]=!lrIsOpen(A.length,k);render();if(S.lrOpen[k]){const el=document.getElementById("lr-"+k.replace(/[^\w-]/g,"_"));if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),60);}break;}
     case "chatOpen":{const p=partyById(t.dataset.id);if(!p)break;S.chatParty=p.id;S.partyView=p.id;chatSubscribe(p);go("chatroom");setTimeout(()=>{try{chatScroll();}catch(_){}},250);break;}
     case "gAcc":{const g=groupById(S.groupView);if(g)gAnswer(g,t.dataset.v);break;}
     case "chatSend":{const i=document.querySelector("[data-chat]");chatSend(i?i.value:S.chatDraft);break;}
     case "chatQuick":chatSend(t.dataset.v);break;
     case "lockItem":{const p=partyById(S.partyView);if((p.state||{})[t.dataset.key]!=="open"){toast("Les paris se ferment tout seuls au coup d'envoi.");break;}p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});rlogAdd(p,t.dataset.key,rowsOfParty(p).find(x=>x.key===t.dataset.key),"close");savePartyDoc(p,"Paris fermés");break;}
+    case "reopenQuick":S.partyView=t.dataset.id;/* falls through */
     case "reopenItem":{const p=partyById(S.partyView),k=t.dataset.key,r=rowsOfParty(p).find(x=>x.key===k);const apply=()=>{p.state=Object.assign({},p.state,{[k]:"open"});rlogAdd(p,k,r,"open");};
       if(r&&r.it&&!lateOk(r.it)&&+r.it.date<=+NOW){S.pay={title:"Rouvrir les paris",detail:r.title+" a déjà commencé : la réouverture est payante.",amount:LATE.reopen,what:"Réouverture · "+r.title,apply};render();}else{apply();savePartyDoc(p,"Paris rouverts");}break;}
     case "addPlayer":{const p=partyById(S.partyView),nm=(S.npName||"").trim(),em=p.demo?"":normEmail(S.npEmail);if(!nm)return toast("Écris le prénom du joueur.");if(rawPlayers(p).some(x=>x.name.toLowerCase()===nm.toLowerCase()))return toast("Ce prénom est déjà dans la partie.");
