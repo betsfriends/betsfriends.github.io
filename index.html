@@ -3314,6 +3314,7 @@ const SPORTS=[
    {id:"buli",group:"Championnats",name:"Bundesliga",flag:"Allemagne",desc:"Saison 2026-27 · 34 journées",build:league({start:D(2026,8,29),breaks:[2,6,10,16,26],teams:T.buli,seed:14})},
    {id:"l1",group:"Championnats",name:"Ligue 1",flag:"France",desc:"Saison 2026-27 · 34 journées",build:league({start:D(2026,8,22),breaks:[3,7,11,16,26],teams:T.l1,seed:15})},
    {id:"jpl",group:"Championnats",name:"Jupiler Pro League",flag:"Belgique",desc:"Saison 2026-27 · 34 journées",build:league({start:D(2026,8,1),breaks:[6,10,14,20],teams:T.jpl,seed:16})},
+   {id:"unl",group:"Sélections",name:"Ligue des nations",flag:"Europe",desc:"2026-27 · phase de ligue · vrais matchs",build:()=>[]},
    {id:"ucl",group:"Coupes d'Europe",name:"Ligue des champions",flag:"Europe",desc:"2026-27 · phase de ligue et élimination",build:uclBuild},
    {id:"cdf",group:"Coupes nationales",name:"Coupe de France",flag:"France",desc:"2026-27 · élimination directe",build:cupBuild({teams:T.l1,seed:41,first:["8es de finale",D(2027,2,3)],rounds:[["Quarts de finale",D(2027,3,3)],["Demi-finales",D(2027,4,21)],["Finale",D(2027,5,22,21),null,"La finale"]]})},
    {id:"dfb",group:"Coupes nationales",name:"DFB-Pokal",flag:"Allemagne",desc:"2026-27 · élimination directe",build:cupBuild({teams:T.buli,seed:42,first:["8es de finale",D(2026,12,1)],rounds:[["Quarts de finale",D(2027,2,2)],["Demi-finales",D(2027,4,20)],["Finale",D(2027,5,22,20),null,"La finale"]]})},
@@ -3451,7 +3452,7 @@ const CACHE={};
    - résultats tennis, golf, F1 : un doc live/<lid> par match / jour / séance */
 const ESPN="https://site.api.espn.com/apis/site/v2/sports/";
 const FEED={pl:["soccer/eng.1","L",T.pl],liga:["soccer/esp.1","L",T.liga],seriea:["soccer/ita.1","L",T.serieA],buli:["soccer/ger.1","L",T.buli],l1:["soccer/fra.1","L",T.l1],jpl:["soccer/bel.1","L",T.jpl],
-  ucl:["soccer/uefa.champions","U",null],cdf:["soccer/fra.coupe_de_france","K",T.l1],dfb:["soccer/ger.dfb_pokal","K",T.buli],coppa:["soccer/ita.coppa_italia","K",T.serieA],rey:["soccer/esp.copa_del_rey","K",T.liga],
+  ucl:["soccer/uefa.champions","U",null],unl:["soccer/uefa.nations","L",null],cdf:["soccer/fra.coupe_de_france","K",T.l1],dfb:["soccer/ger.dfb_pokal","K",T.buli],coppa:["soccer/ita.coppa_italia","K",T.serieA],rey:["soccer/esp.copa_del_rey","K",T.liga],
   croky:["soccer/bel.cup","K",T.jpl],facup:["soccer/eng.fa","K",T.pl],nba:["basketball/nba","N",T.nba],top14:["rugby/270559","L",T.top14],six:["rugby/180659","S",T.six]};
 const RES_SP=["tennis","f1"];const LIVE_FROM=+new Date("2026-11-14T00:00:00");
 const LCAL={};let CAL_VER=0;const LNET={fail:0,ok:0,last:{},busy:{},err:""};
@@ -3464,9 +3465,10 @@ const ESPN_TEAM={"club brugge":"Club Bruges","cercle brugge ksv":"Cercle Bruges"
   "philadelphia 76ers":"Philadelphie","la clippers":"LA Clippers","los angeles clippers":"LA Clippers","los angeles lakers":"LA Lakers",
   "section paloise":"Pau","stade toulousain":"Toulouse","stade rochelais":"La Rochelle","aviron bayonnais":"Bayonne","usa perpignan":"Perpignan","union bordeaux begles":"Bordeaux-Bègles","stade francais paris":"Stade Français","clermont auvergne":"Clermont","castres olympique":"Castres","montpellier herault":"Montpellier","rc toulon":"Toulon","lyon ou":"Lyon","us montauban":"Montauban",
   "england":"Angleterre","ireland":"Irlande","scotland":"Écosse","wales":"Pays de Galles","italy":"Italie","france":"France"};
+const LV_NAT={"portugal":"Portugal","denmark":"Danemark","austria":"Autriche","republic of ireland":"Irlande","ireland":"Irlande","northern ireland":"Irlande du Nord","ukraine":"Ukraine","poland":"Pologne","romania":"Roumanie","bosnia herzegovina":"Bosnie-Herzégovine","bosnia and herzegovina":"Bosnie-Herzégovine","sweden":"Suède","israel":"Israël","kosovo":"Kosovo","hungary":"Hongrie","georgia":"Géorgie","wales":"Pays de Galles","norway":"Norvège","belgium":"Belgique","france":"France","germany":"Allemagne","spain":"Espagne","italy":"Italie","netherlands":"Pays-Bas","england":"Angleterre","scotland":"Écosse","switzerland":"Suisse","croatia":"Croatie","serbia":"Serbie","czechia":"Tchéquie","czech republic":"Tchéquie","turkey":"Turquie","turkiye":"Turquie","greece":"Grèce","slovakia":"Slovaquie","slovenia":"Slovénie","iceland":"Islande","finland":"Finlande","albania":"Albanie","north macedonia":"Macédoine du Nord","montenegro":"Monténégro","bulgaria":"Bulgarie","belarus":"Biélorussie","armenia":"Arménie","azerbaijan":"Azerbaïdjan","cyprus":"Chypre","estonia":"Estonie","latvia":"Lettonie","lithuania":"Lituanie","luxembourg":"Luxembourg","malta":"Malte","moldova":"Moldavie","faroe islands":"Îles Féroé","gibraltar":"Gibraltar","andorra":"Andorre","liechtenstein":"Liechtenstein","san marino":"Saint-Marin","kazakhstan":"Kazakhstan"};
 const lvK=s=>normS(s).replace(/[^a-z0-9]+/g," ").trim();
 const LV_STOP=new Set(["fc","cf","ac","as","sc","sv","rc","afc","kv","kaa","kvc","krc","ksv","royal","club","de","la","le","the","sk","us","cd","ud","ss","ssc","vfb","vfl","tsg","bc","ogc","sco","rcd","1","04","07"]);
-function lvTeam(cid,name){const k=lvK(name);if(ESPN_TEAM[k])return ESPN_TEAM[k];const f=FEED[cid];
+function lvTeam(cid,name){const k=lvK(name);if(cid==="unl")return LV_NAT[k]||name;if(ESPN_TEAM[k])return ESPN_TEAM[k];const f=FEED[cid];
   const L=f&&f[2]?f[2]:[].concat(T.pl,T.liga,T.serieA,T.buli,T.l1,T.jpl,T.ucl);const toks=x=>lvK(x).split(" ").filter(t=>t.length>2&&!LV_STOP.has(t));
   const df={};L.forEach(n=>new Set(toks(n+" "+(TEAM_ALIAS[n]||""))).forEach(t=>df[t]=(df[t]||0)+1));
   const mine=toks(name);let best=null,bs=0,tie=false;L.forEach(n=>{const ts=new Set(toks(n+" "+(TEAM_ALIAS[n]||"")));let s=0,k=0;mine.forEach(t=>{if(ts.has(t)){s+=1/(df[t]||1);k++;}});if(k)s+=.5*k/ts.size;if(s>bs){bs=s;best=n;tie=false;}else if(s===bs&&s>0)tie=true;});
@@ -3713,7 +3715,7 @@ function pageHead(title,sub,back){const n=title.replace(/<[^>]+>/g,"").length;re
 function urgency(p){if(!p||p.free)return null;let t=Infinity;try{rowsOfParty(p).forEach(r=>{if(r.it&&itemState(p,r)==="open")t=Math.min(t,(p.state||{})[r.key]==="open"?+r.it.date:closeAt(r.it));});}catch(e){return null;}if(t===Infinity)return null;const h=(t-+NOW)/36e5;if(h>24)return null;return h<=1?"Ferme très bientôt":"Ferme dans "+Math.round(h)+" h";}
 const urgIc=p=>{const u=urgency(p);return u?`<span class="urg" title="${u}" aria-label="${u}">⏰</span>`:"";};
 /* évents mis en avant (accueil « Nouveautés » + onglet Évents « À la une ») : [compétition, journée, badge, titre, nombre, dates] */
-const NEWS=[["st26",null,"Cette semaine","ATP 250 Stockholm","12 matchs en 16es","8 – 14 nov."],["atpf",null,"Groupes connus","ATP Finals · Turin","McEnroe & Lendl","15 – 22 nov."],["ucl","r5","Ouvert","Ligue des champions · J5","18 matchs","24 – 26 nov."],["six",null,"Nouveau","Six Nations 2027","15 matchs","Fév. – mars"],["dpw",null,"Cette semaine","DP World Tour Championship","4 tours","12 – 15 nov."]];
+const NEWS=[["unl",null,"Ce soir","Ligue des nations","Portugal – Danemark…","14 – 17 nov."],["st26",null,"Cette semaine","ATP 250 Stockholm","12 matchs en 16es","8 – 14 nov."],["atpf",null,"Groupes connus","ATP Finals · Turin","McEnroe & Lendl","15 – 22 nov."],["ucl","r5","Ouvert","Ligue des champions · J5","18 matchs","24 – 26 nov."],["six",null,"Nouveau","Six Nations 2027","15 matchs","Fév. – mars"],["dpw",null,"Cette semaine","DP World Tour Championship","4 tours","12 – 15 nov."]];
 /* onglet Évents : à la une, en direct, filtres quand / sport, agenda par semaine */
 function compSpan(c){const ds=[];let n=0;try{subsOf(c).forEach(su=>su.items.forEach(i=>{if(/^(wdc|wcc|rook)$/.test(i.id)||i.tbd)return;ds.push(+i.date);n++;}));}catch(e){}if(!ds.length)return null;return{a:Math.min(...ds),b:Math.max(...ds),n};}
 function vEvents(){const now=+NOW,day=864e5,F=S.evF||"hot",SP=S.evS||"";
@@ -4009,7 +4011,7 @@ const FL_C=[
  {id:"es",name:"Espagne",comps:["liga","rey"],lg:"liga"},
  {id:"be",name:"Belgique",comps:["jpl","croky"],lg:"jpl"},
  {id:"en",name:"Angleterre",comps:["pl","facup"],lg:"pl"},
- {id:"eu",name:"Europe",comps:["ucl"]},
+ {id:"eu",name:"Europe",comps:["ucl","unl"]},
  {id:"wd",name:"Monde",comps:[]}];
 const FL_TEAMS={l1:T.l1,buli:T.buli,seriea:T.serieA,liga:T.liga,jpl:T.jpl,pl:T.pl};
 function flStar(cx,cy,r){let p=[];for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,rr=k%2?r*.42:r;p.push((cx+rr*Math.cos(a)).toFixed(2)+","+(cy+rr*Math.sin(a)).toFixed(2));}return`<polygon points="${p.join(" ")}" fill="#FFCC00"/>`;}
