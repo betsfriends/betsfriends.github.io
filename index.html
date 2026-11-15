@@ -3502,6 +3502,17 @@ html{background:#0B0905}
 .rtile .rtveil{display:none}
 /* terrains plus marqués sur les tuiles de Mes parties */
 .ntile .pcart{filter:brightness(1.45) contrast(1.15)}
+.rtlist2{display:grid;gap:0}
+.rtst.soon{align-self:center;background:rgba(255,255,255,.08);color:#E9DFC6;border:1px dashed rgba(243,224,166,.5)}
+.rtst.live{align-self:center;background:rgba(214,69,65,.25);color:#FF9A92;border:1px solid rgba(255,120,110,.55)}
+.rtsoon{align-items:center;text-align:center;gap:6px}
+.rtwhen{font-size:15px;color:#fff;font-weight:800}
+.rttodo{font-size:12.5px;font-weight:900;padding:5px 12px;border-radius:999px;background:rgba(255,181,71,.16);color:#FFC46B;border:1px solid rgba(255,181,71,.45)}
+.rtok{font-size:12.5px;font-weight:900;padding:5px 12px;border-radius:999px;background:rgba(70,200,120,.14);color:#58D68D;border:1px solid rgba(88,214,141,.45)}
+.rtsort{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 12px}
+.rtsb{flex:1 1 auto;min-width:0;padding:8px 12px;border-radius:999px;border:1px solid rgba(243,224,166,.35);background:rgba(0,0,0,.3);color:#E9DFC6;font:inherit;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer}
+.rtsb.on{background:linear-gradient(135deg,#EED9AA 0%,#C7A04A 48%,#9C7432 100%);color:#2A0705;border-color:transparent}
+.rtcat{margin:6px 2px 8px}
 </style>
 </head>
 <body>
@@ -5910,6 +5921,15 @@ function withWhom(p){let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameC
 const tileTitle=n=>String(n||"").replace(/^\s*🧪\s*/,"").replace(/^(En cours|Terminée|À venir)\s*·\s*/i,"");
 /* v80 : tuile « Résultats » — même famille que le salon des lives : cadre aux couleurs du sport, drapeaux + score final (1 match) ou ta place en grand (plusieurs matchs), groupe ou joueurs, place, crédits */
 /* v81 : tuile « Résultats » — au centre, le classement de la PARTIE (trio de tête + toi), points et crédits ; terminée = ta place en grand à gauche */
+/* v85 : classer les parties — par position, de la plus récente à la plus ancienne (ou l'inverse), ou par sport */
+const RT_SORTS=[["pos","Position"],["new","Plus récentes"],["old","Plus anciennes"],["sport","Sport"]];
+function rtSortKey(){if(S.rtSort)return S.rtSort;try{const v=localStorage.getItem("bf_rtsort");if(v)return S.rtSort=v;}catch(_){}return"new";}
+function rtGrid(list,D){const k=rtSortKey(),endT=p=>{try{const t=rowsOfParty(p).filter(r=>r.it).map(r=>+r.it.date);return t.length?Math.max(...t):+new Date(p.createdAt||0);}catch(_){return 0;}},rk=p=>{const r=D&&D.RK&&D.RK.get(p.id);return r?r.rank:Infinity;};
+  const SPO=["foot","tennis","f1","golf","rugby","basket","velo","free"],a=list.slice();
+  if(k==="pos")a.sort((x,y)=>rk(x)-rk(y)||endT(y)-endT(x));else if(k==="old")a.sort((x,y)=>endT(x)-endT(y));else if(k==="sport")a.sort((x,y)=>SPO.indexOf(sportOfParty(x))-SPO.indexOf(sportOfParty(y))||endT(y)-endT(x));else a.sort((x,y)=>endT(y)-endT(x));
+  const NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",basket:"Basket",velo:"Cyclisme",free:"Pari libre"};
+  let body="",cur=null;a.forEach(p=>{if(k==="sport"){const sd=sportOfParty(p);if(sd!==cur){cur=sd;body+=`<div class="ntcat rtcat">${esc(NM[sd]||sd)}</div>`;}}body+=rtile(p,D);});
+  return`<div class="rtsort" role="group" aria-label="Classer les parties">${RT_SORTS.map(([v,l])=>`<button type="button" class="rtsb${k===v?" on":""}" data-act="rtSort" data-v="${v}" aria-pressed="${k===v}">${l}</button>`).join("")}</div><div class="pclist rtlist2">${body}</div>`;}
 function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done",D);
   const sp=c.sport.id,rows=rowsOfParty(p).filter(r=>r.it),one=rows.length===1?rows[0].it:null,fin=isClosed(p);
   const sub=one?(one.label||""):String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
@@ -5919,12 +5939,18 @@ function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done"
   const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i><b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?"up":""}">${cr>0?"+"+cr:"0"} cr.</u>`:""}</span>`;};
   let list=R.slice(0,3).map((_,i)=>line(i)).join("");if(meI>2)list+=`<span class="rtsep">···</span>`+line(meI);
   const att=rows.filter(r=>{try{return!isDone(r.it)&&+r.it.date+3*3600e3<+NOW;}catch(_){return false;}}).length;
-  const head=fin?`<span class="rtst fin">Terminée</span>`:`<span class="rtst cur">En cours · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""}${att?` · ${att} résultat${att>1?"s":""} attendu${att>1?"s":""}`:""}</span>`;
+  const started=(sc&&sc.done>0)||rows.some(r=>+r.it.date<=+NOW),onAir=!fin&&rows.some(r=>{try{return inPlay(r.it);}catch(_){return false;}});
+  if(!started){const t0=rows.length?Math.min(...rows.map(r=>+r.it.date)):0,todo=(()=>{try{return D.todoN(p);}catch(_){return 0;}})();
+    const when=t0?new Date(t0).toLocaleString("fr-BE",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+    const plN=(()=>{try{return playersOf(p).filter(x=>!x.fake).length;}catch(_){return 0;}})();
+    return rtileWrap(p,c,sp,sub,`<div class="rtc cur"><div class="rtlist rtsoon"><span class="rtst soon">À venir</span>${when?`<b class="rtwhen">1er match · ${esc(when)}</b>`:""}<small class="rtprov">${rows.length} ${sp==="f1"?"session":sp==="golf"?"sélection":sp==="velo"?"étape":"match"}${rows.length>1?"s":""} · ${plN} joueur${plN>1?"s":""}${hasPot?` · mise ${p.amount} cr.`:""}</small>${todo?`<span class="rttodo">✏️ ${todo} prono${todo>1?"s":""} à faire</span>`:`<span class="rtok">✓ Tes pronos sont faits</span>`}</div></div>`);}
+  const head=fin?`<span class="rtst fin">Terminée</span>`:onAir?`<span class="rtst live">● En direct · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""}</span>`:`<span class="rtst cur">En cours · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""}${att?` · ${att} résultat${att>1?"s":""} attendu${att>1?"s":""}`:""}</span>`;
   const myRk=meI>=0?tieRank(R,meI):null;
   const center=fin?`<div class="rtc fin">${myRk?`<div class="rtme2"><b>${myRk}<sup>${myRk>1?"e":"er"}</sup></b><small>sur ${R.length}</small></div>`:""}<div class="rtlist">${head}${list}</div></div>`
     :`<div class="rtc cur"><div class="rtlist">${head}<small class="rtprov">Classement provisoire${hasPot?" · crédits si ça tient":""}</small>${list}</div></div>`;
-  const sd=one?sides(one):null;
-  const deco="";
+  return rtileWrap(p,c,sp,sub,center);}
+function rtileWrap(p,c,sp,sub,center){const deco="";
+  const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
   let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameCrew(x,p))||null;}catch(_){}}
   let who="";if(g)who=`<span class="rtgrp">👥 ${esc(g.name)}</span>`;else{let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
     who=`<span class="rtpl"><span class="rtav">${pl.slice(0,4).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(x.name||"?").charAt(0).toUpperCase())}</i>`;}).join("")}</span><span class="rtnm">${esc(pl.map(x=>nm(x)).join(", "))}</span></span>`;}
@@ -6000,7 +6026,7 @@ function vParties(){
     const rk=r?`${r.rank}${r.rank>1?"e":"er"}`:"";
     const ph=phaseInfo(p).k,right=`<span class="pcright">${r&&ph!=="soon"?rkPill(r,0,ph==="live"):""}${n?todoTile(n,0,p.id):!fin&&rdy.includes(p)?editTile():""}</span>`;
     return`<button type="button" class="pcard pc2 ph-${ph} pcsu pcsp sp-${sid}${S.justNew&&S.justNew.id===p.id?" pcnew":""}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span><b class="pct">${!n&&urgIc(p)?urgIc(p):""}${esc(p.name)}</b><span class="pcb">${c?compBadge(c,44):`<span class="prfree">🥂</span>`}</span><span class="pcm"><small>${phaseLine(p,n?urgTag(vibeT(p)):"",1)}</small>${fin&&gainOf(p)>0?`<em class="pcgain">+${gainOf(p).toLocaleString("fr-BE")} cr.</em>`:playedTxt(p)}</span>${right}</button>`;};
-  const grid=list=>list.length?`<div class="pclist">${list.map(pcard).join("")}</div>`:`<p class="empty">${f&&f.k==="pending"?"Tout est fait, chapeau 👌":"Rien ici pour l'instant."}</p>`;
+  const grid=list=>list.length?rtGrid(list,D):`<p class="empty">${f&&f.k==="pending"?"Tout est fait, chapeau 👌":"Rien ici pour l'instant."}</p>`;
   if(f){
     if(f.k==="groups"){const gs=allGroups();return head("PAR <b>GROUPE</b>","Une bande d'amis, ses parties")+`<div class="ptg">${gs.map(g=>{const ps=groupParties(g),t=ps.reduce((a,p)=>a+D.todoN(p),0);return`<button type="button" class="pcat" data-act="pf" data-k="group" data-v="${esc(g.id)}">${scene("sport",1)}<span class="ptsh"></span><span class="pcic">${esc(g.name.split(" ").filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join("").toUpperCase())}</span><span class="pttx"><b>${esc(g.name)}</b><small>${g.members.length} membres · ${ps.length} partie${ps.length>1?"s":""}</small>${t?`<em>✏️ ${t} prono${t>1?"s":""} à faire</em>`:""}</span></button>`;}).join("")}</div>`;}
     if(f.k==="group"){const g=groupById(f.v);return head(esc(g?g.name:"Groupe"),g?g.members.join(" · "):"")+grid(g?groupParties(g):[]);}
@@ -6021,7 +6047,7 @@ function vParties(){
   /* ticket : clic → il se déchire, le talon tombe, la partie droite prend toute la largeur et montre les parties en grand (plus de page à part) */
   const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir les ${n} parties"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
   const SP_ORD=["foot","tennis","f1","golf","rugby","velo","basket","free"],SP_NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",velo:"Cyclisme",basket:"Basket",free:"Pari libre"};
-  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;const T=p=>k==="done"?rtile(p,D):(k==="pending"||k==="ready")?ntile(p,k,D):pcard(p);
+  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;if(k==="done")return rtGrid(list,D);const T=p=>k==="done"?rtile(p,D):(k==="pending"||k==="ready")?ntile(p,k,D):pcard(p);
     if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist">${h}</div>`;}
     return`<div class="pclist">${list.map(T).join("")}</div>`;};
   /* tri (pas un filtre) : toutes les parties restent, seul l'ordre change — par urgence (fermeture la plus proche) ou par classement (ta meilleure place d'abord) */
@@ -7740,6 +7766,7 @@ case "kf":{const p=partyById(S.partyView),k=t.dataset.k,cur=(S.kf||{})[p.id];S.k
       Object.keys(d).forEach(k=>{if(key==="free"?/^q\d+$/.test(k):k.startsWith(key+"|")){if(d[k]==null||d[k]==="")delete mine[k];else mine[k]=d[k];delete d[k];n++;}});
       if(!n)return toast("Rien de nouveau à enregistrer.");S.mbOpen=null;writeMyPicks(p,mine,"Pronos enregistrés");render();break;}
     case "match":go("match",{mitem:t.dataset.item});break;
+    case "rtSort":S.rtSort=t.dataset.v;try{localStorage.setItem("bf_rtsort",S.rtSort);}catch(_){}render();break;
     case "pf":S.pfStack=(S.pfStack||[]).concat([S.pf||null]);S.pf={k:t.dataset.k,v:t.dataset.v};render();window.scrollTo(0,0);break;
     case "psport":S.psport=t.dataset.v;render();break;
     case "pflip":{const bx=t.closest(".prowbox"),c=bx&&bx.querySelector(".pflip");if(!c||bx.classList.contains("torn")||bx.classList.contains("tkmove"))break;
