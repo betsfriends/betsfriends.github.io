@@ -3323,7 +3323,7 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .gspc{display:inline-grid;place-items:center;width:66px;height:66px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2A2010,#0C0904);border:1.5px solid rgba(217,182,106,.65);box-shadow:0 6px 18px rgba(0,0,0,.5)}
 .chicwm .gsp{opacity:.16}
 .gsumd{margin:6px 0 2px;font-size:12px;color:rgba(255,236,190,.62);font-weight:600}.gsumd b{font-weight:800}.gsumd b.up{color:#8FE3B0}.gsumd b.dn{color:#F09A92}
-.evfl{grid-template-columns:minmax(0,1fr)}.evsps{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px;min-width:0}
+.evfl{grid-template-columns:minmax(0,1fr)}.evsps{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px;min-width:0;padding:0 18px}
 .evsp{min-width:0;display:grid;place-items:center;padding:9px 0;border-radius:14px;border:1px solid rgba(217,182,106,.45);background:rgba(20,14,6,.55)}
 .evsp.on{background:linear-gradient(160deg,#6A4C17,#3A2A0D);border-color:#E6C680;box-shadow:0 0 0 1px #E6C680 inset}
 .pfsps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -3342,6 +3342,20 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .chip.chlock{background:#FFB547!important;color:#2A1702!important;border-color:#FFB547!important;font-weight:900}
 #app{min-height:100vh;min-height:100lvh}
 .mckind.mklive{background:#C9302C!important;color:#fff!important;border-color:#E5534B!important;letter-spacing:.08em;font-weight:900;animation:chblink 2.6s ease-in-out infinite}@media (prefers-reduced-motion:reduce){.mckind.mklive{animation:none}}
+.chlist2{display:grid;gap:10px;padding:14px max(16px,env(safe-area-inset-left,0px)) 0}
+.chcard{position:relative;display:flex;align-items:stretch;border-radius:18px;border:1px solid rgba(217,182,106,.28);background:linear-gradient(160deg,rgba(40,30,14,.75),rgba(14,11,6,.85))}
+.chcard.unread{border-color:rgba(230,198,128,.75);box-shadow:0 0 0 1px rgba(230,198,128,.35) inset}
+.chmain{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px 6px 12px 12px;border:0;background:none;color:inherit;text-align:left}
+.chavs{flex:none;display:flex;align-items:center;min-width:44px}
+.chpa{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;overflow:hidden;border:2px solid #14100A;color:#fff;font-weight:800;font-size:15px;margin-left:-12px}
+.chpa:first-child{margin-left:0}.chpa img{width:100%;height:100%;object-fit:cover}.chpa.more{background:#3A2D14;color:#F3E0A6;font-size:12px}
+.chtx{flex:1;min-width:0;display:grid;gap:2px}
+.chwho{font-size:16px;font-weight:900;color:#F3E0A6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev2{display:flex;align-items:center;gap:5px;font-size:12.5px;color:rgba(243,224,166,.7);font-weight:700;min-width:0}.chev2>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.chlast{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chlast em{font-style:normal;font-weight:800;color:#fff}.chlast i{font-style:normal}
+.chcard.unread .chlast{color:#fff}
+.chside{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}.chside small{font-size:11px;color:var(--muted)}
+.charc2{flex:none;width:44px;border:0;border-left:1px solid rgba(217,182,106,.18);background:none;color:var(--muted);font-size:17px;border-radius:0 18px 18px 0}
 </style>
 </head>
 <body>
@@ -4239,7 +4253,7 @@ const H3_ICO={"foot": "<svg viewBox=\"0 0 48 48\" aria-hidden=\"true\"><clipPath
 function evAlive(cid,sid){try{const c=FIND[cid];if(!c)return false;const sus=subsOf(c).filter(su=>!sid||su.id===sid);const now=Date.now();
   return sus.some(su=>su.items.some(i=>{const t=+new Date(i.date);if(isNaN(t))return false;return t>now||inPlay(i);}));}catch(e){return true;}}
 function spOn(id){const h=me().hs;return!(Array.isArray(h)&&h.includes(id));}
-function goldSp(sid,sz=26,cls=""){return`<span class="gsp ${cls}" style="width:${sz}px;height:${sz}px" aria-hidden="true">${H3_ICO[sid]||H3_ICO.free||""}</span>`;}
+function goldSp(sid,sz=26,cls=""){/* v59 : or plein (le dégradé SVG partagé ne s'affiche pas sur iPhone) */const svg=String(H3_ICO[sid]||H3_ICO.free||"").replace(/url\(#h3gold\)/g,"#D9B66A");return`<span class="gsp ${cls}" style="width:${sz}px;height:${sz}px" aria-hidden="true">${svg}</span>`;}
 function goldDefs(){if(document.getElementById("gdefs"))return;const d=document.createElement("div");d.id="gdefs";d.style.cssText="position:absolute;width:0;height:0;overflow:hidden";d.innerHTML=`<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="h3gold" gradientUnits="userSpaceOnUse" x1="4" y1="4" x2="44" y2="44"><stop offset="0" stop-color="#E6C680"/><stop offset=".5" stop-color="#C9A04E"/><stop offset="1" stop-color="#9A7535"/></linearGradient></defs></svg>`;document.body.prepend(d);}
 function h3Ready(){return !!hmS().sport;}
 function h3Who(){const H=hmS();return H.mode==="duel"?!!H.duel:H.mode==="multi"?H.multi.length>0:false;}
@@ -4940,11 +4954,13 @@ const testOpen=i=>!!(i&&i.lid&&TEST_OPEN[i.lid]&&!i.whole);
 /* v48 : plus de délai — un match reste sélectionnable et ouvert aux pronos jusqu'à l'heure pile de son début, pour tous les sports */const LOCK_NEW=0,LOCK_EX={st26:"2026-11-14T12:15:00Z",/* v42 : Ligue des nations de ce soir (14 nov.) — pronos et nouvelles parties ouverts jusqu'au coup d'envoi pile */unl:"2026-11-14T23:59:00Z"};
 const stLate=i=>!!(i&&i._c==="st26"&&!i.tbd&&Date.now()<+new Date("2026-11-14T12:15:00Z"));
 const lockOf=(cid,t)=>{const ex=LOCK_EX[cid];return ex&&(t==null?Date.now():t)<+new Date(ex)?0:LOCK_NEW;};
-function selOpen(i){if(!i||isDone(i))return false;if(stLate(i)||unlLate(i))return true;/* v49 : un « tour entier » dont la date est passée n'est plus jouable (sinon un tournoi fini, ex. Stockholm, reste proposé) */if(i.tbd)return /^(wdc|wcc|rook)$/.test(i.id)||+new Date(i.date)>Date.now();return +i.date-lockOf(i._c)>Date.now();}
+function selOpen(i){if(!i||isDone(i))return false;if(stLate(i)||unlLate(i)||austinLate(i))return true;/* v49 : un « tour entier » dont la date est passée n'est plus jouable (sinon un tournoi fini, ex. Stockholm, reste proposé) */if(i.tbd)return /^(wdc|wcc|rook)$/.test(i.id)||+new Date(i.date)>Date.now();return +i.date-lockOf(i._c)>Date.now();}
 const compOpenNew=(c,sid)=>{try{return subsOf(c).some(su=>(!sid||su.id===sid)&&su.items.some(selOpen));}catch(_){return false;}};
 /* v44 : Ligue des nations, les 2 matchs de 18:00 (14 nov.) restent ouverts aux pronos jusqu'à 18:15 */
 const unlLate=i=>!!(i&&i._c==="unl"&&!i.tbd&&+new Date(i.date)===+new Date("2026-11-14T17:00:00Z")&&Date.now()<+new Date("2026-11-14T17:15:00Z"));
-const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)||unlLate(i)));
+/* v59 : exception du 15 nov. — Austin Championship (PGA Tour) : dernier tour + tournoi entier ouverts jusqu'à 20 h (départ des leaders) */
+const austinLate=i=>{if(!i||i.tbd||Date.now()>=+new Date("2026-11-15T19:00:00Z"))return false;const c=FIND[i._c];return!!(c&&c.auto&&/austin/i.test(c.name||"")&&(i.whole||i.golfDay===4||i.final));};
+const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)||unlLate(i)||austinLate(i)));
 /* les pronos se ferment au coup d'envoi de chaque match / session */
 const CLOSE_MS=0,closeAt=i=>+i.date-CLOSE_MS;
 const canPickIt=i=>!isDone(i)&&(lateOk(i)||(closeAt(i)>+NOW&&(!i.live||liveSt(i)==="NS")));
@@ -5144,9 +5160,18 @@ function vChats(){const L=(S.parties||[]).filter(p=>p&&!p.demo);L.forEach(p=>{tr
   const nA=rows.filter(isA).length,nAct=rows.length-nA,vis=rows.filter(r=>cf==="arch"?isA(r):!isA(r));
   h+=`<div class="pad"><div class="ktabs chf" role="tablist"><button type="button" role="tab" class="ktab${cf==="act"?" on":""}" aria-selected="${cf==="act"}" data-act="chF" data-v="act"><b>${nAct}</b><span>Actifs</span></button><button type="button" role="tab" class="ktab${cf==="arch"?" on":""}" aria-selected="${cf==="arch"}" data-act="chF" data-v="arch"><b>${nA}</b><span>Archivés</span></button></div></div>`;
   if(!vis.length)return h+`<p class="empty">${cf==="arch"?"Aucune conversation archivée.":"Aucune conversation active."}</p>`;
-  h+=`<div class="list chlist">${vis.map(({p,l,u})=>{const c=p.free?null:FIND[p.comp],g=partyGroup(p),pl=playersOf(p);
-    const who=l?(l.uid===myId(p)?"Toi":(l.name||((pl.find(y=>y.id===l.uid)||{}).name)||"Un pote")):"";
-    return`<button type="button" class="item chrow" data-act="chatOpen" data-id="${esc(p.id)}">${c?compBadge(c,40):`<span class="prfree">🥂</span>`}<span class="main"><b>${esc(g?g.name+" · "+p.name:p.name)}</b><span>${l?`<em>${esc(who)} :</em> ${esc(String(l.text).slice(0,70))}`:"Pas encore de message"}</span></span>${u?`<i class="chun">${u}</i>`:`<span class="chev">›</span>`}</button><button type="button" class="charc" data-act="chArch" data-id="${esc(p.id)}" aria-label="${cf==="arch"?"Désarchiver":"Archiver"} la conversation">${cf==="arch"?"↩︎ Désarchiver":"🗄 Archiver"}</button>`;}).join("")}</div>`;
+  h+=`<div class="chlist2">${vis.map(({p,l,u})=>{const c=p.free?null:FIND[p.comp],pl=playersOf(p),me=myId(p),sid=c&&c.sport?c.sport.id:"free";
+    const who=l?(l.uid===me?"Toi":(l.name||((pl.find(y=>y.id===l.uid)||{}).name)||"Un pote")):"";
+    const others=pl.filter(x=>x.id!==me&&!x.fake);
+    const av=others.slice(0,3).map(x=>{const pr=personOf(p,x),im=bubImg(pr);return`<span class="chpa" style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(x.name||"?").charAt(0).toUpperCase())}</span>`;}).join("")+(others.length>3?`<span class="chpa more">+${others.length-3}</span>`:"");
+    const cn=c?c.name:(p.freeTitle||"Pari libre"),sub=String(p.name||"").replace(new RegExp("^"+cn.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
+    const when=l?fmtChatT(l.at):"";
+    return`<div class="chcard${u?" unread":""}"><button type="button" class="chmain" data-act="chatOpen" data-id="${esc(p.id)}">
+      <span class="chavs">${av||goldSp(sid,34)}</span>
+      <span class="chtx"><b class="chwho">${esc(partyBase(p))}</b><span class="chev2">${goldSp(sid,15)}<span>${esc(cn)}${sub&&sub!==cn?" · "+esc(sub):""}</span></span>
+      <span class="chlast">${l?`<em>${esc(who)} :</em> ${esc(String(l.text).slice(0,80))}`:`<i>Pas encore de message</i>`}</span></span>
+      <span class="chside">${when?`<small>${esc(when)}</small>`:""}${u?`<i class="chun">${u}</i>`:`<span class="chev">›</span>`}</span></button>
+      <button type="button" class="charc2" data-act="chArch" data-id="${esc(p.id)}" aria-label="${cf==="arch"?"Remettre dans les actifs":"Archiver"} la conversation" title="${cf==="arch"?"Désarchiver":"Archiver"}">${cf==="arch"?"↩︎":"🗄"}</button></div>`;}).join("")}</div>`;
   return h;}
 function chArch(){try{return JSON.parse(localStorage.getItem("bf_charch")||"{}")||{};}catch(_){return S._chA||(S._chA={});}}
 function chArchSet(o){S._chA=o;try{localStorage.setItem("bf_charch",JSON.stringify(o));}catch(_){}}
@@ -7632,11 +7657,11 @@ case "hmGx":{const H=hmS(),x=H.multi[+t.dataset.i];if(x&&x.k==="g"){x.ex=(x.ex||
     case "hmGo":{hmS().mode=t.dataset.ctx;const e=document.getElementById("hm-terrain");if(e)e.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"center"});break;}
     case "scrollSports":case "newParty":go("sports");break;
     case "sport":go("sport",{sport:t.dataset.id});break;
-    case "comp":{if(["events","sports","sport"].includes(S.screen)&&FIND[t.dataset.comp]){evOpen(t.dataset.comp,t);break;}S.showPast=false;const cd=S.screen==="sports"&&t.closest(".pcard"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&(cd.closest(".prowbox.open .pflip")||cd.closest(".vtk.open"));
+    case "comp":{if((["events","sports","sport"].includes(S.screen)||t.closest(".hbs"))&&FIND[t.dataset.comp]){evOpen(t.dataset.comp,t);break;}S.showPast=false;const cd=S.screen==="sports"&&t.closest(".pcard"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&(cd.closest(".prowbox.open .pflip")||cd.closest(".vtk.open"));
       S.morphFrom=cd&&bx?{pid:t.dataset.comp,pf:bx.dataset.k,y:window.scrollY,scr:"sports",to:"comp"}:null;const bgH=bg?bg.outerHTML:"";
       if(cd)document.body.classList.add("mcomp");else document.body.classList.remove("mcomp");
       window._mSrc=cd?mBgOf(cd):null;go("comp",{sport:FIND[t.dataset.comp].sport.id,comp:t.dataset.comp});if(r0)heroMorph(r0,bgH);break;}
-    case "sub":{if(["events","sports","sport"].includes(S.screen)&&FIND[t.dataset.comp]){evOpen(t.dataset.comp,t);break;}/* journée / étape depuis un ticket ouvert de la compétition : même animation que les cartes (la tuile monte à vide, puis l'en-tête apparaît d'un coup) */
+    case "sub":{if((["events","sports","sport"].includes(S.screen)||t.closest(".hbs"))&&FIND[t.dataset.comp]){evOpen(t.dataset.comp,t);break;}/* journée / étape depuis un ticket ouvert de la compétition : même animation que les cartes (la tuile monte à vide, puis l'en-tête apparaît d'un coup) */
       const cd=S.screen==="comp"&&t.closest(".rw"),bx=cd&&cd.closest(".prowbox.open .pflip"),r0=bx&&cd.getBoundingClientRect(),y=window.scrollY;
       const bgH=r0?`<span class="pcbg"><span style="position:absolute;inset:0;background:${getComputedStyle(cd).background.replace(/"/g,"'")}"></span></span>`:"";
       if(r0)document.body.classList.add("mcomp");
