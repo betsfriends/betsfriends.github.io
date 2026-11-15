@@ -3451,6 +3451,57 @@ html{background:#0B0905}
 .lrc[class*="lrc-"].open{border-color:#F3E0A6!important}
 /* v79 : le cadre intérieur (drapeaux, joueurs, score) garde son fond sombre d'origine */
 .lrc .lrbody{background:linear-gradient(180deg,#370D0B,#150A08)!important}
+/* v80 : tuiles Résultats */
+.rtile{display:block;width:100%;text-align:left;color:inherit;padding:14px 14px 12px;cursor:pointer;font:inherit}
+.rtile .lrbody{margin-top:12px}
+.rtend{animation:none!important;background:rgba(243,224,166,.2)!important;color:#F3E0A6!important}
+.rtbg{position:absolute;inset:0;display:grid;place-items:center;opacity:.09;filter:saturate(.8);pointer-events:none}
+.rtme{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:100%}
+.rtrk{margin-top:8px;font-family:var(--display);font-size:64px;line-height:.9;font-weight:900;color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.6)}
+.rtrk sup{font-size:.42em;vertical-align:top;margin-left:2px;color:#F3E0A6}
+.rtme small{font-size:13px;font-weight:800;color:#E9DFC6}.rtme small em{font-style:normal;color:#F3E0A6}
+.rtme>i{font-style:normal;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#C9D0DC;font-weight:800}
+.rtfoot{flex-wrap:wrap}
+.rtfoot>.rtpl,.rtfoot>.rtgrp{flex:1 1 100%;max-width:100%}.rtfoot>.rtgrp{flex:0 1 auto}.rtfoot .rtright{margin-left:auto}
+@media (min-width:600px){.rtfoot>.rtpl{flex:1 1 0}}
+.rtgrp{font-family:var(--display);font-weight:900;font-size:17px;letter-spacing:.02em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:linear-gradient(135deg,rgba(243,224,166,.22),rgba(199,160,74,.12));border:1px solid rgba(243,224,166,.55);color:#F3E0A6;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rtpl{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.rtav{display:flex;flex:none}.rtav i{width:26px;height:26px;border-radius:50%;overflow:hidden;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;color:#fff;border:1.5px solid #1a120a;margin-left:-7px}.rtav i:first-child{margin-left:0}.rtav i img{width:100%;height:100%;object-fit:cover}
+.rtnm{font-size:13px;font-weight:800;color:#F3E0A6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rtright{display:flex;align-items:center;gap:6px;margin-left:auto;flex:none}
+.rtplace{font-size:12px;font-weight:900;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);color:#fff}
+.rtcr{font-size:12px;font-weight:900;padding:5px 10px;border-radius:999px}.rtcr.up{background:rgba(70,200,120,.16);color:#58D68D;border:1px solid rgba(88,214,141,.45)}.rtcr.dn{background:rgba(230,70,70,.14);color:#F07070;border:1px solid rgba(240,112,112,.4)}
+/* v81 : centre des tuiles Résultats = classement de la partie */
+.rtbody{position:relative}
+.rtveil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,6,4,.55),rgba(8,6,4,.72));z-index:0}
+.rtc{position:relative;z-index:1;height:100%;display:flex;align-items:center;justify-content:center;gap:18px;padding:0 12px}
+.rtme2{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(243,224,166,.35),rgba(199,160,74,.12) 60%,rgba(0,0,0,.2));border:1.5px solid rgba(243,224,166,.6);box-shadow:0 0 24px rgba(243,224,166,.18)}
+.rtme2 b{font-family:var(--display);font-size:38px;line-height:.9;font-weight:900;color:#fff}.rtme2 b sup{font-size:.45em;color:#F3E0A6;vertical-align:top;margin-left:1px}
+.rtme2 small{font-size:11px;font-weight:800;color:#E9DFC6;margin-top:2px}
+.rtlist{display:flex;flex-direction:column;gap:4px;min-width:0;width:min(330px,100%)}
+.rtc.cur .rtlist{align-items:stretch}
+.rtst{align-self:flex-start;font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin-bottom:2px}
+.rtst.fin{background:rgba(243,224,166,.2);color:#F3E0A6}.rtst.cur{background:rgba(255,181,71,.16);color:#FFC46B;border:1px solid rgba(255,181,71,.4)}
+.rtc.cur .rtst{align-self:center}
+.rtprov{text-align:center;font-size:11px;color:#C9D0DC;font-weight:700;margin-bottom:2px}
+.rtl{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:4px 8px;border-radius:10px;background:rgba(0,0,0,.28)}
+.rtl i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;color:#1d1408;background:#8a8f99}
+.rtl.r1 i{background:linear-gradient(135deg,#F7E6B0,#C7A04A)}.rtl.r2 i{background:linear-gradient(135deg,#EEF1F5,#A9B0BC)}.rtl.r3 i{background:linear-gradient(135deg,#F1C7A0,#B0703E)}
+.rtl b{font-size:13.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtl em{font-style:normal;font-size:12.5px;font-weight:800;color:#E9DFC6;white-space:nowrap}
+.rtl u{text-decoration:none;font-size:11.5px;font-weight:900;color:#C9D0DC;white-space:nowrap;min-width:52px;text-align:right}.rtl u.up{color:#58D68D}
+.rtc.cur .rtl u.up{color:#FFC46B}
+.rtl.me{background:rgba(243,224,166,.16);box-shadow:inset 0 0 0 1px rgba(243,224,166,.55)}.rtl.me b{color:#F3E0A6}
+.rtsep{text-align:center;font-size:11px;color:#C9D0DC;line-height:.8}
+@media (max-width:420px){.rtme2{width:70px;height:70px}.rtme2 b{font-size:30px}.rtc{gap:10px;padding:0 6px}}
+/* v82 : terrain du sport bien visible dans le cadre extérieur des tuiles Résultats ; intérieur sobre */
+.rtile{position:relative;overflow:hidden}
+.rtile>.rtart{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;background-size:cover!important;background-position:center!important;z-index:0;pointer-events:none;opacity:1;mix-blend-mode:screen;filter:brightness(1.55) contrast(1.15) saturate(1.1)}
+.rtile>:not(.rtart){position:relative;z-index:1}
+.rtile .lrbody{background:linear-gradient(180deg,rgba(12,8,5,.88),rgba(8,6,4,.94))!important;box-shadow:inset 0 0 0 1px rgba(243,224,166,.12)}
+.rtile .rtveil{display:none}
+/* terrains plus marqués sur les tuiles de Mes parties */
+.ntile .pcart{filter:brightness(1.45) contrast(1.15)}
 </style>
 </head>
 <body>
@@ -3721,7 +3772,13 @@ const FIND={};SPORTS.forEach(s=>s.comps.forEach(c=>{c.sport=s;FIND[c.id]=c;}));S
    status : NS à venir · LIVE en cours · FT terminé (score connu) · END terminé, score pas encore relevé */
 const LIVE_AT="7 nov. 2026, 17:15";
 /* v54 : quand un match passe en terminé, on note l'heure (ftAt) → il reste 15 min dans le Live */
-function liveWrap(o){return new Proxy(o,{set(t,k,v){const old=t[k];if(v&&typeof v==="object"&&(v.status==="FT"||v.status==="END")&&!v.ftAt){if(old&&old.ftAt)v.ftAt=old.ftAt;else if(old&&old.status&&old.status!=="FT"&&old.status!=="END")v.ftAt=new Date().toISOString();}t[k]=v;return true;}});}
+/* v81 : l'heure de fin est mémorisée une seule fois (même si plusieurs téléphones renvoient l'info) ; un match terminé ne redevient jamais « en direct » */
+const FTAT=(()=>{try{return JSON.parse(localStorage.getItem("bf_ftat")||"{}")||{};}catch(_){return{};}})();
+function ftatSave(){try{const ks=Object.keys(FTAT);if(ks.length>400)ks.slice(0,ks.length-400).forEach(k=>delete FTAT[k]);localStorage.setItem("bf_ftat",JSON.stringify(FTAT));}catch(_){}}
+function liveWrap(o){return new Proxy(o,{set(t,k,v){const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+  if(v&&typeof v==="object"&&isEnd(old)&&(v.status==="LIVE"||v.status==="NS")&&!v.manual)return true;
+  if(v&&typeof v==="object"&&isEnd(v)){if(FTAT[k])v.ftAt=FTAT[k];else if(!v.ftAt){if(old&&old.ftAt)v.ftAt=old.ftAt;else if(old&&old.status&&!isEnd(old))v.ftAt=new Date().toISOString();}if(v.ftAt&&!FTAT[k]){FTAT[k]=v.ftAt;ftatSave();}}
+  t[k]=v;return true;}});}
 const LIVE=liveWrap({
  "pl10-m1":{status:"FT",sa:3,sb:1,line:"Mi-temps 0-0"},"pl10-m2":{status:"FT",sa:1,sb:0},"pl10-m3":{status:"FT",sa:1,sb:0,line:"Mi-temps 0-0 · Ødegaard 72e"},"pl10-m4":{status:"FT",sa:1,sb:1,line:"Mi-temps 0-0"},"pl10-m5":{status:"FT",sa:3,sb:1,line:"Mi-temps 2-0 · Cunha 6e, Delap 18e et 73e – Cherki 52e"},
  "pl10-m6":{status:"NS"},"pl10-m7":{status:"NS"},"pl10-m8":{status:"NS"},"pl10-m9":{status:"NS"},"pl10-m10":{status:"NS"},
@@ -3844,7 +3901,8 @@ function lvEvent(cid,e){const kind=FEED[cid][1],sp=FEED[cid][0].split("/")[0],co
   const C=co.competitors||[],H=C.find(x=>x.homeAway==="home")||C[0]||{},A=C.find(x=>x.homeAway==="away")||C[1]||{};
   const hn=lvTeam(cid,(H.team||{}).displayName||(H.team||{}).name||"?"),an=lvTeam(cid,(A.team||{}).displayName||(A.team||{}).name||"?");
   const nba=sp==="basketball",a=nba?an:hn,b=nba?hn:an,CA=nba?A:H,CB=nba?H:A;
-  const s=/POSTPONED|CANCEL|SUSPEND|DELAY/.test(ty.name||"")?"PST":ty.state==="in"?"LIVE":ty.state==="post"?(ty.completed===false?"PST":"FT"):"NS";
+  const endTxt=/^(FT|AET|FT-Pens|Full ?Time|Final|Ended|Pens)\b/i.test(String(ty.shortDetail||ty.detail||""))||/FINAL|FULL_TIME|END_OF_GAME/.test(ty.name||"");
+  const s=/POSTPONED|CANCEL|SUSPEND|DELAY/.test(ty.name||"")?"PST":ty.state==="in"&&!endTxt?"LIVE":ty.state==="in"&&endTxt?"FT":ty.state==="post"?(ty.completed===false?"PST":"FT"):"NS";
   const sa=lvNum(CA.score),sb=lvNum(CB.score);const rec=x=>{const r=(x.records||[]).find(r=>r.type==="total")||(x.records||[])[0];if(!r||!r.summary)return null;const n=String(r.summary).split("-").map(Number);return n.every(v=>!isNaN(v))?n.reduce((t,v)=>t+v,0):null;};
   const o={i:String(e.id),d:e.date,a,b,s,sl:(e.season||{}).slug||"",ga:rec(CA),gb:rec(CB)};{const ta=CA.team||{},tb=CB.team||{};if(ta.logo)o.la=ta.logo;if(tb.logo)o.lb=tb.logo;if(ta.displayName)o.ea=ta.displayName;if(tb.displayName)o.eb=tb.displayName;}
   if(s==="LIVE"||s==="FT"){o.x=sa;o.y=sb;const D=co.details||[],tid=x=>String(((x||{}).team||{}).id||""),ia=String((CA.team||{}).id||""),ib=String((CB.team||{}).id||"");
@@ -5258,9 +5316,11 @@ function saveGroup(g,msg){S.groups=(S.groups||[]).map(x=>x.id===g.id?g:x);if(db)
 /* ===================================================================== v37 : ONGLET CHAT
    Une page générale : toutes mes parties, la dernière réplique et les messages non lus ; on choisit une partie pour y chatter. */
 /* v40 : messages non lus de toutes mes parties → pastille rouge sur l'onglet « Chat » du menu du bas */
-function chatUnreadAll(){let n=0;(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{chatSubscribe(p);n+=chatUnread(p);}catch(_){}});return n;}
+function chatUnreadAll(){let n=0;const A=chArch();(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{chatSubscribe(p);const a=+A[p.id]||0;if(a){const me=myId(p),seen=Math.max(chatSeen(p.id),a);n+=chatMsgs(p).filter(x=>!x.sys&&!String(x.id||"").startsWith("seed")&&x.uid!==me&&chAt(x)>seen).length;}else n+=chatUnread(p);}catch(_){}});return n;}
+/* v80 : ouvrir l'onglet Chat = tu as vu les derniers messages → la pastille du menu s'efface */
+function chatSeenAll(){(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{const m=chatMsgs(p);if(m.length)chatSeen(p.id,Math.max(chatSeen(p.id),Date.now(),...m.map(chAt)));}catch(_){}});try{navChatBadge();}catch(_){}}
 function navChatBadge(){const b=document.querySelector('#tabs [data-tab="chats"]');if(!b)return;const n=chatUnreadAll();let i=b.querySelector(".tbdot");if(!n){if(i)i.remove();return;}if(!i){i=document.createElement("i");i.className="tbdot";b.appendChild(i);}i.textContent=n>9?"9+":String(n);}
-function vChats(){const L=(S.parties||[]).filter(p=>p&&!p.demo);L.forEach(p=>{try{chatSubscribe(p);}catch(_){}});
+function vChats(){setTimeout(chatSeenAll,0);const L=(S.parties||[]).filter(p=>p&&!p.demo);L.forEach(p=>{try{chatSubscribe(p);}catch(_){}});
   const last=p=>{const m=chatMsgs(p).filter(x=>!x.sys);return m.length?m[m.length-1]:null;};
   const rows=L.map(p=>({p,l:last(p),u:(()=>{try{return chatUnread(p);}catch(_){return 0;}})()})).sort((a,b)=>(b.u-a.u)||((b.l?b.l.at:0)-(a.l?a.l.at:0)));
   let h=pageHead("LE <b>CHAT</b>","Choisis une partie pour discuter avec tes potes");
@@ -5848,6 +5908,29 @@ function tileStarted(p){try{const PK=picksOf(p);if(Object.values(PK).some(m=>m&&
 function withWhom(p){let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameCrew(x,p))||null;}catch(_){}}if(g)return"Tu joues avec « "+g.name+" »";let pl=[];try{const mine=myId(p);pl=playersOf(p).filter(x=>x.id!==mine&&!isMeName(x.name));}catch(_){}
   if(!pl.length)return"Tu joues seul pour l'instant";if(pl.length===1)return"Tu joues avec "+pl[0].name;return"Tu joues avec "+pl.length+" amis";}
 const tileTitle=n=>String(n||"").replace(/^\s*🧪\s*/,"").replace(/^(En cours|Terminée|À venir)\s*·\s*/i,"");
+/* v80 : tuile « Résultats » — même famille que le salon des lives : cadre aux couleurs du sport, drapeaux + score final (1 match) ou ta place en grand (plusieurs matchs), groupe ou joueurs, place, crédits */
+/* v81 : tuile « Résultats » — au centre, le classement de la PARTIE (trio de tête + toi), points et crédits ; terminée = ta place en grand à gauche */
+function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done",D);
+  const sp=c.sport.id,rows=rowsOfParty(p).filter(r=>r.it),one=rows.length===1?rows[0].it:null,fin=isClosed(p);
+  const sub=one?(one.label||""):String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
+  let sc=null;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(_){}
+  const R=sc?sc.rows.slice().sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name))):[],me=myId(p),pot=(+p.amount||0)*effPeople(p),hasPot=pot>0&&(p.split||[]).length;
+  const meI=R.findIndex(x=>x.id===me||x.name==="Toi"),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
+  const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i><b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?"up":""}">${cr>0?"+"+cr:"0"} cr.</u>`:""}</span>`;};
+  let list=R.slice(0,3).map((_,i)=>line(i)).join("");if(meI>2)list+=`<span class="rtsep">···</span>`+line(meI);
+  const att=rows.filter(r=>{try{return!isDone(r.it)&&+r.it.date+3*3600e3<+NOW;}catch(_){return false;}}).length;
+  const head=fin?`<span class="rtst fin">Terminée</span>`:`<span class="rtst cur">En cours · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""}${att?` · ${att} résultat${att>1?"s":""} attendu${att>1?"s":""}`:""}</span>`;
+  const myRk=meI>=0?tieRank(R,meI):null;
+  const center=fin?`<div class="rtc fin">${myRk?`<div class="rtme2"><b>${myRk}<sup>${myRk>1?"e":"er"}</sup></b><small>sur ${R.length}</small></div>`:""}<div class="rtlist">${head}${list}</div></div>`
+    :`<div class="rtc cur"><div class="rtlist">${head}<small class="rtprov">Classement provisoire${hasPot?" · crédits si ça tient":""}</small>${list}</div></div>`;
+  const sd=one?sides(one):null;
+  const deco="";
+  let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameCrew(x,p))||null;}catch(_){}}
+  let who="";if(g)who=`<span class="rtgrp">👥 ${esc(g.name)}</span>`;else{let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
+    who=`<span class="rtpl"><span class="rtav">${pl.slice(0,4).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(x.name||"?").charAt(0).toUpperCase())}</i>`;}).join("")}</span><span class="rtnm">${esc(pl.map(x=>nm(x)).join(", "))}</span></span>`;}
+  return`<button type="button" class="lrc lrc-${sp} rtile" data-act="party" data-id="${esc(p.id)}"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span><span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b><small>${esc(sub)}</small></span></span>
+    <span class="lrbody mh-${sp} rtbody">${deco}<span class="rtveil" aria-hidden="true"></span>${center}</span>
+    <span class="lrfoot rtfoot">${who}<span class="rtright"><span class="lrcta">Voir le détail</span></span></span></button>`;}
 function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,fin=D.sec.done.includes(p),st=!fin&&tileStarted(p);
   let nPl=0;try{nPl=playersOf(p).length;}catch(_){}
   return`<button type="button" class="pcard pc2 ntile pcsu pcsp sp-${sid}${S.justNew&&S.justNew.id===p.id?" pcnew":""}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span>
@@ -5859,9 +5942,9 @@ function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK
 /* v51 : un match est « en direct » si la source le dit, OU si son heure de début est passée sans résultat (source muette, ex. ATP Finals sur ESPN) — pendant la durée normale du match */
 function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END"||st==="PST")return false;const t=+new Date(it.date),now=+NOW;return t<=now&&now<t+(it.dur||3)*3600e3;}
 const GRACE=15*60e3;
-function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;const L=LIVE[it.lid]||{},f=L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
+function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;if(+NOW>+new Date(it.date)+6*3600e3)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
 function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it)||inGrace(it));}
-function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it));}catch(_){}rows.forEach(r=>out.push({p,r}));});
+function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{const cl=isClosed(p);rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it)&&!(cl&&inGrace(r.it)));}catch(_){}rows.forEach(r=>out.push({p,r}));});
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
 /* noms courts, comme sur l'affiche du match (« Tirante – Munar ») */
 function shortSides(it){const sd=sides(it);if(!sd)return null;const l=String(it.label||""),sep=l.includes(" @ ")?" @ ":" – ",pr=l.split(sep);return pr.length===2?pr:sd;}
@@ -5938,7 +6021,7 @@ function vParties(){
   /* ticket : clic → il se déchire, le talon tombe, la partie droite prend toute la largeur et montre les parties en grand (plus de page à part) */
   const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir les ${n} parties"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
   const SP_ORD=["foot","tennis","f1","golf","rugby","velo","basket","free"],SP_NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",velo:"Cyclisme",basket:"Basket",free:"Pari libre"};
-  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;const T=p=>(k==="pending"||k==="ready"||k==="done")?ntile(p,k,D):pcard(p);
+  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;const T=p=>k==="done"?rtile(p,D):(k==="pending"||k==="ready")?ntile(p,k,D):pcard(p);
     if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist">${h}</div>`;}
     return`<div class="pclist">${list.map(T).join("")}</div>`;};
   /* tri (pas un filtre) : toutes les parties restent, seul l'ordre change — par urgence (fermeture la plus proche) ou par classement (ta meilleure place d'abord) */
@@ -6342,7 +6425,7 @@ function genPicks(p,players,seedBase){
 }
 function isClosed(p){if(p.closedAt)return true;if(p.free||!FIND[p.comp])return false;const c=FIND[p.comp],subs=subsOf(c),rows=rowsOfParty(p).filter(r=>r.it);
   const v=rows.length>0&&rows.every(r=>{if(!isDone(r.it))return false;const su=subs.find(x=>x.id===r.key.split("/")[0]);const res=resultOf(c,su,r.it);return res&&!res.pending;});return v;}
-function partyStatus(p){if(isClosed(p))return["Terminée","#98A2B3"];if(p.free)return p.close&&+new Date(p.close)<=+NOW?["En cours","#FFB547"]:["Paris ouverts","var(--lime)"];const rows=rowsOfParty(p).filter(r=>r.it);const st=rows.map(r=>itemState(p,r));
+function partyStatus(p){if(isClosed(p))return["Terminée","#98A2B3"];if(!p.free){try{if(rowsOfParty(p).some(r=>r.it&&inGrace(r.it)))return["En direct","#E5534B"];}catch(_){}}if(p.free)return p.close&&+new Date(p.close)<=+NOW?["En cours","#FFB547"]:["Paris ouverts","var(--lime)"];const rows=rowsOfParty(p).filter(r=>r.it);const st=rows.map(r=>itemState(p,r));
   if(rows.length&&st.every(x=>x==="done"))return["Résultats complets","#FFB547"];if(rows.some(r=>r.it.live&&liveSt(r.it)==="LIVE"))return["En direct","#E5534B"];if(st.includes("done")||rows.some(r=>+r.it.date<=+NOW))return["En cours","#FFB547"];if(st.includes("closed"))return["Pronos figés","#9CC3FF"];return["Paris ouverts","var(--lime)"];}
 /* phase unique d'une partie, partout dans l'appli : À VENIR (rien n'a commencé) · EN COURS (au moins un match joué ou en jeu → classement provisoire) · TERMINÉE (classement final) */
 function phaseInfo(p){let st="";try{st=partyStatus(p)[0];}catch(e){}
@@ -6595,6 +6678,8 @@ const BANTER_PRE=["Ce week-end je vous mets tous d'accord 😎","Qui a encore mi
 const BANTER_DONE=["{res}… je l'avais dit 😏","{res} 😩 mon prono est parti en fumée","{win} qui prend {pts} pts sur ce match, ça sent le coup de chance 🍀","Bien joué {win} 👏 mais ça va pas durer","{res}, j'y croyais pas une seconde 😂"];
 const BANTER_LEAD=["{lead} en tête… profite, ça va pas durer 😂","Respect pour {lead}, on s'incline 🙇","{last} tu remontes quand ? 😅","Le classement me plaît bien 😌"];
 const REPLIES=["😂😂","Tu rêves 😏","On en reparle dimanche 👀","Facile à dire maintenant 🙄","Ok, pari tenu 🤝","Je note, je note 📝","🔥🔥🔥"];
+/* v82 : heure de référence fixe par partie pour les messages d'ambiance */
+function chAnchor(pid){try{const k="bf_chanc_"+pid;let v=+localStorage.getItem(k);if(!v){v=Date.now();localStorage.setItem(k,String(v));}return v;}catch(_){return(S._chanc||(S._chanc={}))[pid]||(S._chanc[pid]=Date.now());}}
 function chatSeed(p){const pl=playersOf(p),me=myId(p),fakes=pl.filter(x=>x.id!==me&&(x.fake||x.local||p.demo));if(!fakes.length||p.free&&!p.demo)return[];
   const r=rng(hs("chat"+p.id)),pick=a=>a[Math.floor(r()*a.length)],who=()=>pick(fakes),out=[];const c=p.free?null:FIND[p.comp];
   const fill=(t,o)=>t.replace(/\{(\w+)\}/g,(_,k)=>o[k]!=null?o[k]:"");
@@ -6602,16 +6687,17 @@ function chatSeed(p){const pl=playersOf(p),me=myId(p),fakes=pl.filter(x=>x.id!==
   const done=rows.filter(x=>{try{const su=subsOf(c).find(s=>s.id===x.key.split("/")[0]),res=resultOf(c,su,x.it);return res&&!res.pending&&!res.void;}catch(e){return false;}}).sort((a,b)=>a.it.date-b.it.date);
   const next=rows.filter(x=>+x.it.date>+NOW).sort((a,b)=>a.it.date-b.it.date)[0];
   const t0=+(rows.length?Math.min(...rows.map(x=>+x.it.date)):+p.createdAt?new Date(p.createdAt):+NOW-864e5)-6*36e5;
-  out.push({uid:who().id,text:fill(pick(BANTER_PRE),{next:next?next.title:"la suite"}),at:Math.min(t0,+NOW-36e5*20)});
+  out.push({uid:who().id,text:fill(pick(BANTER_PRE),{next:next?next.title:"la suite"}),at:Math.min(t0,chAnchor(p.id)-36e5*20)});
   done.slice(-4).forEach(x=>{const su=subsOf(c).find(s=>s.id===x.key.split("/")[0]),res=resultOf(c,su,x.it),w=sc?stageWinner(p,x,sc):null;const wn=w?w.names.map(n=>n):[];
     const line=(sides(x.it)&&res.sa!=null?sides(x.it)[0]+" "+res.sa+"-"+res.sb+" "+sides(x.it)[1]:x.title);
     out.push({sys:1,text:"🏁 "+line+(w?" · "+wn.join(", ")+" +"+w.pts+" pts":""),at:+x.it.date+3*36e5});
     if(r()<.85)out.push({uid:who().id,text:fill(pick(BANTER_DONE),{res:line,win:wn[0]||"",pts:w?w.pts:0}),at:+x.it.date+3*36e5+(5+r()*40)*6e4});
     if(r()<.5)out.push({uid:who().id,text:pick(REPLIES),at:+x.it.date+3*36e5+(50+r()*60)*6e4});});
-  if(sc&&sc.done&&sc.rows.length>1){const lead=sc.rows[0].name,last=sc.rows[sc.rows.length-1].name;out.push({uid:who().id,text:fill(pick(BANTER_LEAD),{lead:lead==="Toi"?"le boss":lead,last:last==="Toi"?"l'organisateur":last}),at:+NOW-(30+r()*90)*6e4});}
+  if(sc&&sc.done&&sc.rows.length>1){const lead=sc.rows[0].name,last=sc.rows[sc.rows.length-1].name;out.push({uid:who().id,text:fill(pick(BANTER_LEAD),{lead:lead==="Toi"?"le boss":lead,last:last==="Toi"?"l'organisateur":last}),at:chAnchor(p.id)-(30+r()*90)*6e4});}
   return out.filter(m=>m.at<=+NOW).map((m,i)=>Object.assign({id:"seed"+i},m));}
 function chatMsgs(p){return chatSeed(p).concat(CHAT[p.id]||[],CHAT_LOCAL[p.id]||[]).sort((a,b)=>a.at-b.at);}
-function chatUnread(p){const m=chatMsgs(p),me=myId(p),seen=chatSeen(p.id);return m.filter(x=>!x.sys&&x.uid!==me&&x.at>seen).length;}
+const chAt=x=>{const v=x&&x.at;return typeof v==="number"?v:v&&v.seconds?v.seconds*1e3:+new Date(v)||0;};
+function chatUnread(p){const m=chatMsgs(p),me=myId(p),seen=chatSeen(p.id);return m.filter(x=>!x.sys&&!String(x.id||"").startsWith("seed")&&x.uid!==me&&chAt(x)>seen).length;}
 function fmtChatT(t){const d=new Date(t),n=new Date(+NOW);const same=d.toDateString()===n.toDateString();const y=new Date(+NOW-864e5).toDateString()===d.toDateString();return(same?"":y?"hier ":d.toLocaleDateString("fr-BE",{day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("fr-BE",{hour:"2-digit",minute:"2-digit"});}
 function chatTab(p,mark=true){const m=chatMsgs(p),me=myId(p),pl=playersOf(p);const nm=id=>{const x=pl.find(y=>y.id===id);return x?x.name:"Un pote";};
   if(mark)chatSeen(p.id,Math.max(+NOW,...m.map(x=>x.at)));let last=null;
