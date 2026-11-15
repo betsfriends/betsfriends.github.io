@@ -3763,11 +3763,24 @@ function lvTennis(j){const out=[];(j.events||[]).forEach(t=>(t.groupings||[]).fo
   out.push({id:String(m.id),d:m.date,tn:t.name||"",round:((m.round||{}).displayName)||"",p:[nm(C[0]),nm(C[1])],w:C.findIndex(x=>x.winner===true),ls:C.map(x=>(x.linescores||[]).map(s=>({v:lvNum(s.value),tb:lvNum(s.tiebreak)}))),st:ty.state==="in"?"LIVE":ty.state==="post"?(/RETIRED|WALKOVER/.test(ty.name||"")||ty.completed?"FT":"PST"):"NS",wo:/WALKOVER/.test(ty.name||""),det:ty.shortDetail||"",
     /* v36 : joueur au service (ESPN le donne pendant le match selon les flux : possession / serving sur le joueur, ou situation.server) */
     srv:(()=>{const i=C.findIndex(x=>x.possession===true||x.serving===true||x.isServing===true||x.server===true);if(i>=0)return i;const sv=(m.situation||{}).server||(m.situation||{}).possession;if(sv!=null){const j=C.findIndex(x=>String(x.id)===String(sv)||String((x.athlete||{}).id)===String(sv));if(j>=0)return j;}return-1;})()});});}));return out;}
+
+/* ---------- v52 : 2e source tennis = AllSportsApi via le relais Cloudflare (clé cachée dans le relais) ---------- */
+const RELAIS="https://betsfriends-scores.ti-ed6.workers.dev";
+async function asGet(path){const ac=typeof AbortController!=="undefined"?new AbortController():null;const to=setTimeout(()=>{try{ac&&ac.abort();}catch(_){}},15000);
+  try{const r=await fetch(RELAIS+path,{signal:ac?ac.signal:undefined});if(!r.ok)throw new Error("HTTP "+r.status);return await r.json();}finally{clearTimeout(to);}}
+function asTennisOne(e){if(!e||!e.homeTeam||!e.awayTeam)return null;const h=e.homeTeam.name||"",a=e.awayTeam.name||"";if(/\//.test(h+a))return null;
+  const st=e.status||{},ty=st.type||"",code=st.code;const S=[e.homeScore||{},e.awayScore||{}];
+  const ls=S.map(x=>{const r=[];for(let k=1;k<=5;k++){if(x["period"+k]==null)break;r.push({v:lvNum(x["period"+k]),tb:lvNum(x["period"+k+"TieBreak"])});}return r;});
+  const fin=ty==="finished"||code===100||code===92||code===93;
+  return{id:"as"+e.id,asid:e.id,src:"as",d:new Date((e.startTimestamp||0)*1000).toISOString(),tn:((e.tournament||{}).name)||"",round:((e.roundInfo||{}).name)||"",p:[h,a],
+    w:e.winnerCode===1?0:e.winnerCode===2?1:-1,ls,st:ty==="inprogress"?"LIVE":fin?"FT":/canceled|postponed|interrupted|suspended/.test(ty)?"PST":"NS",
+    wo:code===93||/walkover/i.test(st.description||""),det:st.description||"",srv:e.firstToServe===1?0:e.firstToServe===2?1:-1,pt:[S[0].point,S[1].point]};}
+const asTennis=j=>((j&&j.events)||[]).map(asTennisOne).filter(Boolean);
 function lvTennisRes(it,m){const SD=sides(it);it={a:SD[0],b:SD[1]};const sw=lvSame(m.p[0],it.b)&&lvSame(m.p[1],it.a);const A=sw?1:0,B=sw?0:1,la=m.ls[A]||[],lb=m.ls[B]||[];const sets=[];
   for(let k=0;k<Math.max(la.length,lb.length);k++){const x=(la[k]||{}).v,y=(lb[k]||{}).v;if(x==null||y==null)continue;sets.push([x,y]);}
   const done=(x,y)=>(Math.max(x,y)>=6&&Math.abs(x-y)>=2)||(Math.max(x,y)===7&&Math.min(x,y)>=5);let sa=0,sb=0;sets.forEach(([x,y],k)=>{if(m.st==="FT"||k<sets.length-1||done(x,y)){if(x>y)sa++;else if(y>x)sb++;}});
   const line=sets.map(([x,y],k)=>{const tb=(m.ls[x>y?B:A]||[])[k];return x+"-"+y+(Math.max(x,y)===7&&Math.min(x,y)===6&&tb&&tb.tb!=null?"("+tb.tb+")":"");}).join(" ");
-  const win=m.st==="FT"&&m.w>=0?(m.w===A?it.a:it.b):null;const o={status:m.st,sa,sb,line:line+(m.st==="LIVE"?" · en cours":"")+(m.wo?" · forfait":""),src:"espn"};if(win)o.winner=win;if(m.st==="LIVE"&&m.srv>=0)o.srv=m.srv===A?0:1;
+  const win=m.st==="FT"&&m.w>=0?(m.w===A?it.a:it.b):null;const o={status:m.st,sa,sb,line:line+(m.st==="LIVE"&&m.pt&&m.pt[A]!=null&&m.pt[B]!=null&&m.pt[A]!==""?" · jeu "+m.pt[A]+"-"+m.pt[B]:"")+(m.st==="LIVE"?" · en cours":"")+(m.wo?" · forfait":""),src:m.src||"espn"};if(m.asid)o.asid=m.asid;if(win)o.winner=win;if(m.st==="LIVE"&&m.srv>=0)o.srv=m.srv===A?0:1;
   const ans={};if(win)ans.win=win;if(m.st==="FT"&&!m.wo){ans.score=sa+"-"+sb;ans.sets=(sa+sb)+" sets";Object.assign(ans,tnAns(sets,[it.a,it.b]));}else if(sets.length&&done(sets[0][0],sets[0][1]))Object.assign(ans,{set1:sets[0][0]+"-"+sets[0][1],first:sets[0][0]>sets[0][1]?it.a:it.b});
   o.ans=ans;return o;}
 /* ---------- golf : classement → résultat de chaque journée ---------- */
@@ -3818,6 +3831,15 @@ function liveTick(){if(document.hidden)return;const now=Date.now();try{resNotify
         const o={status:"FT",winner:W,line:"Vainqueur : "+W,ans:{win:W,final:Lo,fscore:sw+"-"+sl,undef:undefined},src:"espn"};delete o.ans.undef;if(!(LIVE[it.lid]||{}).manual){LIVE[it.lid]=o;lvSave1(it.lid,o);ch=true;}});});
     if(ch){lvMeta();dataRender();}});};
   if(tAct.length)tGo(tDays,"tn_live",90e3);else if(tLate.length)tGo([...new Set(tLate.map(([,,it])=>etDay(it.date)))].slice(0,4),"tn_late",10*60e3);
+  /* 2b. v52 : relais AllSportsApi — matchs commencés (ou sur le point de l'être) sans score ESPN */
+  const asNeed=TN.filter(([,,it])=>{const L=LIVE[it.lid]||{},t=+it.date;if(L.manual||L.src==="espn"||["FT","END"].includes(L.status))return false;return t<=now+5*60e3&&t>now-7*3600e3;});
+  if(asNeed.length&&lvDue("as_live",120e3))lvRun("as_live",async()=>{const M=asTennis(await asGet("/api/tennis/events/live"));let ch=false;
+    for(const[c,su,it]of asNeed){const sd=sides(it),cur=LIVE[it.lid]||{};let m=M.find(m=>(lvSame(m.p[0],sd[0])&&lvSame(m.p[1],sd[1]))||(lvSame(m.p[0],sd[1])&&lvSame(m.p[1],sd[0])));
+      /* plus dans la liste du direct alors qu'il y était → résultat final par l'identifiant du match */
+      if(!m&&cur.src==="as"&&cur.asid&&cur.status==="LIVE"&&lvDue("as_ev_"+cur.asid,4*60e3)){for(const p of["/api/tennis/event/","/api/event/"]){try{const j=await asGet(p+cur.asid);const e=asTennisOne(j.event||j);if(e){m=e;break;}}catch(_){}}}
+      if(!m||m.st==="NS")continue;const o=lvTennisRes(it,m);if((LIVE[it.lid]||{}).manual||(LIVE[it.lid]||{}).src==="espn")continue;
+      if(lvHash(o)!==lvHash(Object.assign({},cur,{at:undefined}))){LIVE[it.lid]=o;lvSave1(it.lid,o);ch=true;}}
+    if(ch){lvMeta();dataRender();}});
   /* 3. golf */
   SPORTS.find(s=>s.id==="golf").comps.forEach(c=>{if(c.custom)return;const I=lvItems(c).map(x=>x[1]).filter(i=>i.lid&&!i.whole);if(!I.length)return;const a=Math.min(...I.map(i=>+i.date)),b=Math.max(...I.map(i=>+i.date));
     if(now<a-6*3600e3||now>b+3*864e5)return;if(I.every(i=>["FT"].includes((LIVE[i.lid]||{}).status)))return;const tour=/DP World/i.test(c.group||c.flag||"")||/dp world/i.test(c.flag||"")?"eur":/LIV/i.test(c.group||"")?"liv":"pga";
