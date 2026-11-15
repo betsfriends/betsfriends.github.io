@@ -3536,6 +3536,24 @@ html{background:#0B0905}
 .rtu.u-o{background:linear-gradient(135deg,#E58C3A,#B4532A)}.rtu.u-r{background:linear-gradient(135deg,#E5534B,#8E1E1A)}
 .rtpend .rtst{align-self:center;margin:0}
 .rtpend .rtplace{margin-left:auto}
+/* v87 : même rendu partout — rien par-dessus la tuile dans les tickets (pas de lignes ondulées) ; événement en grand */
+.prowbox .rtile{z-index:5;isolation:isolate}
+.prowbox.open:has(.rtile)::before{display:none}
+.prowbox .pclist.rtlist2{position:relative;z-index:5}
+.rtpend{flex-wrap:nowrap!important;justify-content:flex-start!important;gap:14px!important;min-height:52px;padding:0 10px!important}
+.rtev{flex:1 1 auto;min-width:0;font-family:var(--display);font-weight:900;font-size:22px;line-height:1.05;letter-spacing:.01em;text-transform:uppercase;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.rtside{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.rtside .rtplace{margin:0}
+@media (max-width:480px){.rtev{font-size:17px}.rtu{width:40px;height:40px;font-size:13px}}
+/* v89 : couleurs des tuiles sans color-mix (non pris en charge sur certains iPhone → tuile transparente et motif du ticket visible au travers) ; fond toujours opaque */
+.lrc.lrc-foot{background:radial-gradient(120% 70% at 50% -10%,rgba(31,122,69,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#183E23,#0B2E1A) #0B2E1A!important;box-shadow:0 0 22px rgba(69,181,114,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc.lrc-tennis{background:radial-gradient(120% 70% at 50% -10%,rgba(180,83,42,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#5B2C17,#3E180A) #3E180A!important;box-shadow:0 0 22px rgba(229,132,80,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc.lrc-f1{background:radial-gradient(120% 70% at 50% -10%,rgba(163,22,27,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#531111,#33070A) #33070A!important;box-shadow:0 0 22px rgba(232,80,74,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc.lrc-golf{background:radial-gradient(120% 70% at 50% -10%,rgba(78,139,74,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#2D4626,#16301A) #16301A!important;box-shadow:0 0 22px rgba(147,203,132,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc.lrc-rugby{background:radial-gradient(120% 70% at 50% -10%,rgba(29,91,72,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#173025,#0A251D) #0A251D!important;box-shadow:0 0 22px rgba(70,165,134,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc.lrc-basket{background:radial-gradient(120% 70% at 50% -10%,rgba(194,106,42,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#613717,#401E08) #401E08!important;box-shadow:0 0 22px rgba(242,162,90,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc.lrc-velo{background:radial-gradient(120% 70% at 50% -10%,rgba(184,144,30,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#5D4812,#3A2D06) #3A2D06!important;box-shadow:0 0 22px rgba(234,199,90,0.22),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.prowbox .rtile,.prowbox .lrc{background-color:#120d08}
 </style>
 </head>
 <body>
@@ -5957,8 +5975,9 @@ function rtGrid(list,D){const k=rtSortKey(),endT=p=>{try{const t=rowsOfParty(p).
 function rtPend(p,k,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,k,D);const sp=c.sport.id,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,fin=D.sec.done.includes(p),st=!fin&&tileStarted(p);
   let nPl=0;try{nPl=playersOf(p).length;}catch(_){}
   const sub=String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
-  const center=`<div class="rtc rtpend">${u?`<span class="rtu u-${u[1]}" title="Échéance de ton prochain prono">${u[0]}</span>`:""}<span class="rtpw">${esc(withWhom(p))}</span>${st?`<span class="rtst cur">En cours</span>`:""}${r?`<span class="rtplace">${r.rank}${r.rank>1?"e":"er"} sur ${r.n||nPl}${fin?"":" — provisoire"}</span>`:""}</div>`;
-  return rtileWrap(p,c,sp,sub,center);}
+  /* v87 : le groupe n'est plus répété (il est dans le pied) ; l'événement en grand sur toute la largeur */
+  const center=`<div class="rtc rtpend">${u?`<span class="rtu u-${u[1]}" title="Échéance de ton prochain prono">${u[0]}</span>`:""}<b class="rtev">${esc(sub||c.name)}</b><span class="rtside">${st?`<span class="rtst cur">En cours</span>`:""}${r?`<span class="rtplace">${r.rank}${r.rank>1?"e":"er"} sur ${r.n||nPl}${fin?"":" — provisoire"}</span>`:""}</span></div>`;
+  return rtileWrap(p,c,sp,"",center);}
 function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done",D);
   const sp=c.sport.id,rows=rowsOfParty(p).filter(r=>r.it),one=rows.length===1?rows[0].it:null,fin=isClosed(p);
   const sub=one?(one.label||""):String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
@@ -5983,7 +6002,7 @@ function rtileWrap(p,c,sp,sub,center){const deco="";
   let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameCrew(x,p))||null;}catch(_){}}
   let who="";if(g)who=`<span class="rtgrp">👥 ${esc(g.name)}</span>`;else{let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
     who=`<span class="rtpl"><span class="rtav">${pl.slice(0,4).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(x.name||"?").charAt(0).toUpperCase())}</i>`;}).join("")}</span><span class="rtnm">${esc(pl.map(x=>nm(x)).join(", "))}</span></span>`;}
-  return`<button type="button" class="lrc lrc-${sp} rtile" data-act="party" data-id="${esc(p.id)}"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span><span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b><small>${esc(sub)}</small></span></span>
+  return`<button type="button" class="lrc lrc-${sp} rtile" data-act="party" data-id="${esc(p.id)}"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span><span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b>${sub?`<small>${esc(sub)}</small>`:""}</span></span>
     <span class="lrbody mh-${sp} rtbody">${deco}<span class="rtveil" aria-hidden="true"></span>${center}</span>
     <span class="lrfoot rtfoot">${who}<span class="rtright"><span class="lrcta">Voir le détail</span></span></span></button>`;}
 function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,fin=D.sec.done.includes(p),st=!fin&&tileStarted(p);
@@ -6076,7 +6095,7 @@ function vParties(){
   /* ticket : clic → il se déchire, le talon tombe, la partie droite prend toute la largeur et montre les parties en grand (plus de page à part) */
   const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir les ${n} parties"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
   const SP_ORD=["foot","tennis","f1","golf","rugby","velo","basket","free"],SP_NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",velo:"Cyclisme",basket:"Basket",free:"Pari libre"};
-  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;if(k==="done")return rtGrid(list,D);const T=p=>k==="done"?rtile(p,D):(k==="pending"||k==="ready")?rtPend(p,k,D):pcard(p);
+  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;if(k==="done")return rtGrid(list,D);const T=p=>(k==="done"||k==="pending"||k==="ready")?rtile(p,D):pcard(p);
     if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist rtlist2">${h}</div>`;}
     return`<div class="pclist rtlist2">${list.map(T).join("")}</div>`;};
   /* tri (pas un filtre) : toutes les parties restent, seul l'ordre change — par urgence (fermeture la plus proche) ou par classement (ta meilleure place d'abord) */
