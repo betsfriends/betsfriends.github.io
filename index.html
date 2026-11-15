@@ -3513,6 +3513,29 @@ html{background:#0B0905}
 .rtsb{flex:1 1 auto;min-width:0;padding:8px 12px;border-radius:999px;border:1px solid rgba(243,224,166,.35);background:rgba(0,0,0,.3);color:#E9DFC6;font:inherit;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer}
 .rtsb.on{background:linear-gradient(135deg,#EED9AA 0%,#C7A04A 48%,#9C7432 100%);color:#2A0705;border-color:transparent}
 .rtcat{margin:6px 2px 8px}
+/* v86 : tuiles moins hautes (≈ −⅓) ; tuiles « en attente / prono fait » dans le même cadre */
+.rtile{padding:10px 12px 9px!important}
+.rtile .lrtop b{font-size:13px}.rtile .lrtop small{font-size:11.5px}
+.rtile .lrbody{height:auto!important;min-height:0;margin-top:8px;padding:10px 8px!important}
+.rtile .rtc{height:auto;gap:14px;padding:0 8px}
+.rtile .rtme2{width:66px;height:66px}.rtile .rtme2 b{font-size:28px}.rtile .rtme2 small{font-size:10px}
+.rtile .rtlist{gap:3px}
+.rtile .rtl{padding:2px 8px;border-radius:8px}.rtile .rtl i{width:18px;height:18px;font-size:10px}.rtile .rtl b{font-size:12.5px}.rtile .rtl em{font-size:12px}.rtile .rtl u{font-size:11px}
+.rtile .rtst{padding:2px 8px;font-size:10px;margin-bottom:1px}
+.rtile .rtprov{font-size:10.5px;margin-bottom:1px}
+.rtile .rtwhen{font-size:13.5px}
+.rtile .rttodo,.rtile .rtok{padding:3px 10px;font-size:11.5px}
+.rtile .rtsoon{gap:4px}
+.rtile .lrfoot{margin-top:8px;padding-top:7px}
+.rtile .rtgrp{font-size:14px;padding:3px 10px}
+.rtile .lrcta{padding:5px 11px;font-size:11.5px}
+.rtile .rtfoot{flex-wrap:nowrap}.rtile .rtfoot>.rtpl{flex:1 1 0!important;max-width:none}.rtile .rtfoot>.rtgrp{flex:0 1 auto;min-width:0}.rtile .rtav i{width:22px;height:22px}.rtile .rtnm{font-size:12px}
+.rtpend{flex-wrap:wrap;justify-content:flex-start!important;gap:10px!important;min-height:46px}
+.rtpw{font-size:13px;color:#F3E0A6;font-weight:800;flex:1 1 auto;min-width:0}
+.rtu{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:15px;color:#fff;border:2px solid #F3E0A6;box-shadow:0 0 14px rgba(0,0,0,.4)}
+.rtu.u-o{background:linear-gradient(135deg,#E58C3A,#B4532A)}.rtu.u-r{background:linear-gradient(135deg,#E5534B,#8E1E1A)}
+.rtpend .rtst{align-self:center;margin:0}
+.rtpend .rtplace{margin-left:auto}
 </style>
 </head>
 <body>
@@ -5930,6 +5953,12 @@ function rtGrid(list,D){const k=rtSortKey(),endT=p=>{try{const t=rowsOfParty(p).
   const NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",basket:"Basket",velo:"Cyclisme",free:"Pari libre"};
   let body="",cur=null;a.forEach(p=>{if(k==="sport"){const sd=sportOfParty(p);if(sd!==cur){cur=sd;body+=`<div class="ntcat rtcat">${esc(NM[sd]||sd)}</div>`;}}body+=rtile(p,D);});
   return`<div class="rtsort" role="group" aria-label="Classer les parties">${RT_SORTS.map(([v,l])=>`<button type="button" class="rtsb${k===v?" on":""}" data-act="rtSort" data-v="${v}" aria-pressed="${k===v}">${l}</button>`).join("")}</div><div class="pclist rtlist2">${body}</div>`;}
+/* v86 : « Pronos en attente » / « Prono fait » — mêmes infos qu'avant (échéance J−1/H−x, statut, ta place), dans le cadre des tuiles de Toutes mes parties */
+function rtPend(p,k,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,k,D);const sp=c.sport.id,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,fin=D.sec.done.includes(p),st=!fin&&tileStarted(p);
+  let nPl=0;try{nPl=playersOf(p).length;}catch(_){}
+  const sub=String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
+  const center=`<div class="rtc rtpend">${u?`<span class="rtu u-${u[1]}" title="Échéance de ton prochain prono">${u[0]}</span>`:""}<span class="rtpw">${esc(withWhom(p))}</span>${st?`<span class="rtst cur">En cours</span>`:""}${r?`<span class="rtplace">${r.rank}${r.rank>1?"e":"er"} sur ${r.n||nPl}${fin?"":" — provisoire"}</span>`:""}</div>`;
+  return rtileWrap(p,c,sp,sub,center);}
 function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done",D);
   const sp=c.sport.id,rows=rowsOfParty(p).filter(r=>r.it),one=rows.length===1?rows[0].it:null,fin=isClosed(p);
   const sub=one?(one.label||""):String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
@@ -6047,9 +6076,9 @@ function vParties(){
   /* ticket : clic → il se déchire, le talon tombe, la partie droite prend toute la largeur et montre les parties en grand (plus de page à part) */
   const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir les ${n} parties"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
   const SP_ORD=["foot","tennis","f1","golf","rugby","velo","basket","free"],SP_NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",velo:"Cyclisme",basket:"Basket",free:"Pari libre"};
-  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;if(k==="done")return rtGrid(list,D);const T=p=>k==="done"?rtile(p,D):(k==="pending"||k==="ready")?ntile(p,k,D):pcard(p);
-    if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist">${h}</div>`;}
-    return`<div class="pclist">${list.map(T).join("")}</div>`;};
+  const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;if(k==="done")return rtGrid(list,D);const T=p=>k==="done"?rtile(p,D):(k==="pending"||k==="ready")?rtPend(p,k,D):pcard(p);
+    if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist rtlist2">${h}</div>`;}
+    return`<div class="pclist rtlist2">${list.map(T).join("")}</div>`;};
   /* tri (pas un filtre) : toutes les parties restent, seul l'ordre change — par urgence (fermeture la plus proche) ou par classement (ta meilleure place d'abord) */
   /* un 2e clic sur le tri actif inverse l'ordre (flèche ↓ = ordre normal, ↑ = inversé) */
   const tkSortOf=k=>{const o=Object.assign({by:k==="done"?(D.all.some(p=>hasResult(p)&&!D.sec.done.includes(p))?"cur":"fin"):"urg",rev:false},k==="ready"?{}:(S.tkSort||{})[k]);if(k==="pending"&&!["urg","cat"].includes(o.by))o.by="urg";if(k==="pending")o.rev=false;if(k==="done"&&!["cur","fin"].includes(o.by))o.by="fin";if(o.by==="rank")o.by="cur";return o;};
