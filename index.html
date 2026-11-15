@@ -3522,7 +3522,7 @@ const SPORTS=[
  {id:"tennis",name:"Tennis",acc:"#DDF246",bg:"radial-gradient(rgba(255,255,255,.08) 1px,transparent 1.6px) 0 0/6px 6px,#C8562E",body:"#3A1607",icon:"tennis",
   comps:[
    {id:"atpf",group:"Fin de saison 2026",name:"ATP Finals",flag:"Turin",desc:"15 – 22 nov. 2026 · groupes McEnroe et Lendl, 8 joueurs",build:atpfBuild},
-   {id:"dc26",group:"Fin de saison 2026",name:"Coupe Davis · Final 8",flag:"Bologne",desc:"23 – 29 nov. 2026 · 8 nations",build:tbdRounds([["Quarts de finale","2026-11-24T16:00","2026-11-26T22:00","Les 4 quarts de finale"],["Demi-finales","2026-11-27T16:00","2026-11-28T22:00","Les 2 demi-finales"],["Finale","2026-11-29T16:00","2026-11-29T22:00","La finale"]])},
+   {id:"dc26",group:"Fin de saison 2026",name:"Coupe Davis · Final 8",flag:"Bologne",desc:"24 – 29 nov. 2026 · 8 nations",build:tbdRounds([["Quarts de finale","2026-11-24T16:00","2026-11-26T22:00","Italie – Corée du Sud · Tchéquie – Canada · Grande-Bretagne – Allemagne · Autriche – Espagne"],["Demi-finales","2026-11-27T16:00","2026-11-28T15:00","Les 2 demi-finales"],["Finale","2026-11-29T15:00","2026-11-29T21:00","La finale"]])},
    {id:"ngf26",group:"Fin de saison 2026",name:"Next Gen ATP Finals",flag:"Djeddah",desc:"7 – 13 déc. 2026 · 8 joueurs de 20 ans et moins",build:tbdRounds([["Phase de groupes","2026-12-07T14:00","2026-12-11T22:00","Les matchs de poule"],["Demi-finales","2026-12-12T16:00","2026-12-12T22:00","Les 2 demi-finales"],["Finale","2026-12-13T18:00","2026-12-13T22:00","La finale"]])},
    {id:"ao",group:"Grands Chelems 2027",name:"Open d'Australie",flag:"Melbourne",desc:"Janvier 2027 · 128 joueurs",build:slam(D(2027,1,18),7)},
    {id:"rg",group:"Grands Chelems 2027",name:"Roland-Garros",flag:"Paris",desc:"Mai – juin 2027 · 128 joueurs",build:slam(D(2027,5,24),7)},
@@ -3545,6 +3545,7 @@ const SPORTS=[
  {id:"rugby",name:"Rugby",acc:"#E9DCC3",bg:"linear-gradient(160deg,#1B5A3D,#15452F)",body:"#0B2117",icon:"rugby",
   comps:[
    {id:"top14",group:"Championnats",name:"Top 14",flag:"France",desc:"Saison 2026-27 · 26 journées",build:league({start:D(2026,9,5),breaks:[6,10,14],teams:T.top14,seed:31,slots:[[0,14,30],[0,16,35],[0,16,35],[0,16,35],[0,21,5],[1,16,30],[1,21,5]]})},
+   {id:"nch",group:"Sélections",name:"Nations Championship",flag:"Monde",desc:"Novembre 2026 · tests + week-end des finales à Londres",build:tbdRounds([["Week-end des finales","2026-11-27T18:00","2026-11-29T20:00","Les 6 finales à Londres (1er Nord contre 1er Sud…)"]])},
    {id:"six",group:"Tournois",name:"Six Nations 2027",flag:"Europe",desc:"Février – mars 2027 · 5 journées",build:sixBuild}
   ]},
  {id:"velo",name:"Cyclisme",acc:"#F5D547",bg:"linear-gradient(160deg,#C9A227,#6B4E0A)",body:"#241A06",icon:"velo",
@@ -3565,6 +3566,7 @@ const SPORTS=[
    {id:"tourch",group:"PGA Tour 2027",name:"Tour Championship",flag:"East Lake",desc:"Août 2027 · 4 tours",build:golf(D(2027,8,26),"East Lake"),golfN:30},
    {id:"liv1",group:"LIV Golf 2027",name:"LIV Golf Riyad",flag:"Arabie saoudite",desc:"Février 2027 · 3 tours",build:golf(D(2027,2,4),"LIV Riyad",3),golfN:54},
    {id:"liv2",group:"LIV Golf 2027",name:"LIV Golf Adélaïde",flag:"Australie",desc:"Février 2027 · 3 tours",build:golf(D(2027,2,11),"LIV Adélaïde",3),golfN:54},
+   {id:"rsm26",group:"PGA Tour",name:"The RSM Classic",flag:"Sea Island, Géorgie",desc:"19 – 22 nov. 2026 · 4 tours · finale de saison",build:golf(D(2026,11,19,13,0),"Sea Island Golf Club"),golfN:50},
    {id:"dpw",group:"DP World Tour",name:"DP World Tour Championship",flag:"Dubaï",desc:"12 – 15 nov. 2026 · 4 tours",build:golf(D(2026,11,12,7,0),"Jumeirah Golf Estates, Earth Course"),golfN:50},
    {id:"ryder",group:"Équipes",name:"Ryder Cup 2027",flag:"Adare Manor, Irlande",desc:"Septembre 2027 · Europe – États-Unis",build:ryder()}
   ]}
@@ -3573,7 +3575,9 @@ const FIND={};SPORTS.forEach(s=>s.comps.forEach(c=>{c.sport=s;FIND[c.id]=c;}));S
 /* ===================================================================== DONNÉES RÉELLES (démo) — relevées sur le web, mises à jour dans la base « live »
    status : NS à venir · LIVE en cours · FT terminé (score connu) · END terminé, score pas encore relevé */
 const LIVE_AT="7 nov. 2026, 17:15";
-const LIVE={
+/* v54 : quand un match passe en terminé, on note l'heure (ftAt) → il reste 15 min dans le Live */
+function liveWrap(o){return new Proxy(o,{set(t,k,v){const old=t[k];if(v&&typeof v==="object"&&(v.status==="FT"||v.status==="END")&&!v.ftAt){if(old&&old.ftAt)v.ftAt=old.ftAt;else if(old&&old.status&&old.status!=="FT"&&old.status!=="END")v.ftAt=new Date().toISOString();}t[k]=v;return true;}});}
+const LIVE=liveWrap({
  "pl10-m1":{status:"FT",sa:3,sb:1,line:"Mi-temps 0-0"},"pl10-m2":{status:"FT",sa:1,sb:0},"pl10-m3":{status:"FT",sa:1,sb:0,line:"Mi-temps 0-0 · Ødegaard 72e"},"pl10-m4":{status:"FT",sa:1,sb:1,line:"Mi-temps 0-0"},"pl10-m5":{status:"FT",sa:3,sb:1,line:"Mi-temps 2-0 · Cunha 6e, Delap 18e et 73e – Cherki 52e"},
  "pl10-m6":{status:"NS"},"pl10-m7":{status:"NS"},"pl10-m8":{status:"NS"},"pl10-m9":{status:"NS"},"pl10-m10":{status:"NS"},
  "pm26-q1":{status:"FT",sa:2,sb:1,line:"6-4 4-6 6-3"},"pm26-q2":{status:"FT",sa:2,sb:1,line:"6-4 6-7 7-5"},"pm26-q3":{status:"FT",sa:1,sb:2,line:"6-7 7-5 6-3"},"pm26-q4":{status:"FT",sa:2,sb:0,line:"7-6 6-4"},
@@ -3583,7 +3587,7 @@ const LIVE={
  "ad26-r2":{status:"FT",winners:["Tyrrell Hatton","Francesco Laporta","Jon Rahm"],score:-12,board:[["T1","Tyrrell Hatton","-12"],["T1","Francesco Laporta","-12"],["T1","Jon Rahm","-12"],["T4","Sam Bairstow","-11"],["T4","Matthew Jordan","-11"],["T4","Rory McIlroy","-11"],["T4","Adrian Meronk","-11"]]},
  "ad26-r3":{status:"FT",winners:["Jon Rahm"],score:-18,board:[["1","Jon Rahm","-18"],["T2","Tyrrell Hatton","-17"],["T2","Francesco Laporta","-17"],["4","Rory McIlroy","-16"],["5","Adam Scott","-15"]]},
  "ad26-r4":{status:"NS"},"ww26-r1":{status:"END"},"ww26-r2":{status:"END"},"ww26-r3":{status:"FT",winners:["Ben James"],score:-21,board:[["1","Ben James","-21"],["2","Ryan Gerard","-17"],["T3","Chris Kirk","-16"],["T3","Denny McCarthy","-16"],["T5","Alvaro Ortiz","-15"],["T5","Paul Peterson","-15"],["T5","Keith Mitchell","-15"],["T5","Kensei Hirata","-15"]]},"ww26-r4":{status:"NS"}
-};
+});
 const liveSt=it=>(LIVE[it.lid]||{}).status||"NS";
 const LV=(lid,label,a,b,date,sub)=>({id:lid.split("-")[1],lid,live:true,label,a,b,date,sub});
 const LIVE_COMPS=[
@@ -3657,7 +3661,7 @@ const CACHE={};
 const ESPN="https://site.api.espn.com/apis/site/v2/sports/";
 const FEED={pl:["soccer/eng.1","L",T.pl],liga:["soccer/esp.1","L",T.liga],seriea:["soccer/ita.1","L",T.serieA],buli:["soccer/ger.1","L",T.buli],l1:["soccer/fra.1","L",T.l1],jpl:["soccer/bel.1","L",T.jpl],
   ucl:["soccer/uefa.champions","U",null],unl:["soccer/uefa.nations","L",null],cdf:["soccer/fra.coupe_de_france","K",T.l1],dfb:["soccer/ger.dfb_pokal","K",T.buli],coppa:["soccer/ita.coppa_italia","K",T.serieA],rey:["soccer/esp.copa_del_rey","K",T.liga],
-  croky:["soccer/bel.cup","K",T.jpl],facup:["soccer/eng.fa","K",T.pl],nba:["basketball/nba","N",T.nba],top14:["rugby/270559","L",T.top14],six:["rugby/180659","S",T.six]};
+  croky:["soccer/bel.cup","K",T.jpl],facup:["soccer/eng.fa","K",T.pl],nba:["basketball/nba","N",T.nba],top14:["rugby/270559","L",T.top14],nch:["rugby/17567","K",null],six:["rugby/180659","S",T.six]};
 const RES_SP=["tennis","f1"];const LIVE_FROM=+new Date("2026-11-14T00:00:00");
 const LCAL={};let CAL_VER=0;const LNET={fail:0,ok:0,last:{},busy:{},err:""};
 /* noms ESPN → noms de l'app (logos, options de paris) */
@@ -3841,8 +3845,9 @@ function liveTick(){if(document.hidden)return;const now=Date.now();try{resNotify
       if(lvHash(o)!==lvHash(Object.assign({},cur,{at:undefined}))){LIVE[it.lid]=o;lvSave1(it.lid,o);ch=true;}}
     if(ch){lvMeta();dataRender();}});
   /* 3. golf */
+  GTOURS.forEach(([t])=>{if(lvDue("gcal_"+t,GCAL[t]?6*3600e3:60e3))lvRun("gcal_"+t,()=>gcalFetch(t));});
   SPORTS.find(s=>s.id==="golf").comps.forEach(c=>{if(c.custom)return;const I=lvItems(c).map(x=>x[1]).filter(i=>i.lid&&!i.whole);if(!I.length)return;const a=Math.min(...I.map(i=>+i.date)),b=Math.max(...I.map(i=>+i.date));
-    if(now<a-6*3600e3||now>b+3*864e5)return;if(I.every(i=>["FT"].includes((LIVE[i.lid]||{}).status)))return;const tour=/DP World/i.test(c.group||c.flag||"")||/dp world/i.test(c.flag||"")?"eur":/LIV/i.test(c.group||"")?"liv":"pga";
+    if(now<a-6*3600e3||now>b+3*864e5)return;if(I.every(i=>["FT"].includes((LIVE[i.lid]||{}).status)))return;const tour=gTourOf(c);
     if(!lvDue("golf_"+c.id,now>=a&&now<=b+12*3600e3?3*60e3:15*60e3))return;lvRun("golf_"+c.id,async()=>{const R=lvGolf(c,await lvGet("golf/"+tour+"/scoreboard"));if(!R)return;let ch=false;
       Object.keys(R).forEach(lid=>{const cur=LIVE[lid]||{};if(cur.manual)return;if(lvHash(R[lid])!==lvHash(cur)){LIVE[lid]=R[lid];lvSave1(lid,R[lid]);ch=true;}});if(ch){lvMeta();dataRender();}});});
   /* 4. F1 */
@@ -3866,6 +3871,27 @@ function resNotify(){if(!db||!S.uid)return;(S.parties||[]).forEach(p=>{if(!p||p.
     Promise.resolve(db.doc(NTF_COLS[0]+"/"+id).get()).then(sn=>{if(sn&&sn.exists)return;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+id).set(d).catch(()=>{});}catch(_){}});}).catch(()=>{});}));});}
 function liveStart(){if(window._lvOn)return;window._lvOn=1;{let k=0;const tick=()=>{if(S.email&&!S.eh)sha256(normEmail(S.email)).then(h=>{if(h)S.eh=h;});if(S.eh){resetPurge().then(()=>resetProfiles());render();return;}if(++k<40)setTimeout(tick,3000);};setTimeout(tick,1500);}setTimeout(()=>{if(!LNET.ok&&LNET.fail)toast("⚠️ Scores en direct indisponibles pour l'instant ("+LNET.err+")");},25e3);setTimeout(liveTick,1500);setInterval(liveTick,20e3);document.addEventListener("visibilitychange",()=>{if(!document.hidden)setTimeout(liveTick,500);});}
 
+
+/* ---------- v55 : golf — tous les tournois de la semaine, automatiquement (calendrier ESPN des circuits) ---------- */
+const GTOURS=[["pga","PGA Tour"],["eur","DP World Tour"],["lpga","LPGA"]];const GCAL={};
+function gTourOf(c){return c.tour||(/DP World/i.test(c.group||c.flag||"")?"eur":/LIV/i.test(c.group||"")?"liv":/LPGA/i.test(c.group||"")?"lpga":"pga");}
+function gcalBuild(){const sp=SPORTS.find(s=>s.id==="golf");if(!sp)return false;let add=false;const now=Date.now();
+  GTOURS.forEach(([t,tn])=>{const K=GCAL[t];if(!K||!K.cal)return;K.cal.forEach(ev=>{const a=+new Date(ev.s),b=+new Date(ev.e);if(isNaN(a)||isNaN(b))return;if(b<now-60*864e5||a>now+24*864e5)return;
+    const id="gx"+t+String(ev.id).replace(/\W/g,"");if(FIND[id])return;
+    /* déjà dans l'appli à la main (même circuit, mêmes dates) → on ne double pas */
+    const dup=sp.comps.concat(Object.values(FIND).filter(c=>c.sport===sp)).some(c=>{if(c.auto||gTourOf(c)!==t)return false;let d=[];try{d=c.build().flatMap(su=>su.items).map(i=>+new Date(i.date)).filter(x=>!isNaN(x));}catch(_){}return d.some(x=>x>=a-864e5&&x<=b+864e5);});if(dup)return;
+    const u=new Date(a),n=Math.max(2,Math.min(4,Math.round((b-a)/864e5)+1));
+    /* premier départ ≈ 6 h 30 heure locale du tournoi (le calendrier ESPN démarre à minuit local) → pronos fermés un peu avant le 1er départ, partout dans le monde */
+    const st=new Date(a+6.5*3600e3);
+    const f=x=>new Date(x).toLocaleDateString("fr-BE",{day:"numeric",month:"short",timeZone:"UTC"});
+    const c={id,group:tn,name:ev.label,flag:tn,desc:f(a)+" – "+f(b)+" · "+n+" tours",build:golf(st,ev.label,n),golfN:50,auto:true,tour:t,sport:sp};
+    sp.comps.push(c);FIND[id]=c;add=true;});});
+  if(add)CAL_VER++;return add;}
+function gcalApply(t,v,silent){if(!v||!v.cal||!v.cal.length)return;const cur=GCAL[t];if(cur&&cur.h===v.h)return;GCAL[t]=v;try{localStorage.setItem("bf_gcal_"+t,JSON.stringify(v));}catch(_){}if(gcalBuild()&&!silent)dataRender();}
+try{GTOURS.forEach(([t])=>{const x=localStorage.getItem("bf_gcal_"+t);if(x)gcalApply(t,JSON.parse(x),true);});}catch(_){}
+async function gcalFetch(t){const j=await lvGet("golf/"+t+"/scoreboard");const L=((j.leagues||[])[0]||{}).calendar||[];
+  const cal=L.map(x=>{const ref=((x.event||{}).$ref)||"",m=ref.match(/events\/(\d+)/);return{id:String(x.id||(m&&m[1])||x.label||""),label:x.label||x.name||"",s:x.startDate,e:x.endDate};}).filter(x=>x.id&&x.label&&x.s&&x.e);
+  if(!cal.length)return;const v={cal,upd:new Date().toISOString()};v.h=lvHash(cal);if(GCAL[t]&&GCAL[t].h===v.h)return;gcalApply(t,v);await lvSave1("gcal_"+t,v);}
 /* ---------- tennis : vrai tableau du tournoi (ESPN) ---------- */
 const TFEED={st26:{day:"20261114",re:/stockholm/i,from:"2026-11-06",to:"2026-11-15"},atpf:{day:"20261115",re:/atp finals|nitto/i,from:"2026-11-14",to:"2026-11-23",fill:true}};
 const TCAL={};const REAL_STATIC={six:1};
@@ -4034,7 +4060,8 @@ function vEvents(){const now=+NOW,day=864e5,F=S.evF||"hot",SP=S.evS||"";
 /* couleurs de chaque sport, les mêmes que les tickets de la page Sports */
 const SP_TK={foot:["#1E7A3A","#062A1C","rgba(46,204,113,.45)"],tennis:["#B5532A","#3A1607","rgba(255,140,80,.5)"],f1:["#8E1B1B","#16070A","rgba(255,70,60,.45)"],golf:["#3B7A3F","#0F2A12","rgba(243,224,166,.4)"],velo:["#B8901F","#2A1E05","rgba(255,226,120,.45)"],basket:["#B8682A","#2A1709","rgba(255,154,60,.45)"],rugby:["#1B5A3D","#0B2117","rgba(233,220,195,.35)"],free:["#5A4512","#1E1606","rgba(243,224,166,.45)"]};
 /* v36 : « Résultats » = au moins un match TERMINÉ (un match en direct reste dans Live tant qu'il n'est pas fini) */
-function hasResult(p){try{if(p.free)return isClosed(p);return rowsOfParty(p).some(r=>r.it&&(itemState(p,r)==="done"||matchOver(r.it)));}catch(e){return false;}}
+function hasResult(p){try{if(p.free)return isClosed(p);return rowsOfParty(p).some(r=>r.it&&!inGrace(r.it)&&(itemState(p,r)==="done"||matchOver(r.it)));}catch(e){return false;}}
+function inGraceP(p){try{return!p.free&&rowsOfParty(p).some(r=>r.it&&inGrace(r.it));}catch(e){return false;}}
 /* v41 : match fini mais résultat officiel pas encore arrivé → il va quand même dans « Résultats » (résultat en attente), jamais nulle part */
 function matchOver(it){if(!it||it.tbd)return false;const now=+NOW,t=+it.date;if(!(t<=now))return false;
   if(it.live){const st=liveSt(it);if(st==="LIVE")return false;if(st==="FT"||st==="END")return true;return now>t+(it.dur||3)*3600e3;}
@@ -4578,6 +4605,10 @@ function flMbFit(){document.querySelectorAll("#flwrap .flgrid").forEach(g=>{cons
 function flUnify(){flOneLine();document.querySelectorAll("#flwrap .flgrid").forEach(g=>{[".flc:not(.tm):not(.h2h)>b",".flc:not(.tm):not(.h2h)>small"].forEach(sel=>{const L=[...g.querySelectorAll(sel)].filter(x=>x.offsetParent);if(L.length<2)return;const m=Math.min(...L.map(x=>parseFloat(getComputedStyle(x).fontSize)));L.forEach(x=>x.style.setProperty("font-size",m+"px","important"));});});}
 if(!window._flFitOn){window._flFitOn=1;addEventListener("resize",()=>{flFit();flTileSize();document.querySelectorAll("#flwrap .mbn").forEach(flBnFit);flBnUnify();});try{document.fonts.ready.then(()=>flFit());}catch(e){}}
 /* après chaque choix : le terrain (cadre) où l'on agit doit être visible en entier, au-dessus du menu du bas */
+/* bas de la zone couverte en haut de l'écran (bandeau prix fixe…) */
+function coverTop(){const H=innerHeight,x=innerWidth/2,fx=new Map();const isFix=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){if(fx.has(e)){if(fx.get(e))return true;continue;}const p=getComputedStyle(e).position,f=p==="fixed"||p==="sticky";fx.set(e,f);if(f)return true;}return false;};
+  let y=0;for(let k=0;k<H*.45;k+=6){const el=document.elementFromPoint(x,k);if(!el||!isFix(el)){y=k;break;}y=k;}return y;}
+function mpModeScroll(){requestAnimationFrame(()=>{const m=document.querySelector(".mpmodes");if(!m)return;const sec=m.closest("section")||m,top=sec.getBoundingClientRect().top,to=Math.max(0,scrollY+top-coverTop()-8);h3ScrollTo(to);});}
 function flViewBox(){const vv=window.visualViewport,H=vv?vv.height:innerHeight,nav=document.querySelector("nav.tabs"),nr=nav&&getComputedStyle(nav).display!=="none"?nav.getBoundingClientRect():null,nt=nr&&nr.top>H*.5&&nr.top<H?nr.top:H;return{top:12,bot:Math.min(H,nt)-12};}
 /* après chaque choix : le terrain où l'on agit + le bouton d'action actif doivent être visibles, au-dessus du menu du bas (tous écrans) */
 function flShowStage(){setTimeout(()=>{if(window._suBackOn)return;const c=document.querySelector("#flwrap .flcad");if(!c)return;const b=document.querySelector("#flwrap .flok:not([disabled]),#flwrap .h3create:not(.flok)"),{top,bot}=flViewBox(),
@@ -4931,7 +4962,7 @@ function friendsCard(cr){const fr=crFriends().slice(0,cr.people-1),bad=cr.frErr|
 function vCreate(){
   const cr=S.create,isFree=!!S.createFree;
   const c=isFree?null:FIND[S.sel.comp],sp=c?c.sport:null;
-  const pot=cr.amount*cr.people;
+  splitFix(cr);const pot=cr.amount*cr.people;
   const splits={"100":[100],"70-30":[70,30],"50-30-20":[50,30,20],"40-30-20-10":[40,30,20,10],"perso":cr.custom};
   const sp_=splits[cr.split],sum=sp_.reduce((a,b)=>a+(+b||0),0);
   const medals=["#FFD24A","#D0D5DD","#E39B5B","#98A2B3","#98A2B3"];
@@ -4944,7 +4975,7 @@ function vCreate(){
   ${!cr.showPot?`<button type="button" class="card fold" data-act="potToggle"><span><b>Cagnotte</b><small>${cr.amount} × ${cr.people} = ${pot.toLocaleString("fr-BE")} · ${cr.split==="perso"?"répartition perso":cr.split.split("-").join(" / ")}</small></span><span class="foldgo">Modifier</span></button>`:`<div class="card"><div class="fhead"><b>Cagnotte</b><button type="button" class="link" data-act="potToggle">Replier</button></div><div class="lab">Montant par joueur</div><div class="seg">${[10,20,100].map(v=>`<button type="button" class="opt" data-act="amt" data-v="${v}" aria-pressed="${cr.amount===v}">${v}</button>`).join("")}<input class="inp" style="min-height:46px;text-align:center" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" aria-label="Autre montant" data-c="amount" value="${[10,20,100].includes(cr.amount)?"":cr.amount}" placeholder="Autre"></div>
    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)"><span style="font-weight:700">Cagnotte · ${cr.amount} × ${cr.people}</span><span class="disp" style="font-size:32px;color:var(--lime)">${pot.toLocaleString("fr-BE")}</span></div>
    <div class="lab" style="margin-top:16px">Répartition</div>
-   <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">${[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"],["perso","Personnalisée"]].map(([k,l])=>`<button type="button" class="opt" data-act="split" data-v="${k}" aria-pressed="${cr.split===k}">${l}</button>`).join("")}</div>
+   <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">${SPLIT_ALL.filter(([k])=>splitOk(k,cr.people)).map(([k,l])=>`<button type="button" class="opt" data-act="split" data-v="${k}" aria-pressed="${cr.split===k}">${l}</button>`).join("")}</div>
    <div class="pod">${sp_.map((pc,i)=>`<div>${medalIcon(i+1,26,(FIND[S.sel.comp]||{sport:{id:"free"}}).sport.id)}<span>${i===0?"1er":(i+1)+"e"}</span>${cr.split==="perso"?`<input inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" aria-label="Pourcentage place ${i+1}" data-pc="${i}" value="${pc}"> %`:`<span class="muted">${pc} %</span>`}<span class="a">${Math.round(pot*(+pc||0)/100).toLocaleString("fr-BE")}</span></div>`).join("")}</div>
    ${cr.split==="perso"?`<div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn ghost" style="flex:1;padding:10px" data-act="pcAdd">+ une place</button><button type="button" class="btn ghost" style="flex:1;padding:10px" data-act="pcDel">− une place</button></div>`:""}
    ${sum!==100?`<p class="err" style="margin:10px 0 0">Total ${sum} % : la répartition doit faire 100 %.</p>`:""}
@@ -5074,7 +5105,7 @@ function vChatRoom(){const p=partyById(S.chatParty||S.partyView);if(!p)return vC
   return`<div class="chhead"><button type="button" class="back" data-act="back" aria-label="Retour">‹</button>${c?compBadge(c,34):`<span class="prfree">🥂</span>`}<span><b>${esc(g?g.name:p.name)}</b><small>${esc(g?p.name:(c?c.name:"Pari libre"))}</small></span><button type="button" class="link chgo" data-act="party" data-id="${esc(p.id)}">Voir la partie</button></div>${chatTab(p,true)}`;}
 /* ===================================================================== v39 : SALON DES LIVES
    Le ticket Live mène toujours ici. 1 seul event : déjà déplié. Plusieurs : on déplie celui qu'on veut, les autres restent sur la page. */
-function lrIsOpen(n,k){S.lrOpen=S.lrOpen||{};if(k in S.lrOpen)return S.lrOpen[k];return n===1;}
+function lrIsOpen(n,k){S.lrOpen=S.lrOpen||{};if(k in S.lrOpen)return S.lrOpen[k];return false;}
 function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),pls=playersOf(p),pk=picksOf(p),me=myId(p);
   const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text")
     /* seulement les paris où au moins un joueur a un prono */
@@ -5085,8 +5116,8 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
 function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},k=m.k,sv=srvSide(it),short=shortSides(it)||sd;
   S.lrSel=S.lrSel||{};let sel=m.rows.find(x=>x.p.id===S.lrSel[k])||m.rows[0];const p=sel.p,r=sel.r;
   const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${esc(short[k2])}${sv===k2?SRV_BALL:""}</b>${natOf(sd[k2])&&!CLUB[sd[k2]]?`<span class="mhf">${FLAG[natOf(sd[k2])]||""}</span>`:""}</div>`;
-  const center=`<div class="mhc"><span class="mhlive">● EN DIRECT</span>${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
-  const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>${sp==="tennis"?tnGrid(sd,L.line,true):""}`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
+  const center=`<div class="mhc">${inGrace(it)?`<span class="mhlive" style="background:rgba(243,224,166,.2);color:#F3E0A6">TERMINÉ</span>`:`<span class="mhlive">● EN DIRECT</span>`}${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
+  const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>${sp==="tennis"?tnGrid(sd,L.line,!inGrace(it)):""}`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
   const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
   let h=`<div class="lrc${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
     <span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b><small>${esc(it.label||"")}</small></span><i class="lrchev" aria-hidden="true">${open?"▴":"▾"}</i></span>
@@ -5132,7 +5163,7 @@ const PEOPLE_COLS=["people","data/dir/people"];
 const pColor=id=>["#22E4FF","#EFE4C8","#CFA85A","#FFB547","#9B8CFF","#4DD6A6"][[...String(id)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7)%6];
 /* ===================================================================== v37 : PHOTOS DES AMIS DANS LES PASTILLES
    personOf : retrouve la fiche (photo) d'un joueur d'une partie ou d'un membre de groupe. */
-function personByUid(uid,name){if(uid&&S.uid&&uid===S.uid)return me();const m=uid&&MEMBERS.find(x=>x.uid===uid);if(m)return m;if(name&&(isMeName(name)||normS(name)===normS(me().name||"")))return me();return name?memberByName(name)||null:null;}
+function personByUid(uid,name){if(uid&&S.uid&&uid===S.uid)return me();const m=uid&&MEMBERS.find(x=>x.uid===uid);if(m)return m;if(name&&(isMeName(name)||normS(name)===normS(me().name||"")||(me().pseudo&&normS(String(name).replace(/^@/,""))===normS(me().pseudo))))return me();return name?memberByName(name)||null:null;}
 function personOf(p,x){if(!x)return null;const uid=x.uid||(x.id===p.owner?p.owner:null)||(S.uid&&x.id===S.uid?S.uid:null);if(x.id===p.owner&&p.owner===S.uid)return me();return personByUid(uid,isMeName(x.name)?null:x.name);}
 function bubImg(pr){return pr&&okPhoto(pr.photo)?`<img src="${pr.photo}" alt="">`:"";}
 /* pastille d'un membre : pleine (photo) s'il a accepté, en pointillé s'il n'a pas encore répondu, barrée s'il a refusé */
@@ -5161,8 +5192,13 @@ function peopleApply(list){const by={};MEMBERS.forEach(m=>by[m.uid]=m);list.forE
   MEMBERS.splice(0,MEMBERS.length,...Object.values(by).sort((a,b)=>a.name.localeCompare(b.name)));SIDX=null;setTimeout(partyRepair,0);}
 /* réparation : dans MES parties, un pote invité par son prénom qui correspond à un inscrit est rattaché à son compte (il voit alors la partie) */
 const REPAIRED={};
-function partyRepair(){if(!db||!S.uid||!MEMBERS.length)return;(S.rawParties||[]).forEach(p=>{if(!p||p.owner!==S.uid||p.demo||!p.players||REPAIRED[p.id])return;let ch=false;
-  const pl=p.players.map(x=>{if(!x||x.id===p.owner||x.uid)return x;const hits=MEMBERS.filter(m=>normS(m.short)===normS(x.name)||normS(m.name)===normS(x.name)||(x.email&&m.eh&&EH[normEmail(x.email)]===m.eh));if(hits.length!==1)return x;ch=true;return Object.assign({},x,{uid:hits[0].uid});});
+const GREP={};
+function groupRepair(){if(!db||!S.uid||!MEMBERS.length)return;(S.rawGroups||[]).forEach(g=>{if(!g||g.owner!==S.uid||GREP[g.id]||!Array.isArray(g.members))return;GREP[g.id]=1;const out=[],seen=new Set();let ch=false;
+  g.members.forEach(n=>{let nn=n;if(!isMeName(n)){let u=null;try{u=gMemberUid(g,n);}catch(_){}const m=u&&MEMBERS.find(x=>x.uid===u);if(m&&m.uid===S.uid){ch=true;return;}if(m&&m.short&&normS(m.short)!==normS(n)){nn=m.short;ch=true;}}
+    const k=isMeName(nn)?"toi":normS(nn);if(seen.has(k)){ch=true;return;}seen.add(k);out.push(nn);});
+  if(ch){g.members=out;Promise.resolve(db.doc("groups/"+g.id).update({members:out})).catch(()=>{GREP[g.id]=0;});}});}
+function partyRepair(){setTimeout(groupRepair,0);if(!db||!S.uid||!MEMBERS.length)return;(S.rawParties||[]).forEach(p=>{if(!p||p.owner!==S.uid||p.demo||!p.players||REPAIRED[p.id])return;let ch=false;
+  const pl=p.players.map(x=>{if(!x||x.id===p.owner)return x;if(x.uid){const m=MEMBERS.find(y=>y.uid===x.uid);if(m&&m.short&&m.uid!==S.uid&&normS(m.short)!==normS(x.name)){ch=true;return Object.assign({},x,{name:m.short});}return x;}const k=normS(String(x.name||"").replace(/^@/,""));let hits=MEMBERS.filter(m=>normS(m.short)===k||normS(m.name)===k||(x.email&&m.eh&&EH[normEmail(x.email)]===m.eh));if(!hits.length)hits=MEMBERS.filter(m=>m.pseudo&&normS(m.pseudo)===k);if(hits.length!==1)return x;ch=true;return Object.assign({},x,{uid:hits[0].uid,name:hits[0].short||x.name});});
   REPAIRED[p.id]=1;if(!ch)return;const uids=pl.map(x=>x.uid).filter(Boolean);
   db.doc("parties/"+p.id).update({players:pl,uids}).then(()=>{pl.forEach(x=>{if(x.uid&&!(p.players.find(y=>y.id===x.id)||{}).uid)notify(x.uid,"party",(me().name||"Ton pote")+" t'invite à la partie « "+p.name+" »",{pid:p.id});});},()=>{REPAIRED[p.id]=0;});});}
 function peopleEntry(doc){return{eh:S.eh||null,uid:S.uid,name:doc.name,pseudo:doc.pseudo,city:doc.city||"",vis:doc.vis||"public",photo:doc.photo&&doc.photo.length<120000?doc.photo:null,at:doc.at||new Date().toISOString()};}
@@ -5285,7 +5321,7 @@ function findMembers(q,excl){q=normS(q).replace(/^@/,"");const fr=friendsSet(),e
     const isFr=fr.has(normS(m.short))||fr.has(normS(m.name))||fr.has(normS(m.pseudo));
     if(m.vis==="public"||isFr)return hit;
     return q&&normS(m.pseudo)===q;});}
-const memberByName=n=>MEMBERS.find(m=>normS(m.short)===normS(n)||normS(m.name)===normS(n));
+const memberByName=n=>{const k=normS(String(n||"").replace(/^@/,""));if(!k)return undefined;return MEMBERS.find(m=>normS(m.short)===k||normS(m.name)===k)||MEMBERS.find(m=>m.pseudo&&normS(m.pseudo)===k);};
 const okPhoto=v=>typeof v==="string"&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v);
 const isMeName=n=>normS(n)==="toi";
 const avatar=(m,sz=36)=>{if(m&&isMeName(m.short||"")&&!m.photo)m=me();return`<span class="uav" style="width:${sz}px;height:${sz}px;background:${m&&m.color||"#4A5280"};font-size:${Math.round(sz*.42)}px">${m&&okPhoto(m.photo)?`<img src="${m.photo}" alt="">`:esc(((m&&(m.short||m.name))||"?").slice(0,1).toUpperCase())}</span>`;};
@@ -5325,9 +5361,9 @@ function vProfile(){
 function inviteBase(){try{return/claude\.ai|claudeusercontent|claude\.site/.test(location.host)?APP_LINK:location.origin+location.pathname;}catch(_){return APP_LINK;}}
 function inviteLink(){return inviteBase()+"#invite="+encodeURIComponent(me().pseudo||me().name||"");}
 /* mes amis : ceux que j'ai ajoutés, les joueurs de mes parties et les membres de mes groupes */
-function myFriends(){const by={};const add=(n,src,uid)=>{n=String(n||"").trim();if(!n||isMeName(n)||normS(n)===normS(me().name))return;/* v39 : on relie d'abord par le compte (uid) — le prénom affiché peut différer du nom d'inscription */const byU=uid&&uid!==S.uid?MEMBERS.find(m=>m.uid===uid):null;const mm=byU||memberByName(n),k=normS(byU?n:(mm?mm.short:n));if(byU&&by[k]&&!by[k].m)by[k].m=byU;const e=by[k]||(by[k]={name:byU?n:(mm?mm.short:n),full:mm?mm.name:n,m:mm,src:new Set(),parties:0});e.src.add(src);};
-  (me().friends||[]).forEach(n=>add(n,"ami"));try{realFriends().forEach(f=>{add(f.name,"partie",f.uid);const e=by[normS(f.uid&&MEMBERS.some(m=>m.uid===f.uid)?f.name:(memberByName(f.name)||{short:f.name}).short)];if(e)e.parties=Math.max(e.parties,f.parties.length);});}catch(_){}
-  allGroups().forEach(g=>(g.members||[]).forEach(n=>add(n,"groupe")));
+function myFriends(){const by={};const add=(n,src,uid)=>{n=String(n||"").trim();if(!n||isMeName(n)||normS(n)===normS(me().name)||(me().pseudo&&normS(n.replace(/^@/,""))===normS(me().pseudo))||(uid&&uid===S.uid))return;/* v39 : on relie d'abord par le compte (uid) — le prénom affiché peut différer du nom d'inscription */const byU=uid&&uid!==S.uid?MEMBERS.find(m=>m.uid===uid):null;const mm=byU||memberByName(n);if(mm&&S.uid&&mm.uid===S.uid)return;const k=normS(mm?mm.short:n);if(byU&&by[k]&&!by[k].m)by[k].m=byU;const e=by[k]||(by[k]={name:mm?mm.short:n,full:mm?mm.name:n,m:mm,src:new Set(),parties:0});e.src.add(src);};
+  (me().friends||[]).forEach(n=>add(n,"ami"));try{realFriends().forEach(f=>{add(f.name,"partie",f.uid);const e=by[normS(((f.uid&&MEMBERS.find(m=>m.uid===f.uid))||memberByName(f.name)||{short:f.name}).short)];if(e)e.parties=Math.max(e.parties,f.parties.length);});}catch(_){}
+  allGroups().forEach(g=>(g.members||[]).forEach(n=>{let u=null;try{u=isMeName(n)?null:gMemberUid(g,n);}catch(_){}add(n,"groupe",u);}));
   Object.values(by).forEach(e=>{if(e.m){try{e.parties=Math.max(e.parties,commonWith(e.m).length);}catch(_){}}});
   return Object.values(by).sort((a,b)=>(b.parties-a.parties)||a.name.localeCompare(b.name));}
 function frAv(f,z){return avatar(f.m||{short:f.name,color:"#4A5280"},z);}
@@ -5630,7 +5666,9 @@ function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK
    Visible uniquement quand un match d'une de mes parties est en direct. Lien direct vers la fiche du pari. */
 /* v51 : un match est « en direct » si la source le dit, OU si son heure de début est passée sans résultat (source muette, ex. ATP Finals sur ESPN) — pendant la durée normale du match */
 function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END"||st==="PST")return false;const t=+new Date(it.date),now=+NOW;return t<=now&&now<t+(it.dur||3)*3600e3;}
-function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it));}
+const GRACE=15*60e3;
+function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;const L=LIVE[it.lid]||{},f=L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
+function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it)||inGrace(it));}
 function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it));}catch(_){}rows.forEach(r=>out.push({p,r}));});
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
 /* noms courts, comme sur l'affiche du match (« Tirante – Munar ») */
@@ -5642,14 +5680,29 @@ function lvTkScore(it){const L=LIVE[it.lid]||{},sd=shortSides(it),sv=srvSide(it)
 /* v45 : un match joué dans plusieurs parties = UN seul match en direct */
 function liveMatches(){const by={},out=[];liveRowsAll().forEach(x=>{const k=x.r.it.lid||x.r.key;if(!by[k]){by[k]={k,it:x.r.it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}by[k].rows.push(x);});return out;}
 /* nom lisible d'une partie : son groupe, sinon « avec Alexandre, Maxime », sinon son nom */
-function partyLabel(p){const g=partyGroup(p);if(g)return g.name;const me=myId(p);const o=playersOf(p).filter(x=>x.id!==me&&!x.fake).map(x=>x.name);return o.length?"avec "+o.slice(0,3).join(", ")+(o.length>3?"…":""):p.name;}
+const SPLIT_ALL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"],["perso","Personnalisée"]];
+function splitOk(k,n){n=+n||2;if(k==="perso")return n>=3;return String(k).split("-").length<n;}
+function splitFix(cr){if(cr&&!splitOk(cr.split,cr.people))cr.split="100";}
+function partyGroupLike(p){const g=partyGroup(p);if(g)return g;let gs=[];try{gs=allGroups();}catch(_){gs=S.groups||[];}
+  const pl=rawPlayers(p).filter(x=>!x.fake&&plStatus(p,x)!=="out");if(pl.length<2)return null;
+  const kp=x=>{const u=x.uid||(x.id===p.owner?p.owner:null);return u?"u:"+u:"n:"+normS(x.name);},PK=pl.map(kp),PN=pl.map(x=>normS(x.name));
+  for(const G of gs){const M=G.members||[];if(M.length!==pl.length)continue;const GK=M.map(m=>{let u=null;try{u=gMemberUid(G,m);}catch(_){}return u?"u:"+u:"n:"+normS(m);});
+    if(PK.every(k=>GK.includes(k)))return G;
+    /* repli par prénoms (toi = « Toi » dans le groupe) */
+    const me=normS((rawPlayers(p).find(x=>x.id===myId(p))||{}).name||""),GN=M.map(m=>isMeName(m)?me:normS(m));if(PN.every(n=>GN.includes(n))&&GN.every(n=>PN.includes(n)))return G;}
+  return null;}
+function partyBase(p){const g=partyGroupLike(p);if(g)return g.name;const me=myId(p);const o=playersOf(p).filter(x=>x.id!==me&&!x.fake).map(x=>x.name);return o.length?"avec "+o.slice(0,3).join(", ")+(o.length>3?"…":""):p.name;}
+function partyLabel(p){const b=partyBase(p);let same=[];try{same=(S.parties||[]).filter(q=>q&&q.id!==p.id&&!q.demo&&partyBase(q)===b);}catch(_){}if(!same.length)return b;
+  const cn=q=>((FIND[q.comp]||{}).name)||"";if(cn(p)&&same.every(q=>cn(q)!==cn(p)))return b+" · "+cn(p);
+  const d=q=>q.made?new Date(q.made).toLocaleDateString("fr-BE",{day:"numeric",month:"short"}):"",dh=q=>q.made?new Date(q.made).toLocaleString("fr-BE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+  if(d(p)&&same.every(q=>d(q)!==d(p)))return b+" · "+d(p);return dh(p)?b+" · "+dh(p):b;}
 function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();const{p,r}=A[0],it=r.it,L=LIVE[it.lid]||{},c=FIND[p.comp],g=partyGroup(p),sid=sportOfParty(p);
   const extra=A.length-1,mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
-  const when=[L.minute,sid==="tennis"&&L.line?String(L.line).replace(/\s*·\s*en cours$/,""):"",sid!=="tennis"&&!L.minute&&L.line?L.line:""].filter(Boolean).join(" · ");const when_=estLive(it)?"En cours · score pas encore disponible":when;
+  const when=[L.minute,sid==="tennis"&&L.line?String(L.line).replace(/\s*·\s*en cours$/,""):"",sid!=="tennis"&&!L.minute&&L.line?L.line:""].filter(Boolean).join(" · ");const when_=estLive(it)?"En cours · score pas encore disponible":inGrace(it)?"Terminé"+(L.line?" · "+String(L.line).replace(/\s*·\s*en cours$/,""):""):when;
   if(MM.length>1)return`<div class="prowbox hlvb hlvn"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
    <button type="button" class="lvR lvRn" data-act="liveRoom"><span class="lvbig"><b class="lvn2">${MM.length}</b><span class="lvs2">matchs<br>en live</span></span><span class="lvgo">Entrer dans le salon des lives →</span></button></div>`;
   return`<div class="prowbox hlvb" data-live="${esc(p.id)}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b>${MM[0].rows.length>1?`<small>dans ${MM[0].rows.length} parties</small>`:""}</button>
-   <button type="button" class="lvR" data-act="liveRoom"><span class="lvc">${SPEM[sid]||""} ${esc(c?c.name:"")}${g?" · "+esc(g.name):""}</span>${lvTkScore(it)}${when_||mine?`<span class="lvx">${esc(when_)}${when_&&mine?" · ":""}${mine?"ton prono : "+mine:""}</span>`:""}<span class="lvgo">Suivre le match en direct →</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
+   <button type="button" class="lvR" data-act="liveRoom"><span class="lvc">${SPEM[sid]||""} ${esc(c?c.name:"")}${g?" · "+esc(g.name):""}</span>${lvTkScore(it)}${when_||mine?`<span class="lvx">${esc(when_)}${when_&&mine?" · ":""}${mine?"ton prono : "+mine:""}</span>`:""}<span class="lvgo">${inGrace(it)?"Voir le résultat →":"Suivre le match en direct →"}</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
 function vParties(){
   const D=partiesData(),f=S.pf||null;
   /* comme l'accueil : catégories à gauche (1/3), parties de la catégorie choisie à droite (2/3) */
@@ -5666,7 +5719,7 @@ function vParties(){
   const todoL=D.sec.todo.filter(p=>!cur.includes(p)).sort(byKo);rdy.sort(byKo);
   /* pronos en attente = toutes les parties avec un prono à faire (en cours ou à venir) ; paris pris = rien à faire, pas encore terminées */
   const JN=S.justNew&&S.justNew.id,pend=D.all.filter(p=>D.todoN(p)||p.id===JN).sort(byKo),taken=ready.slice().sort(byKo);if(JN){const i=pend.findIndex(p=>p.id===JN);if(i>0)pend.unshift(pend.splice(i,1)[0]);}
-  const doneL=D.all.filter(p=>D.sec.done.includes(p)||hasResult(p)).sort((a,b)=>endT(b)-endT(a)||String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+  const doneL=D.all.filter(p=>(D.sec.done.includes(p)&&!inGraceP(p))||hasResult(p)).sort((a,b)=>endT(b)-endT(a)||String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
   const head=(t,sub)=>pageHead(t,sub,f?`<button type="button" class="back phback" data-act="pfBack" aria-label="Retour"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>`:"");
   /* pages de liste : cartes verticales épurées */
   const pcard=p=>{const c=p.free?null:FIND[p.comp],g=partyGroup(p),[st,col]=partyStatus(p),r=D.RK.get(p.id),n=D.todoN(p),sid=sportOfParty(p),fin=D.sec.done.includes(p),tk=SP_TK[sid]||SP_TK.free;
@@ -6312,25 +6365,26 @@ function myBetsTab(p,sc){
       <span class="mcfoot"><span class="mcmine${pl?"":" none"}">${pl?`Ton prono : <em>${pl}</em>`:can?"Pas encore de prono":"Pas de prono"}</span>${ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:""}</span>
       ${rlogHTML(p,r.key)}${kind==="todo"?"":extra}${orgL}</button>${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}</div>`;};
   /* filtres : À faire (paris ouverts) · En cours (commencés ou fermés) · Terminés · Tous */
-  const FILT={todo:["todo","later"],edit:["ready"],done:["live","wait","locked","done"]}; /* 2 filtres seulement : on parie (En attente) ou on regarde le résultat (Terminés) */ /* un prono fait quitte « À faire » : il attend son résultat dans « En cours » */
+  const FILT={edit:["todo","ready"],done:["live","wait","locked","done"]}; /* 2 filtres seulement : on parie (En attente) ou on regarde le résultat (Terminés) */ /* un prono fait quitte « À faire » : il attend son résultat dans « En cours » */
   const SECT=[["todo","Pronos en attente"],["ready","Pronos faits · encore modifiables"],["later","À venir"],["live","En cours"],["locked","Paris fermés"],["done","Terminés"]];
   const cnt=k=>items.filter(x=>x.kind===k).length,cntF=f=>f==="all"?items.length:items.filter(x=>FILT[f].includes(x.kind)).length;
   /* un filtre vide (0) n'apparaît pas ; « Tous » reste toujours */
-  const tabs=[["todo","En attente"],["edit","Modifier mon prono"],["done","Terminés"]].filter(([k])=>cntF(k)>0);
-  let kf=S.kf&&S.kf[p.id];if(!tabs.some(([k])=>k===kf))kf=tabs.length?tabs[0][0]:"todo";
-  if(tabs.length)h+=`<div class="pad" style="margin-top:12px"><div class="ktabs bnr" role="tablist">${tabs.map(([k,t])=>`<button type="button" role="tab" aria-selected="${kf===k}" class="ktab k-${k}${kf===k?" on":""}${k==="todo"&&cnt("todo")?" hot":""}" data-act="kf" data-k="${k}"><b>${cntF(k)}</b><span>${t}</span></button>`).join("")}</div></div>`;
+  /* v57 : aucun filtre à l'arrivée (tout est affiché : à pronostiquer d'abord, terminés ensuite) ; chaque filtre s'allume / s'éteint d'un clic */
+  const tabs=[["edit","Faire / modifier mon prono"],["done","Terminés"]].filter(([k])=>cntF(k)>0);
+  let kf=S.kf&&S.kf[p.id];if(kf!=="all"&&!tabs.some(([k])=>k===kf))kf="all";
+  if(tabs.length)h+=`<div class="pad" style="margin-top:12px"><div class="ktabs bnr" role="tablist">${tabs.map(([k,t])=>`<button type="button" role="tab" aria-selected="${kf===k}" aria-pressed="${kf===k}" class="ktab k-${k}${kf===k?" on":""}${k==="edit"&&cnt("todo")?" hot":""}" data-act="kf" data-k="${k}"><b>${cntF(k)}</b><span>${t}</span></button>`).join("")}</div></div>`;
   /* filtre par journée / phase / tour : on ne montre qu'une journée à la fois (la prochaine à jouer par défaut) */
   const suOf=x=>x.r.key.split("/")[0],inF=items.filter(x=>kf==="all"||FILT[kf].includes(x.kind));
   const suIds=subs.map(s=>s.id).filter(id=>inF.some(x=>suOf(x)===id));let kj=null;
   if(suIds.length>1){const KJ=p.id+":"+kf;kj=S.kj&&S.kj[KJ];
-    if(!suIds.includes(kj)){if(kf==="done")kj=suIds[suIds.length-1];else{const f0=inF.slice().sort((x,y)=>closeAt(x.r.it)-closeAt(y.r.it))[0];kj=f0?suOf(f0):suIds[0];}}
+    if(!suIds.includes(kj)){if(kf==="done")kj=suIds[suIds.length-1];else{const pool=inF.filter(x=>x.kind==="todo"||x.kind==="ready"),f0=(pool.length?pool:inF).slice().sort((x,y)=>closeAt(x.r.it)-closeAt(y.r.it))[0];kj=f0?suOf(f0):suIds[0];}}
     const lab=su=>{const n=String(su.name||"");const m=n.match(/^(Journée|Matchday|Round|Tour|Étape|Manche)\s+(\d+)$/i);return m?(m[1][0].toUpperCase()==="J"?"J":m[1].slice(0,1).toUpperCase())+m[2]:n;};
     h+=`<div class="kjbar" role="tablist" aria-label="Choisir la journée">${suIds.map(id=>{const su=subs.find(x=>x.id===id),n=inF.filter(x=>suOf(x)===id).length,on=id===kj;return`<button type="button" role="tab" aria-selected="${on}" class="kj${on?" on":""}" data-act="kj" data-k="${esc(KJ)}" data-v="${esc(id)}" title="${esc(su.name)}"><b>${esc(lab(su))}</b><small>${n}</small></button>`;}).join("")}</div>`;}
   const vis=kj?items.filter(x=>suOf(x)===kj):items;
   const shown=SECT.filter(([k])=>kf==="all"||FILT[kf].includes(k));let any=false;
   shown.forEach(([k,t])=>{let l=vis.filter(x=>x.kind===k);if(k==="todo")l=l.slice().sort((x,y)=>(closeAt(x.r.it)-closeAt(y.r.it)));if(!l.length)return;any=true;const n=l.length,cap=k==="later"||k==="done"?(S.kmore&&S.kmore[p.id+k]?9999:12):9999;if(k==="done")l=l.slice().reverse();
     h+=`<div class="pad"><h3 class="ksec k-${k}">${t} <span>${n}</span></h3></div><div class="list">${l.slice(0,cap).map(card).join("")}</div>${n>cap?`<div class="pad"><button type="button" class="btn ghost block" data-act="kmore" data-k="${p.id+k}">Voir les ${n-cap} autres</button></div>`:""}`;});
-  if(!any)h+=`<div class="pad"><div class="kempty">${kf==="todo"?"✓ Plus rien à parier pour l'instant.":kf==="live"?"Aucun match en cours.":kf==="done"?"Aucun match terminé pour l'instant.":"Rien ici pour le moment."}</div></div>`;
+  if(!any)h+=`<div class="pad"><div class="kempty">${kf==="edit"?"✓ Plus rien à parier pour l'instant.":kf==="live"?"Aucun match en cours.":kf==="done"?"Aucun match terminé pour l'instant.":"Rien ici pour le moment."}</div></div>`;
   return h;
 }
 
@@ -6792,7 +6846,7 @@ function vParty(){
     h+=`<div class="pad" style="margin-top:2px"><div class="ptabs rtabs">${[["party","La partie"],["bets","Les paris"],["players","Joueurs"]].map(([k,l])=>`<button type="button" data-act="rtab" data-t="${k}" aria-pressed="${rt===k}">${l}</button>`).join("")}</div>
       <div class="pstate ${isClosed(p)?"end":started?"live":"pre"}" style="margin:8px 2px 0">${isClosed(p)?"Partie terminée":started?"Partie en cours":"Pas encore commencée"}</div></div>`;
     if(rt==="party"){
-    if(own){const D0=S.pset&&S.pset.id===p.id?S.pset:{id:p.id,name:p.name,amount:+p.amount||0,split:(p.split||[]).join("-")||"100"};S.pset=D0;const lk=started,SPL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"]],AM=[...new Set([0,5,10,20,50,100,+p.amount||0])].sort((x,y)=>x-y);
+    if(own){const D0=S.pset&&S.pset.id===p.id?S.pset:{id:p.id,name:p.name,amount:+p.amount||0,split:(p.split||[]).join("-")||"100"};S.pset=D0;const lk=started,SPL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"]].filter(([k])=>splitOk(k,+p.people||rawPlayers(p).length)),AM=[...new Set([0,5,10,20,50,100,+p.amount||0])].sort((x,y)=>x-y);
       const dirty=D0.name.trim()!==p.name||D0.amount!==(+p.amount||0)||D0.split!==((p.split||[]).join("-")||"100");
       h+=`<div class="pad" style="margin-top:12px"><div class="card psetc"><div class="fhead"><b>Réglages de la partie</b></div>
         <div class="lab">Nom de la partie</div><input class="inp" data-pset="name" maxlength="70" value="${esc(D0.name)}" placeholder="Nom de la partie">
@@ -6842,7 +6896,7 @@ function vParty(){
   return h+'</div>';
 }
 
-function ensureCreateVisible(){const b=[...document.querySelectorAll(".h3create:not(.flok)")].find(x=>{const w=x.closest(".h3cw");return !w||w.dataset.on==="1";}),was=!!S._cbWas;let key=null;try{const H=hmS();key=H.sport+"|"+H.mode;}catch(e){}const same=S._cbKey===key,hold=S._cbHold;S._cbHold=false;S._cbWas=!!b;S._cbKey=key;if(!b||hold||(was&&same)||S.screen!=="home")return;
+function ensureCreateVisible(){const b=[...document.querySelectorAll(".h3create:not(.flok)")].find(x=>{const w=x.closest(".h3cw");return !w||w.dataset.on==="1";}),was=!!S._cbWas;let key=null;try{const H=hmS();key=H.sport+"|"+H.mode;}catch(e){}const same=S._cbKey===key;S._cbHold=false;S._cbWas=!!b;S._cbKey=key;if(!b||(was&&same)||S.screen!=="home")return;
   const w=b.closest(".h3cw")||b,lim=flViewBox().bot,bot=w.getBoundingClientRect().bottom+4;
   const d=Math.max(0,Math.round(bot-lim));if(!was)S._cwBack={y0:scrollY,d};if(d>0)h3ScrollTo(scrollY+d);}
 
@@ -7057,7 +7111,7 @@ function vSetup(){
   const who=H.mode==="duel"&&H.duel?"En duel avec "+esc((memberByName(H.duel.name)||{}).short||H.duel.name):g?"Groupe "+esc(g.name):cr.people+" joueurs";
   const what=esc(c.name)+(f.comp===c.id&&(f.teams||[]).length&&!S.sel.full?" · "+esc(f.teams.join(f.h2h?" – ":", ")):S.sel.full?" · toute la compétition":"");
   const[sz,lbl]=sizePrice(on.length,S.sel.full,false),ex=playersExtra(cr.people),tot=sz+ex;S._suTot=tot;
-  const splits={"100":[100],"70-30":[70,30],"50-30-20":[50,30,20],"40-30-20-10":[40,30,20,10],"perso":cr.custom},sp_=splits[cr.split]||[100],sum=sp_.reduce((a,b)=>a+(+b||0),0),pot=cr.amount*cr.people;
+  splitFix(cr);const splits={"100":[100],"70-30":[70,30],"50-30-20":[50,30,20],"40-30-20-10":[40,30,20,10],"perso":cr.custom},sp_=splits[cr.split]||[100],sum=sp_.reduce((a,b)=>a+(+b||0),0),pot=cr.amount*cr.people;
   const word=sp.id==="f1"?["séance","séances"]:sp.id==="golf"?["jour","jours"]:sp.id==="velo"?["étape","étapes"]:["match","matchs"];
   const D=i=>` style="--d:${(i*0.06).toFixed(2)}s"`;
   let h=`<div class="subg" aria-hidden="true">${SU_ART[sp.id]||SU_ART.def}</div><div class="suwrap${s.intro?" intro":""}">
@@ -7089,7 +7143,7 @@ function vSetup(){
   if(tab==="cagnotte")h+=`<section class="susec suin1"${D(2+cats.length)}><h2>La cagnotte <small>${cr.amount} × ${cr.people} = ${pot.toLocaleString("fr-BE")}</small></h2>
    <p class="suhelp">Des crédits pour le classement entre potes : rien n'est débité, ils servent à afficher qui gagne quoi.</p>
    <div class="sucard" style="padding-bottom:12px"><span class="sulab">Mise par joueur</span><div class="suseg">${[10,20,50].map(v=>`<button type="button" class="suopt" data-act="amt" data-v="${v}" aria-pressed="${cr.amount===v}">${v}</button>`).join("")}<input class="suin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" data-c="amount" aria-label="Autre montant" value="${[10,20,50].includes(cr.amount)?"":cr.amount}" placeholder="Autre"></div>
-    <span class="sulab">Répartition</span><div class="susplit">${[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"],["perso","Personnalisée"]].map(([k,l])=>`<button type="button" class="suopt" data-act="split" data-v="${k}" aria-pressed="${cr.split===k}">${l}</button>`).join("")}</div>
+    <span class="sulab">Répartition</span><div class="susplit">${SPLIT_ALL.filter(([k])=>splitOk(k,cr.people)).map(([k,l])=>`<button type="button" class="suopt" data-act="split" data-v="${k}" aria-pressed="${cr.split===k}">${l}</button>`).join("")}</div>
     <div class="supod">${sp_.map((pc,i)=>`<div>${medalIcon(i+1,26,sp.id)}<span>${i===0?"1er":(i+1)+"e"}</span>${cr.split==="perso"?`<input inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" aria-label="Pourcentage place ${i+1}" data-pc="${i}" value="${pc}"> %`:`<span class="muted">${pc} %</span>`}<span class="a">${Math.round(pot*(+pc||0)/100).toLocaleString("fr-BE")}</span></div>`).join("")}</div>
     ${cr.split==="perso"?`<div style="display:flex;gap:8px"><button type="button" class="suopt" style="flex:1" data-act="pcAdd">+ une place</button><button type="button" class="suopt" style="flex:1" data-act="pcDel">− une place</button></div>`:""}
     ${sum!==100?`<p class="suerr">Total ${sum} % : la répartition doit faire 100 %.</p>`:""}</div></section>`;
@@ -7326,7 +7380,7 @@ document.addEventListener("click",e=>{
     case "member":go("member",{memberView:t.dataset.id});break;
     case "kmore":S.kmore=Object.assign({},S.kmore,{[t.dataset.k]:1});render();break;
     case "kj":{S.kj=Object.assign({},S.kj,{[t.dataset.k]:t.dataset.v});render();requestAnimationFrame(()=>{const b=document.querySelector(".kj.on");if(b)b.scrollIntoView({inline:"center",block:"nearest"});});break;}
-case "kf":{const p=partyById(S.partyView);S.kf=Object.assign({},S.kf,{[p.id]:t.dataset.k});render();break;}
+case "kf":{const p=partyById(S.partyView),k=t.dataset.k,cur=(S.kf||{})[p.id];S.kf=Object.assign({},S.kf,{[p.id]:cur===k?"all":k});render();break;}
     case "betOne":S.myDraft={};S.editKey=null;S.missHi=null;S.betQueue=[t.dataset.key];S.betIdx=0;go("bet");break;
     case "betValidate":{const p=partyById(S.partyView),k=curBetKey();if(!commitPick(p,k))break;const q=S.betQueue||[];if((S.betIdx||0)+1<q.length){S.betIdx++;S.myDraft={};render();window.scrollTo(0,0);}else{S.ptab="games";S.myDraft={};back();}break;}
     case "betEdit":{S.editKey=curBetKey();S.myDraft={};render();break;}
@@ -7440,7 +7494,7 @@ case "mpWhoMode":{const H=hmS(),c=t.dataset.ctx;H.wctx=c;if(c==="duel"?!!H.duel:
 case "mpNone":{S.sel.items={};S.sel.full=false;const y=scrollY;render();scrollTo(0,y);toast("Tout est décoché");break;}
     case "mpMode":{const f=flS(),v=t.dataset.v,same=f.mode===v;["subs","phOk","teams","tmOk","h2h","typ"].forEach(k=>delete f[k]);
   if(same){delete f.mode;S.sel={comp:f.comp,full:false,items:{}};}else{f.mode=v;S.sel={comp:f.comp,full:v==="all"&&!f.intl,items:{}};if(v==="all"&&f.intl)mpAuto();}
-  const y=scrollY;render();scrollTo(0,y);break;}
+  const y=scrollY;render();scrollTo(0,y);if(!same)mpModeScroll();break;}
 case "mpSub":case "mpTeam":{const f=flS(),key=a==="mpSub"?"subs":"teams",v=t.dataset.v,arr=f[key]||(f[key]=[]),ix=arr.indexOf(v);if(ix>=0)arr.splice(ix,1);else arr.push(v);
   if(f.mode==="h2h"){if(arr.length>2)arr.splice(0,arr.length-2);f.h2h=arr.length===2;}mpAuto();const y=scrollY;render();scrollTo(0,y);break;}
 case "mpPh":{const f=flS(),c=FIND[f.comp],su=mpPhases(c).find(x=>x.id===t.dataset.v);if(!su)break;if(S.sel.full)mpPhUnfull();
@@ -7541,9 +7595,9 @@ case "hmGx":{const H=hmS(),x=H.multi[+t.dataset.i];if(x&&x.k==="g"){x.ex=(x.ex||
     case "save":saveParty();break;
     /* clic sur la partie : tous les tickets fermés ; clic sur le crayon « à faire » : ticket Matchs ouvert */
     case "party":case "partyBet":S.fromGroup=S.screen==="group";S.partyView=t.dataset.id;chatSubscribe(partyById(t.dataset.id));ensureJoined(partyById(t.dataset.id)||{});S.mailSheet=null;S.emEdit=null;{/* ticket ouvert selon le chemin : depuis Historique → Classement ; depuis Pronos en attente / Paris pris (ou le crayon) → Matchs */
-      const src=(t.closest(".pflip")||{}).dataset,sk=src&&src.k,tab=a==="partyBet"||sk==="pending"||sk==="ready"||sk==="done"?"games":null;S.ptab=tab;S.ptOpen=tab?"pt-"+tab:null;
+      const src=(t.closest(".pflip")||{}).dataset,sk=src&&src.k,pp0=partyById(t.dataset.id),fin0=a!=="partyBet"&&sk!=="pending"&&sk!=="ready"&&pp0&&(isClosed(pp0)||(()=>{try{return rowsOfParty(pp0).every(r=>!r.it||isDone(r.it));}catch(_){return false;}})());let tab=a==="partyBet"||sk==="pending"||sk==="ready"||sk==="done"?"games":null;if(fin0){tab="board";S.ptv=Object.assign({},S.ptv);}S.ptab=tab;S.ptOpen=tab==="games"?"pt-games":null;
       /* le ticket d'entrée choisit le filtre : à faire → En attente, Paris pris → Modifier mon prono, Résultats → Terminés */
-      const kf0=a==="partyBet"||sk==="pending"?"todo":sk==="ready"?"edit":sk==="done"?"done":null;if(kf0)S.kf=Object.assign({},S.kf,{[t.dataset.id]:kf0});}S.orgMode=null;if(S.ptv)delete S.ptv[t.dataset.id];S.myDraft={};S.mbOpen=null;S.pay=null;{const cd=t.closest(".pcard,.prow"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&cd.closest(".prowbox.open .pflip");S.morphFrom=bx&&S.screen==="parties"?{pid:t.dataset.id,pf:bx.dataset.k,y:window.scrollY,scr:"parties",to:"party"}:null;document.body.classList.remove("mcomp");const bgH=bg?bg.outerHTML:"";window._mSrc=cd?mBgOf(cd):null;go("party");if(r0)heroMorph(r0,bgH);}break;
+      S.kf=Object.assign({},S.kf,{[t.dataset.id]:"all"});}S.orgMode=null;if(S.ptv)delete S.ptv[t.dataset.id];S.myDraft={};S.mbOpen=null;S.pay=null;{const cd=t.closest(".pcard,.prow"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&cd.closest(".prowbox.open .pflip");S.morphFrom=bx&&S.screen==="parties"?{pid:t.dataset.id,pf:bx.dataset.k,y:window.scrollY,scr:"parties",to:"party"}:null;document.body.classList.remove("mcomp");const bgH=bg?bg.outerHTML:"";window._mSrc=cd?mBgOf(cd):null;go("party");if(r0)heroMorph(r0,bgH);}break;
     case "invite":{const p=partyById(S.partyView);copyText(`Rejoins ma partie « ${p?p.name:"Bet's Friends"} » sur Bet's Friends : ${APP_LINK}\nConnecte-toi à Claude avec l'adresse e-mail que je t'ai inscrite, la partie s'affiche à l'accueil.`,"Lien d'invitation copié");break;}
     case "joinCode":{const i=document.querySelector("[data-jc]");const v=String((i&&i.value)||"").trim().toUpperCase();S.jcode=v;if(!v)return toast("Tape le code reçu dans l'invitation.");
       const f=(S.rawParties||[]).find(x=>!x.demo&&partyCode(x)===v);if(!f)return toast(S.rawParties?"Code introuvable. Vérifie-le dans l'e-mail.":"Connexion à la base impossible : connecte-toi à ton compte Claude puis recharge.");JC.add(v);LS("bf_codes",[...JC]);S.claim=f.id;render();break;}
@@ -7645,7 +7699,7 @@ render();
   const applyParties=()=>{S.parties=(S.rawParties||[]).filter(p=>!p.archived).filter(afterReset).filter(partyVisible).filter(p=>!(isMemberView(p)&&myStatus(p)==="out")).filter(realParty).map(fillParty);ppSync();S.parties.forEach(ensureJoined);};S.reapply=applyParties;
   /* mes propres docs partypicks : je retrouve une partie même si l'organisateur a changé mon e-mail */
   if(S.uid){try{db.collection("partypicks").where("uid","==",S.uid).onSnapshot(sn=>{let ch=false;sn.docs.forEach(d=>{const v=d.data();if(v&&v.pid&&v.player&&MYCLAIMS[v.pid]!==v.player){MYCLAIMS[v.pid]=v.player;ch=true;}});if(ch){applyParties();softRender();}},()=>{});}catch(_){}}
-  try{db.collection("live").onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();if(d.id==="_meta"){LIVE_UPD=v.updated||null;return;}if(d.id.indexOf("cal_")===0){calApply(d.id.slice(4),v,true);return;}if(d.id.indexOf("tcal_")===0){if(TFEED[d.id.slice(5)])tnApply(d.id.slice(5),v,true);return;}LIVE[d.id]=Object.assign({},LIVE[d.id],v);});if(!document.activeElement||!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))dataRender();},()=>{});}catch(_){}liveStart();
+  try{db.collection("live").onSnapshot(sn=>{sn.docs.forEach(d=>{const v=d.data();if(d.id==="_meta"){LIVE_UPD=v.updated||null;return;}if(d.id.indexOf("cal_")===0){calApply(d.id.slice(4),v,true);return;}if(d.id.indexOf("gcal_")===0){gcalApply(d.id.slice(5),v,true);return;}if(d.id.indexOf("tcal_")===0){if(TFEED[d.id.slice(5)])tnApply(d.id.slice(5),v,true);return;}LIVE[d.id]=Object.assign({},LIVE[d.id],v);});if(!document.activeElement||!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))dataRender();},()=>{});}catch(_){}liveStart();
   try{db.collection("groups").onSnapshot(sn=>{S.rawGroups=sn.docs.map(d=>Object.assign({id:d.id},d.data()));S.groups=S.rawGroups.filter(g=>!g.owner||!S.uid||g.owner===S.uid);if(["groups","group"].includes(S.screen))dataRender();},()=>{});}catch(_){}
   db.collection("parties").onSnapshot(sn=>{S.rawParties=sn.docs.map(d=>Object.assign({id:d.id},d.data()));applyParties();setTimeout(partyRepair,0);if(["home","parties","party","groups","group"].includes(S.screen)&&!typing())dataRender();},()=>{});
 })();
