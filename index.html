@@ -4015,8 +4015,8 @@ const SP_TK={foot:["#1E7A3A","#062A1C","rgba(46,204,113,.45)"],tennis:["#B5532A"
 function hasResult(p){try{if(p.free)return isClosed(p);return rowsOfParty(p).some(r=>r.it&&(itemState(p,r)==="done"||matchOver(r.it)));}catch(e){return false;}}
 /* v41 : match fini mais résultat officiel pas encore arrivé → il va quand même dans « Résultats » (résultat en attente), jamais nulle part */
 function matchOver(it){if(!it||it.tbd)return false;const now=+NOW,t=+it.date;if(!(t<=now))return false;
-  if(it.live){const st=liveSt(it);if(st==="LIVE")return false;if(st==="FT"||st==="END")return true;return now>t+(it.dur||2.5)*3600e3;}
-  return now>t+(it.dur||2.5)*3600e3;}
+  if(it.live){const st=liveSt(it);if(st==="LIVE")return false;if(st==="FT"||st==="END")return true;return now>t+(it.dur||3)*3600e3;}
+  return now>t+(it.dur||3)*3600e3;}
 function hasPlayed(p){try{if(p.free)return isClosed(p);return isClosed(p)||rowsOfParty(p).some(r=>r.it&&["done","closed","live"].includes(itemState(p,r)));}catch(e){return false;}}
 /* Paris pris : au moins un prono fait et encore modifiable, même s'il reste d'autres pronos à faire */
 function readyParties(D){return D.all.filter(p=>{try{return!p.free&&!isClosed(p)&&rowsOfParty(p).some(r=>r.it&&itemState(p,r)==="open"&&hasSaved(p,r.key));}catch(e){return false;}});}
@@ -5063,7 +5063,7 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
 function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},k=m.k,sv=srvSide(it),short=shortSides(it)||sd;
   S.lrSel=S.lrSel||{};let sel=m.rows.find(x=>x.p.id===S.lrSel[k])||m.rows[0];const p=sel.p,r=sel.r;
   const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${esc(short[k2])}${sv===k2?SRV_BALL:""}</b>${natOf(sd[k2])&&!CLUB[sd[k2]]?`<span class="mhf">${FLAG[natOf(sd[k2])]||""}</span>`:""}</div>`;
-  const center=`<div class="mhc"><span class="mhlive">● EN DIRECT</span>${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}<small>${esc(L.minute||(sp==="tennis"?"":L.line)||"")}</small></div>`;
+  const center=`<div class="mhc"><span class="mhlive">● EN DIRECT</span>${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
   const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>${sp==="tennis"?tnGrid(sd,L.line,true):""}`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
   const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
   let h=`<div class="lrc${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
@@ -5606,7 +5606,10 @@ function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK
 
 /* ===================================================================== v36 : TICKET « LIVE » (Mes parties) — rouge, coupon déchiré
    Visible uniquement quand un match d'une de mes parties est en direct. Lien direct vers la fiche du pari. */
-function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p).filter(r=>r.it&&r.it.live&&liveSt(r.it)==="LIVE");}catch(_){}rows.forEach(r=>out.push({p,r}));});
+/* v51 : un match est « en direct » si la source le dit, OU si son heure de début est passée sans résultat (source muette, ex. ATP Finals sur ESPN) — pendant la durée normale du match */
+function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END"||st==="PST")return false;const t=+new Date(it.date),now=+NOW;return t<=now&&now<t+(it.dur||3)*3600e3;}
+function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it));}
+function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it));}catch(_){}rows.forEach(r=>out.push({p,r}));});
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
 /* noms courts, comme sur l'affiche du match (« Tirante – Munar ») */
 function shortSides(it){const sd=sides(it);if(!sd)return null;const l=String(it.label||""),sep=l.includes(" @ ")?" @ ":" – ",pr=l.split(sep);return pr.length===2?pr:sd;}
@@ -5620,11 +5623,11 @@ function liveMatches(){const by={},out=[];liveRowsAll().forEach(x=>{const k=x.r.
 function partyLabel(p){const g=partyGroup(p);if(g)return g.name;const me=myId(p);const o=playersOf(p).filter(x=>x.id!==me&&!x.fake).map(x=>x.name);return o.length?"avec "+o.slice(0,3).join(", ")+(o.length>3?"…":""):p.name;}
 function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();const{p,r}=A[0],it=r.it,L=LIVE[it.lid]||{},c=FIND[p.comp],g=partyGroup(p),sid=sportOfParty(p);
   const extra=A.length-1,mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
-  const when=[L.minute,sid==="tennis"&&L.line?String(L.line).replace(/\s*·\s*en cours$/,""):"",sid!=="tennis"&&!L.minute&&L.line?L.line:""].filter(Boolean).join(" · ");
+  const when=[L.minute,sid==="tennis"&&L.line?String(L.line).replace(/\s*·\s*en cours$/,""):"",sid!=="tennis"&&!L.minute&&L.line?L.line:""].filter(Boolean).join(" · ");const when_=estLive(it)?"En cours · score pas encore disponible":when;
   if(MM.length>1)return`<div class="prowbox hlvb hlvn"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
    <button type="button" class="lvR lvRn" data-act="liveRoom"><span class="lvbig"><b class="lvn2">${MM.length}</b><span class="lvs2">matchs<br>en live</span></span><span class="lvgo">Entrer dans le salon des lives →</span></button></div>`;
   return`<div class="prowbox hlvb" data-live="${esc(p.id)}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b>${MM[0].rows.length>1?`<small>dans ${MM[0].rows.length} parties</small>`:""}</button>
-   <button type="button" class="lvR" data-act="liveRoom"><span class="lvc">${SPEM[sid]||""} ${esc(c?c.name:"")}${g?" · "+esc(g.name):""}</span>${lvTkScore(it)}${when||mine?`<span class="lvx">${esc(when)}${when&&mine?" · ":""}${mine?"ton prono : "+mine:""}</span>`:""}<span class="lvgo">Suivre le match en direct →</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
+   <button type="button" class="lvR" data-act="liveRoom"><span class="lvc">${SPEM[sid]||""} ${esc(c?c.name:"")}${g?" · "+esc(g.name):""}</span>${lvTkScore(it)}${when_||mine?`<span class="lvx">${esc(when_)}${when_&&mine?" · ":""}${mine?"ton prono : "+mine:""}</span>`:""}<span class="lvgo">Suivre le match en direct →</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
 function vParties(){
   const D=partiesData(),f=S.pf||null;
   /* comme l'accueil : catégories à gauche (1/3), parties de la catégorie choisie à droite (2/3) */
