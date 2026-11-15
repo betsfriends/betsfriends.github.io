@@ -4842,7 +4842,7 @@ function matchHTML(i){const sd=sides(i);if(!sd)return esc(i.label);const sep=i.l
 const TEST_OPEN={"ww26-r4":true,"sp26-r":true};
 const testOpen=i=>!!(i&&i.lid&&TEST_OPEN[i.lid]&&!i.whole);
 /* nouvelle partie : un match / une séance / un tour se choisit jusqu'à 2 h avant son début (exception : Stockholm, jusqu'au début de la finale le 14 nov. à 13h) */
-const LOCK_NEW=2*3600e3,LOCK_EX={st26:"2026-11-14T12:15:00Z",/* v42 : Ligue des nations de ce soir (14 nov.) — pronos et nouvelles parties ouverts jusqu'au coup d'envoi pile */unl:"2026-11-14T23:59:00Z"};
+/* v48 : plus de délai — un match reste sélectionnable et ouvert aux pronos jusqu'à l'heure pile de son début, pour tous les sports */const LOCK_NEW=0,LOCK_EX={st26:"2026-11-14T12:15:00Z",/* v42 : Ligue des nations de ce soir (14 nov.) — pronos et nouvelles parties ouverts jusqu'au coup d'envoi pile */unl:"2026-11-14T23:59:00Z"};
 const stLate=i=>!!(i&&i._c==="st26"&&!i.tbd&&Date.now()<+new Date("2026-11-14T12:15:00Z"));
 const lockOf=(cid,t)=>{const ex=LOCK_EX[cid];return ex&&(t==null?Date.now():t)<+new Date(ex)?0:LOCK_NEW;};
 function selOpen(i){if(!i||isDone(i))return false;if(stLate(i)||unlLate(i))return true;if(i.tbd)return true;return +i.date-lockOf(i._c)>Date.now();}
@@ -5764,7 +5764,7 @@ BETS.basket.push(["o220","Plus de 220 points ?","yesno",1,"CX"],["q2","Vainqueur
 BETS.rugby.push(["o50","Plus de 50 points ?","yesno",1,"CX"],["mosttries","Équipe qui marque le plus d'essais","choice",2,"X"]);
 BETS.golf_round.push(["sub65","Un joueur sous 65 aujourd'hui ?","yesno",1,"CX"],["gap12","Écart entre le 1er et le 2e (coups)","number",2,"X"]);
 const BET_AUTO={tennis:["win","sets","score","set1","set2","set3","first","tb","bagel","games","loserset","set75","gdiff"],tennis_title:["win","final","fscore"],tennis_round:[],tennis_group:[],
-  foot:["res","score","scorer","first","goals","btts","ht","red","corners","htft","goal2h","g30","o25","yellows"],foot_ko:[],basket:["win","margin","total","q1","ot","o220","q2","q3","q4","htdiff"],rugby:["win","margin","try1","tries","bonus","yellow","drop","o50","mosttries"],
+  foot:["res","score","goals","btts","ht","red","corners","htft","goal2h","g30","o25","yellows"],/* v48 : plus de buteur / premier buteur (pas vérifiable) */foot_ko:[],basket:["win","margin","total","q1","ot","o220","q2","q3","q4","htdiff"],rugby:["win","margin","try1","tries","bonus","yellow","drop","o50","mosttries"],
   long:[],f1_course:["win"],f1_qualifs:["pole"],f1_sprint:["win"],f1_sq:["pole"],f1_wdc:[],f1_wcc:[],f1_rook:[],golf_round:["lead","low","lowscore","leadscore","sub70","sub65","gap12"],golf_win:["win","wscore","top10","margin"]};
 Object.keys(BET_AUTO).forEach(k=>{if(BETS[k])BETS[k]=BETS[k].filter(b=>BET_AUTO[k].includes(b[0]));});
 /* chaque formule garde au moins le résultat principal */
@@ -6247,7 +6247,7 @@ function myBetsTab(p,sc){
   const open=rows.filter(r=>itemState(p,r)==="open"),todo=todoRows(p);
   const nextKo=open.map(r=>r.it.date).sort((a,b)=>a-b)[0];/* « Parier maintenant » retiré : on parie directement dans la liste */
   const todoK=new Set(todo.map(r=>r.key));
-  const KIND={todo:["Pronos en attente","✏️","Il te manque des pronos"],ready:["Pronos faits","✓","Modifiable jusqu'au coup d'envoi"],live:["En cours","●","Pronos figés · résultat et points calculés automatiquement à la fin"],wait:["En attente du résultat","⏳","Les points arrivent dès que le résultat est confirmé"],locked:["Paris fermés","🔒","Fermés automatiquement 2 h avant le début · pronos figés"],later:["À venir","🗓️","Les pronos s'ouvrent 14 jours avant"],done:["Terminé","🏁","Points distribués"]};
+  const KIND={todo:["Pronos en attente","✏️","Il te manque des pronos"],ready:["Pronos faits","✓","Modifiable jusqu'au coup d'envoi"],live:["En cours","●","Pronos figés · résultat et points calculés automatiquement à la fin"],wait:["En attente du résultat","⏳","Les points arrivent dès que le résultat est confirmé"],locked:["Paris fermés","🔒","Fermés automatiquement au début du match · pronos figés"],later:["À venir","🗓️","Les pronos s'ouvrent 14 jours avant"],done:["Terminé","🏁","Points distribués"]};
   const items=rows.map(r=>{const st=itemState(p,r),su=subs.find(s=>s.id===r.key.split("/")[0]),res=resultOf(c,su,r.it);
     const kind=st==="open"?(isLater(r.it)?"later":todoK.has(r.key)?"todo":"ready"):st==="done"?(res&&!res.pending?"done":"live"):+r.it.date>+NOW?"locked":"live";
     return{r,st,res,kind};});
@@ -6836,7 +6836,7 @@ const SU_ART={
  velo:`<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" ${SU_STROKE}><path d="M0 560l40-30 30 10 40-70 30 20 50-150 30 40 40-120 34 60 26-30 40 110 40 40v260H0z" fill="rgba(231,169,121,.06)"/><path d="M0 560l40-30 30 10 40-70 30 20 50-150 30 40 40-120 34 60 26-30 40 110 40 40"/><path d="M0 610h400" opacity=".6"/><path d="M40 600v20M110 600v20M190 600v20M270 600v20M350 600v20" opacity=".6"/><path d="M260 210v-60l34 12-34 12" fill="rgba(231,169,121,.25)"/><path d="M0 660c90-20 160 20 230 0s110-26 170-6" stroke-dasharray="3 9" opacity=".6"/></svg>`
 };
 SU_ART.def=SU_ART.foot;
-function suS(){return S.su||(S.su={all:{},own:{},open:null,intro:false,more:false});}
+function suS(){return S.su||(S.su={all:{},own:{},open:null,intro:false,more:false,comp:S.sel&&S.sel.comp});}
 function suGen(cat){const s=suS();return s.all[cat]||(s.all[cat]=defaultCfg(cat,"C"));}
 function suCfgOf(scope){const s=suS();if(scope.startsWith("all:"))return suGen(scope.slice(4));return s.own[scope]||null;}
 function suRows(){const c=FIND[S.sel.comp];if(!c)return[];const sp=c.sport,f=flS(),out=[],seen=new Set();
@@ -6862,7 +6862,8 @@ function suStart(btn){const H=hmS(),f=flS();
   if(!FIND[S.sel.comp]){toast("Choisis d'abord un événement.");return;}
   const cr=S.create;S.createFree=false;cr.err="";cr.frErr=null;cr.showPot=true;
   if(H.mode){S.groupCtx=null;cr.friends=[];cr.people=2;hmPrefill();}
-  S.su={all:{},own:{},open:null,intro:false,more:false};
+  /* v48 : on NE remet PAS à zéro les paris déjà réglés quand on revient sur « Paramétrer ma partie » pour le même événement */
+  if(!S.su||S.su.comp!==S.sel.comp)S.su={all:{},own:{},open:null,intro:false,more:false,comp:S.sel.comp};else{S.su.open=null;S.su.paying=false;}
   suMorph(btn);}
 
 /* retour de « Paramétrer ma partie » : l'en-tête redescend à la place du bouton et redevient or, le fond du sport s'efface */
