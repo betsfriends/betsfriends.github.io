@@ -3390,6 +3390,7 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .mhgl{font-size:12px;font-weight:700;color:#F3E0A6;white-space:nowrap;text-shadow:0 2px 6px rgba(0,0,0,.9)}
 .lrbody .mhc small:empty{display:none}
 .lrbody .mhc small:not(.mhsl){display:inline-block;padding:2px 9px;border-radius:999px;background:rgba(201,48,44,.85);color:#fff!important;font-weight:900;font-size:12px}
+.hlvb .lvone{display:block}.hlvm .lvone+.lvone{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.14)}.hlvb .lvpg{display:block;margin-top:6px}.prowbox.hlvb.hlvm{height:auto!important;min-height:182px}.prowbox.hlvm>.lvR{height:auto!important;position:relative;padding-top:14px;padding-bottom:14px}.prowbox.hlvm>.pwid{height:auto!important;align-self:stretch}
 </style>
 </head>
 <body>
@@ -4159,16 +4160,20 @@ function hasPlayed(p){try{if(p.free)return isClosed(p);return isClosed(p)||rowsO
 /* Paris pris : au moins un prono fait et encore modifiable, même s'il reste d'autres pronos à faire */
 function readyParties(D){return D.all.filter(p=>{try{return!p.free&&!isClosed(p)&&rowsOfParty(p).some(r=>r.it&&itemState(p,r)==="open"&&hasSaved(p,r.key));}catch(e){return false;}});}
 /* classement façon « podium » partagé : place, gain (provisoire en ambre et pointillés, acquis en vert) */
-function rkBadge(rank,n,prov){return rkTile(rank,n,prov);}
+function rkBadge(rank,n,prov,eq){return rkTile(rank,n,prov,0,eq);}
 function gainChip(g,prov,sub){const f=v=>v.toLocaleString("fr-BE");return g==null?`<span class="gch none"><b>—</b>${sub!=null?`<small>${sub}</small>`:""}</span>`:`<span class="gch${g>0?(prov?" prov":" won"):" zero"}"><b>${g>0?(prov?"≈ +":"+")+f(g):"0"}<i>cr.</i></b>${sub!=null?`<small>${sub}</small>`:""}</span>`;}
 /* pastille de place actuelle : « 4e » en gros, « sur 5 » dessous (or / argent / bronze sur le podium) */
 function rkPill(r,sm,prov){return rkTile(r.rank,r.n,prov,sm);}
 /* tuiles d'action/place, toutes de la même taille : place (ambre pointillé = provisoire, plein = final), crayon (blanc = pronos à faire), modifier (bleu) */
-function rkTile(rank,n,prov,sm){return`<span class="tile rk r${Math.min(rank,4)}${prov?" prov":" fin"}${sm?" sm":""}" title="Place ${prov?"provisoire (peut encore bouger)":"finale"} : ${rank}${rank>1?"e":"er"}${n?" sur "+n:""}"><em>${prov?"provisoire":"finale"}</em><b>${rank}<sup>${rank>1?"e":"er"}</sup></b>${n?`<small>sur ${n}</small>`:""}</span>`;}
+/* v68 : ex æquo = même place ; les parts des places occupées sont additionnées puis partagées */
+function tieRank(rows,i){return rows.filter(x=>x.pts>rows[i].pts).length+1;}
+function tieEq(rows,i){return rows.filter(x=>x.pts===rows[i].pts).length>1;}
+function tieGain(rows,i,split,pot){const v=rows[i].pts,a=rows.filter(x=>x.pts>v).length,n=rows.filter(x=>x.pts===v).length;let t=0;for(let k=a;k<a+n;k++)t+=+(split[k]||0);return Math.round(pot*t/n/100);}
+function rkTile(rank,n,prov,sm,eq){return`<span class="tile rk r${Math.min(rank,4)}${prov?" prov":" fin"}${sm?" sm":""}" title="Place ${prov?"provisoire (peut encore bouger)":"finale"} : ${rank}${rank>1?"e":"er"}${n?" sur "+n:""}"><em>${eq?"ex æquo":prov?"provisoire":"finale"}</em><b>${rank}<sup>${rank>1?"e":"er"}</sup></b>${n?`<small>sur ${n}</small>`:""}</span>`;}
 function todoTile(n,sm,pid){return`<span class="tile todo${sm?" sm":""}"${pid?` data-act="partyBet" data-id="${esc(pid)}" role="button" aria-label="Faire mes pronos"`:""}><em>à faire</em><b>✏️${n}</b><small>prono${n>1?"s":""}</small></span>`;}
 function editTile(sm){return`<span class="tile edit${sm?" sm":""}"><em>pris</em><b>✎</b><small>modifier</small></span>`;}
 /* crédits gagnés sur une partie (part de la cagnotte selon la place finale) */
-function gainOf(p){try{if(p.free||!(+p.amount>0)||!(p.split||[]).length)return 0;const sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));if(!sc.done)return 0;const me=sc.rows.find(x=>x.id===myId(p)||x.id==="me"||x.name==="Toi");if(!me)return 0;const rk=sc.rows.filter(x=>x.pts>me.pts).length;return rk<p.split.length?Math.round(p.amount*effPeople(p)*p.split[rk]/100):0;}catch(e){return 0;}}
+function gainOf(p){try{if(p.free||!(+p.amount>0)||!(p.split||[]).length)return 0;const sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));if(!sc.done)return 0;const me=sc.rows.find(x=>x.id===myId(p)||x.id==="me"||x.name==="Toi");if(!me)return 0;return tieGain(sc.rows,sc.rows.indexOf(me),p.split,p.amount*effPeople(p));}catch(e){return 0;}}
 function partyGroup(p){return(S.rawGroups||S.groups||[]).find(x=>x.id===p.group||(x.parties||[]).includes(p.id))||null;}
 function homeDash(){let D;try{D=partiesData();}catch(e){D={all:[],sec:{todo:[],live:[],soon:[],done:[]},RK:new Map(),todoN:()=>0};}
   const nTodo=D.sec.todo.reduce((a,p)=>a+D.todoN(p),0),ready=readyParties(D),m=me(),nm=S.myName||m.name||"Toi";
@@ -5109,7 +5114,7 @@ function gIdent(g){const al={};groupParties(g).forEach(p=>{if(p.free)return;rawP
 function generalBoard(g){const tot={},nameOf={},I=gIdent(g);const add=(k,n)=>{if(!tot[k])tot[k]={k,name:I.nm(k,n),pts:0,ev:0,live:0,wins:0,exact:0,cr:0,pod:0};else if(isMeName(tot[k].name)&&!isMeName(n)&&k!=="u:"+(S.uid||"me"))tot[k].name=n;return tot[k];};
   (g.members||[]).forEach(n=>add(I.mk(n),n));let nP=0,nLive=0;
   groupParties(g).forEach(p=>{if(p.free)return;let sc;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(e){return;}if(!sc.done)return;nP++;const fin=isClosed(p)||sc.done===sc.total;if(!fin)nLive++;
-    const pl=rawPlayers(p);sc.rows.forEach((r,i)=>{const x=pl.find(y=>y.id===r.id)||{id:r.id,name:r.name};const k=I.pk(p,x);const t=add(k,r.name);if(k==="u:"+(S.uid||"me"))t.name="Toi";t.pts+=r.pts;t.exact+=r.exact||0;fin?t.ev++:t.live++;if(fin&&i===0&&r.pts>0)t.wins++;if(fin&&i<3&&r.pts>0)t.pod++;if(fin&&+p.amount>0&&(p.split||[])[i])t.cr+=Math.round(p.amount*effPeople(p)*p.split[i]/100);});});
+    const pl=rawPlayers(p);sc.rows.forEach((r,i)=>{const x=pl.find(y=>y.id===r.id)||{id:r.id,name:r.name};const k=I.pk(p,x);const t=add(k,r.name);if(k==="u:"+(S.uid||"me"))t.name="Toi";t.pts+=r.pts;t.exact+=r.exact||0;fin?t.ev++:t.live++;if(fin&&tieRank(sc.rows,i)===1&&r.pts>0)t.wins++;if(fin&&tieRank(sc.rows,i)<=3&&r.pts>0)t.pod++;if(fin&&+p.amount>0&&(p.split||[]).length)t.cr+=tieGain(sc.rows,i,p.split,p.amount*effPeople(p));});});
   const by=S.gbSort||"pts",K={pts:x=>x.pts,wins:x=>x.wins,cr:x=>x.cr};const f=K[by]||K.pts;
   return{nP,nLive,by,rows:Object.values(tot).sort((a,b)=>f(b)-f(a)||b.pts-a.pts||b.wins-a.wins||a.name.localeCompare(b.name))};}
 function generalBoardHTML(g){const B=generalBoard(g),me="u:"+(S.uid||"me");
@@ -5157,7 +5162,7 @@ function groupCredits(g){
   const tot={};(g.members||[]).forEach(n=>tot[n]={name:n,won:0,stake:0,ev:0,prov:0});let fin=0,live=0;
   groupParties(g).forEach(p=>{if(p.free||!(+p.amount>0)||!(p.split||[]).length)return;let sc;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(e){return;}if(!sc.done)return;
     const closed=isClosed(p),pot=p.amount*effPeople(p);closed?fin++:live++;
-    sc.rows.forEach((r,i)=>{const t=tot[r.name]||(tot[r.name]={name:r.name,won:0,stake:0,ev:0,prov:0});const gain=i<p.split.length?Math.round(pot*p.split[i]/100):0;
+    sc.rows.forEach((r,i)=>{const t=tot[r.name]||(tot[r.name]={name:r.name,won:0,stake:0,ev:0,prov:0});const gain=tieGain(sc.rows,i,p.split,pot);
       if(closed){t.won+=gain;t.stake+=+p.amount;t.ev++;}else t.prov+=gain;});});
   return{rows:Object.values(tot).sort((a,b)=>b.won-a.won||(b.won-b.stake)-(a.won-a.stake)||b.prov-a.prov||a.name.localeCompare(b.name)),fin,live};
 }
@@ -5818,13 +5823,12 @@ function partyLabel(p){const b=partyBase(p);let same=[];try{same=(S.parties||[])
   const cn=q=>((FIND[q.comp]||{}).name)||"";if(cn(p)&&same.every(q=>cn(q)!==cn(p)))return b+" · "+cn(p);
   const d=q=>q.made?new Date(q.made).toLocaleDateString("fr-BE",{day:"numeric",month:"short"}):"",dh=q=>q.made?new Date(q.made).toLocaleString("fr-BE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
   if(d(p)&&same.every(q=>d(q)!==d(p)))return b+" · "+d(p);return dh(p)?b+" · "+dh(p):b;}
-function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();const{p,r}=A[0],it=r.it,L=LIVE[it.lid]||{},c=FIND[p.comp],g=partyGroup(p),sid=sportOfParty(p);
-  const extra=A.length-1,mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
-  const when=[L.minute,sid==="tennis"&&L.line?String(L.line).replace(/\s*·\s*en cours$/,""):"",sid!=="tennis"&&!L.minute&&L.line?L.line:""].filter(Boolean).join(" · ");const when_=estLive(it)?"En cours · score pas encore disponible":inGrace(it)?"Terminé"+(L.line?" · "+String(L.line).replace(/\s*·\s*en cours$/,""):""):when;
-  if(MM.length>1)return`<div class="prowbox hlvb hlvn"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
-   <button type="button" class="lvR lvRn" data-act="liveRoom"><span class="lvbig"><b class="lvn2">${MM.length}</b><span class="lvs2">matchs<br>en live</span></span><span class="lvgo">Entrer dans le salon des lives →</span></button></div>`;
-  return`<div class="prowbox hlvb" data-live="${esc(p.id)}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b>${MM[0].rows.length>1?`<small>dans ${MM[0].rows.length} parties</small>`:""}</button>
-   <button type="button" class="lvR" data-act="liveRoom"><span class="lvc">${SPEM[sid]||""} ${esc(c?c.name:"")}${g?" · "+esc(g.name):""}</span>${lvTkScore(it)}${when_||mine?`<span class="lvx">${esc(when_)}${when_&&mine?" · ":""}${mine?"ton prono : "+mine:""}</span>`:""}<span class="lvgo">${inGrace(it)?"Voir le résultat →":"Suivre le match en direct →"}</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
+function lvProg(it){const L=LIVE[it.lid]||{};if(inGrace(it))return"Terminé";const cl=v=>String(v||"").replace(/\s*·\s*en cours$/i,"");
+  if(L.minute)return cl(L.minute);if(L.line&&!/^Score final/i.test(L.line))return cl(L.line);return"En cours";}
+function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();
+  const one=it=>`<span class="lvone">${lvTkScore(it)}<span class="lvx lvpg">${esc(lvProg(it))}</span></span>`;
+  return`<div class="prowbox hlvb${MM.length>1?" hlvm":""}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
+   <button type="button" class="lvR" data-act="liveRoom" aria-label="Ouvrir le salon des lives">${MM.slice(0,4).map(m=>one(m.it)).join("")}${MM.length>4?`<span class="lvx">+ ${MM.length-4} autre${MM.length>5?"s":""}</span>`:""}</button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
 function vParties(){
   const D=partiesData(),f=S.pf||null;
   /* comme l'accueil : catégories à gauche (1/3), parties de la catégorie choisie à droite (2/3) */
@@ -6926,13 +6930,13 @@ function boardAlt(p,sc,bf){const pls=playersOf(p),done=sc.done,me=myId(p),f=v=>v
   if(!done)return`<div class="pad" style="margin-top:12px"><div class="card"><b>Pas encore de classement</b><p class="muted" style="margin:6px 0 0;font-size:13px">Il apparaît dès le premier match terminé.</p></div></div>`;
   let rows,unit,note;
   if(bf==="cr"){const pot=(+p.amount||0)*(+p.people||pls.length),sp=p.split||[];
-    rows=sc.rows.map((r,i)=>({id:r.id,name:r.name,v:i<sp.length?Math.round(pot*sp[i]/100):0,sub:r.pts+" pt"+(r.pts>1?"s":"")}));unit="cr.";
-    note=pot?`Cagnotte de ${f(pot)} crédits (${p.amount} × ${p.people}), partagée ${sp.join(" / ")} %. ${isClosed(p)?"Définitif.":"Provisoire : selon le classement actuel."}`:"Pas de cagnotte dans cette partie.";}
+    rows=sc.rows.map((r,i)=>({id:r.id,name:r.name,v:sp.length?tieGain(sc.rows,i,sp,pot):0,sub:r.pts+" pt"+(r.pts>1?"s":"")}));unit="cr.";
+    note=pot?`Cagnotte de ${f(pot)} crédits (${p.amount} × ${p.people}), partagée ${sp.join(" / ")} % (ex æquo : parts additionnées puis partagées). ${isClosed(p)?"Définitif.":"Provisoire : selon le classement actuel."}`:"Pas de cagnotte dans cette partie.";}
   else{const per=sc.per||{},w={},s2={},s3={};pls.forEach(x=>{w[x.id]=0;s2[x.id]=0;s3[x.id]=0;});
     Object.values(per).forEach(m=>{const L=pls.map(x=>[x.id,m[x.id]||0]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);if(!L.length)return;const top=L[0][1];L.forEach(([id,v],i)=>{if(v===top)w[id]++;else if(i===1)s2[id]++;else if(i===2)s3[id]++;});});
     rows=pls.map(x=>({id:x.id,name:x.name,v:w[x.id],sub:`🥈 ${s2[x.id]} · 🥉 ${s3[x.id]}`})).sort((a,b)=>b.v-a.v||a.name.localeCompare(b.name));unit=done>1?"matchs gagnés":"match gagné";
     note=`Un match est « gagné » par celui qui y marque le plus de points (ex æquo : gagné par chacun). ${done} match${done>1?"s":""} terminé${done>1?"s":""}.`;}
-  return`<div class="pad" style="margin-top:12px"><div class="mbest pboard"><div class="mbl">${rows.map((r,i)=>`<div class="mbc r${Math.min(i+1,4)}${r.id===me?" me":""}">${rkBadge(i+1,0,!isClosed(p))}<span class="mbnm"><b>${esc(r.name)}${r.id===me?" <u>toi</u>":""}</b><small>${r.sub}</small></span><span class="mbpt"><b>${f(r.v)}</b><small>${unit}</small></span></div>`).join("")}</div>
+  return`<div class="pad" style="margin-top:12px"><div class="mbest pboard"><div class="mbl">${rows.map((r,i)=>{const rk=rows.filter(x=>x.v>r.v).length+1,eq=rows.filter(x=>x.v===r.v).length>1;return`<div class="mbc r${Math.min(rk,4)}${r.id===me?" me":""}">${rkBadge(rk,0,!isClosed(p),eq)}<span class="mbnm"><b>${esc(r.name)}${r.id===me?" <u>toi</u>":""}</b><small>${r.sub}</small></span><span class="mbpt"><b>${f(r.v)}</b><small>${unit}</small></span></div>`;}).join("")}</div>
    <p class="muted" style="font-size:12px;margin:10px 4px 2px">${note}</p></div></div>`;}
 function evGrad(id){const t=(typeof H3_TK!=="undefined"&&H3_TK[id])||["#2A1F08","#0D0A06"];return`radial-gradient(90% 70% at 80% 0%,rgba(255,236,190,.22),transparent 60%),linear-gradient(160deg,${t[0]} 0%,${t[1]} 100%)`;}
 function vInvite(p){const c=p.free?null:FIND[p.comp],sp=c?c.sport:SPORTS[0];const rows=p.free?[]:rowsOfParty(p).filter(r=>r.it);
@@ -6972,8 +6976,8 @@ function vParty(){
       {const cl=isClosed(p),pr=!cl&&sc.done>0,hasPot=+p.amount>0&&(p.split||[]).length;
       h+=`<div class="pad" style="margin-top:12px"><div class="mbest pboard${pr?" isprov":""}"><div class="mbtop"><div><b>${cl?"Classement final":pr?"Classement provisoire":"Classement"}</b><small>${sc.done}/${sc.total} terminé${sc.done>1?"s":""}${!sc.done?" · pas encore commencé":""}</small></div></div>
        ${pr?`<div class="provban"><span>⏳</span><p><b>Provisoire</b>Il reste ${sc.total-sc.done} match${sc.total-sc.done>1?"s":""} : places et crédits peuvent encore bouger.</p></div>`:""}
-       <div class="mbl">${sc.rows.map((r,i)=>{const gain=hasPot&&sc.done?(i<p.split.length?Math.round(pot*p.split[i]/100):0):null;const me=r.name==="Toi";
-         return`<div class="mbc r${sc.done?Math.min(i+1,4):4}${me?" me":""}">${sc.done?rkBadge(i+1,0,pr):`<span class="rkb r4"><b>–</b></span>`}<span class="mbnm"><b>${esc(r.name)}${me?` <u>toi</u>`:""}</b><small>${r.pts} pt${r.pts>1?"s":""}${r.exact?" · "+r.exact+" score"+(r.exact>1?"s":"")+" exact"+(r.exact>1?"s":""):""} · ${r.good} bon${r.good>1?"s":""} prono${r.good>1?"s":""}</small></span>${hasPot?gainChip(sc.done?gain:null,pr,!sc.done?"à venir":pr?"si ça tient":"gagné"):""}</div>`;}).join("")}</div>
+       <div class="mbl">${sc.rows.map((r,i)=>{const gain=hasPot&&sc.done?tieGain(sc.rows,i,p.split,pot):null,rk=tieRank(sc.rows,i);const me=r.name==="Toi";
+         return`<div class="mbc r${sc.done?Math.min(rk,4):4}${me?" me":""}">${sc.done?rkBadge(rk,0,pr,tieEq(sc.rows,i)):`<span class="rkb r4"><b>–</b></span>`}<span class="mbnm"><b>${esc(r.name)}${me?` <u>toi</u>`:""}</b><small>${r.pts} pt${r.pts>1?"s":""}${r.exact?" · "+r.exact+" score"+(r.exact>1?"s":"")+" exact"+(r.exact>1?"s":""):""} · ${r.good} bon${r.good>1?"s":""} prono${r.good>1?"s":""}</small></span>${hasPot?gainChip(sc.done?gain:null,pr,!sc.done?"à venir":pr?"si ça tient":"gagné"):""}</div>`;}).join("")}</div>
        ${hasPot?`<div class="mbsum pot"><span><small>Cagnotte · ${p.amount} cr. × ${p.people} joueurs</small><em>${p.split.map((x,i)=>(i+1)+(i?"e":"er")+" "+x+" %").join(" · ")}</em></span><b>${pot.toLocaleString("fr-BE")}<i>cr.</i></b></div>`:""}</div></div>`;}
     }
     if(tab==="chat")h+=chatTab(p,S.ptOpen==="pt-chat");
