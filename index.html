@@ -974,7 +974,7 @@ body.home .livebox{margin:0 18px;border-radius:18px;border:1.5px solid rgba(229,
 @media (prefers-reduced-motion:no-preference){.mkparty{transition:transform .15s}.mkparty:active{transform:scale(.985)}}
 .freetile{border:1.5px solid rgba(239,228,200,.7)!important}
 /* grand écran (iPad) : l'accueil s'élargit pour montrer 4 cartes par rangée, sans grossir le reste */
-@media (min-width:760px){
+@media (min-width:760px) and (hover:hover) and (pointer:fine){
  body.home .app{max-width:820px}
  body.home .row>.fc,body.home .row>.fc.big,body.home .ptrow>.ptile{flex:0 0 calc((100% - 36px)/4.25)}
  body.home .ptrow>.ptile{height:178px}
@@ -1353,7 +1353,7 @@ body[data-sp="velo"] .chichero,body[data-sp="velo"].hasbg .hero.chichero,body[da
 /* =====================================================================
    VERSION SITE (ordinateur, 1024 px et plus) — la version app (téléphone, tablette) n'est pas touchée
    ===================================================================== */
-@media (min-width:1024px){
+@media (min-width:1024px) and (hover:hover) and (pointer:fine){
  /* menu en haut, comme un site */
  /* menu en haut de page (il défile avec la page : rien ne passe dessous quand un ticket s'ouvre) */
  nav.tabs{position:absolute;top:0;bottom:auto;border-top:0;border-bottom:1px solid rgba(199,160,74,.3);padding:0 32px;background:rgba(8,6,4,.88)}
@@ -1671,7 +1671,7 @@ body[data-sp="velo"] .chichero,body[data-sp="velo"].hasbg .hero.chichero,body[da
 /* fond doré de l'accueil jusqu'au menu du bas */
 .app:has(>.goldhome){padding-bottom:0}
 .night.goldhome{min-height:100vh;min-height:100dvh;padding-bottom:calc(env(safe-area-inset-bottom) + 92px)}
-@media (min-width:1024px){.night.goldhome{min-height:calc(100dvh - 124px);padding-bottom:24px}}
+@media (min-width:1024px) and (hover:hover) and (pointer:fine){.night.goldhome{min-height:calc(100dvh - 124px);padding-bottom:24px}}
 
 /* carré doré + icône noire, comme En duel / Multijoueur */
 .h3sp .h3ic{width:min(54px,64%);aspect-ratio:1;border-radius:15px;display:grid;place-items:center;background:var(--goldg);box-shadow:0 0 14px rgba(199,160,74,.4);transition:transform .2s,box-shadow .2s}
@@ -3391,6 +3391,16 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .lrbody .mhc small:empty{display:none}
 .lrbody .mhc small:not(.mhsl){display:inline-block;padding:2px 9px;border-radius:999px;background:rgba(201,48,44,.85);color:#fff!important;font-weight:900;font-size:12px}
 .hlvb .lvone{display:block}.hlvm .lvone+.lvone{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.14)}.hlvb .lvpg{display:block;margin-top:6px}.prowbox.hlvb.hlvm{height:auto!important;min-height:182px}.prowbox.hlvm>.lvR{height:auto!important;position:relative;padding-top:14px;padding-bottom:14px}.prowbox.hlvm>.pwid{height:auto!important;align-self:stretch}
+/* v71 : iPad (écran tactile large) = la mise en page du téléphone, dans une colonne centrée ; menu en bas */
+@media (min-width:600px) and (pointer:coarse){
+ .app,body.home .app{max-width:680px}
+ nav.tabs .in,.hmtin{max-width:680px}
+ .sheet2{max-width:680px}
+ .frbar{width:min(644px,calc(100% - 24px))}
+ .ivfoot,.mpfix{padding-left:max(14px,calc(50% - 326px))!important;padding-right:max(14px,calc(50% - 326px))!important}
+ .ntf{max-width:680px}
+ nav.tabs button{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -6847,6 +6857,14 @@ function liveVerdict(c,r,b,t,v){if(v==null||v===""||!c||!r.it||!r.it.live||liveS
       if(b.id==="score"){const m=String(v).match(/(\d+)\s*-\s*(\d+)/);if(m&&(a>+m[1]||bb>+m[2]))return"lose";return"open";}
       if(b.id==="btts"){if(a>0&&bb>0)return norm(v)==="oui"?"win":"lose";return"open";}
       if(b.id==="goals"&&(t==="exactnum"||t==="number")){if(a+bb>gNum(v))return"lose";return"open";}
+      /* v72 : paris déjà tranchés pendant le match (buts connus avec leur minute) */
+      const G=L.goals||[],full=G.length===a+bb,gm=g=>lvMin(g.t),mtx=String(L.minute||""),htDone=/mi-temps/i.test(mtx)||(lvMin(mtx)>45&&!/^45'?\s*\+/.test(mtx)),mn=/mi-temps/i.test(mtx)?45:(lvMin(mtx)||0);
+      const fh=G.filter(g=>gm(g)!=null&&gm(g)<=45&&!/^(4[6-9]|[5-9]\d)/.test(g.t)),ha=fh.filter(g=>g.s===0).length,hb=fh.filter(g=>g.s===1).length;
+      const verdict=tr=>betGood(t,tr,v)?"win":"lose";
+      if(b.id==="g30"){if(G.some(g=>gm(g)!=null&&gm(g)<30))return verdict("Oui");if(full&&(mn>=30||htDone))return verdict("Non");return"open";}
+      if(b.id==="o25"&&a+bb>2)return verdict("Oui");
+      if(b.id==="ht"&&htDone&&full)return verdict(ha+"-"+hb);
+      if(b.id==="goal2h"&&htDone&&full&&a+bb>ha+hb)return verdict("Oui");
       return"open";}}catch(_){}
   return"open";}
 const LVV={win:["✓ Gagné","win"],lose:["✕ Perdu","lose"],open:["⏳ En jeu","open"]};
