@@ -3406,6 +3406,51 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 .rcnow small{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-right:2px}
 .rcnow span{font-size:inherit!important;color:inherit!important}.rcnow.prov{color:#FFC46B}.rcnow.fin{color:#58D68D}.rcnow.wait{color:var(--muted);font-weight:700;font-size:12px}
 @media (max-width:480px){.rcnow{order:3;flex-basis:100%;margin-top:4px}}
+/* v76 : pas de rebond de la page (iPad/iPhone) — le menu du bas ne bouge plus ; fond sous la page = couleur de l'app */
+html,body{overscroll-behavior:none;overscroll-behavior-y:none}
+html{background:#0B0905}
+/* v77 : tuiles du salon des lives toutes de la même hauteur */
+.lrbody{height:186px;display:flex!important;flex-direction:column;justify-content:center}
+.lrbody .mhg{align-items:center}
+.lrbody .mhp .bclogo,.lrbody .mhp img,.lrbody .mhp .nlw{max-width:70px;max-height:70px}
+.lrbody .mhfi{margin-right:5px;font-size:14px}
+.lrbody .mhc{min-height:0;gap:3px}
+.lrbody.mh-tennis .mhs{font-size:34px}
+.lrbody .mhsl{margin-top:-2px}
+.lrbody .mhc small:not(.mhsl):empty{display:none!important}
+.lrbody .mhp b{white-space:nowrap;overflow-wrap:normal!important;font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:block!important}
+.lrbody .mhp .tavw,.lrbody .mhp .tav,.lrbody .mhp>span:first-child{max-width:72px;max-height:72px}
+.tnch{display:flex;gap:4px;margin-top:4px}
+.tnch i{display:flex;flex-direction:column;align-items:center;min-width:30px;padding:3px 5px 4px;border-radius:9px;background:rgba(5,8,22,.6);border:1px solid rgba(199,160,74,.4);font-style:normal;line-height:1}
+.tnch i em{font-style:normal;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#C9D0DC;font-weight:800;margin-bottom:2px;white-space:nowrap}
+.tnch i b{font-family:var(--display);font-size:16px;font-weight:900;color:#C9D0DC}
+.tnch i b.w{color:var(--lime)}
+.tnch i.cur{background:rgba(201,48,44,.55);border-color:rgba(255,120,110,.6)}
+.tnch i.cur b{color:#fff}
+/* v78 : ligne de situation alignée sur le même axe dans toutes les cartes, en pastille */
+.rcqh.lvh{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,44%) 86px;align-items:center;gap:10px}
+.rcqh.lvh>b{grid-column:1;min-width:0}
+.rcqh.lvh>.rcnow{grid-column:2;justify-self:center;margin:0}
+.rcqh.lvh>span{grid-column:3;justify-self:end;margin:0}
+.rcnow{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 12px;border-radius:999px;font-size:13px!important;line-height:1.1;border:1px solid transparent;flex:none!important;order:0!important}
+.rcnow.prov{background:rgba(255,181,71,.12);border-color:rgba(255,181,71,.45)}
+.rcnow.fin{background:rgba(70,200,120,.14);border-color:rgba(88,214,141,.5)}
+.rcnow.wait{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);font-size:11.5px!important}
+.rcnow.none{padding:0;border:0;background:none}
+@media (max-width:480px){.rcqh.lvh{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}.rcqh.lvh>.rcnow{grid-column:1/-1;grid-row:2}.rcqh.lvh>span{grid-column:2;grid-row:1}.rcqh.lvh>.rcnow.none{display:none}}
+/* v78 : tuiles du salon des lives espacées, couleurs du sport (fond + cadre) */
+.lrc{margin-bottom:18px}
+.lrc-foot{--lc1:#1F7A45;--lc2:#0B2E1A;--lcb:#45B572}
+.lrc-tennis{--lc1:#B4532A;--lc2:#3E180A;--lcb:#E58450}
+.lrc-f1{--lc1:#A3161B;--lc2:#33070A;--lcb:#E8504A}
+.lrc-golf{--lc1:#4E8B4A;--lc2:#16301A;--lcb:#93CB84}
+.lrc-rugby{--lc1:#1D5B48;--lc2:#0A251D;--lcb:#46A586}
+.lrc-basket{--lc1:#C26A2A;--lc2:#401E08;--lcb:#F2A25A}
+.lrc-velo{--lc1:#B8901E;--lc2:#3A2D06;--lcb:#EAC75A}
+.lrc[class*="lrc-"]{border:1.5px solid var(--lcb,#C7A04A)!important;background:radial-gradient(120% 70% at 50% -10%,color-mix(in srgb,var(--lc1) 70%,transparent),transparent 70%),linear-gradient(180deg,color-mix(in srgb,var(--lc1) 45%,#120d08),var(--lc2,#160a08))!important;box-shadow:0 0 22px color-mix(in srgb,var(--lcb) 22%,transparent),0 14px 30px -18px rgba(0,0,0,.9)!important}
+.lrc[class*="lrc-"].open{border-color:#F3E0A6!important}
+/* v79 : le cadre intérieur (drapeaux, joueurs, score) garde son fond sombre d'origine */
+.lrc .lrbody{background:linear-gradient(180deg,#370D0B,#150A08)!important}
 </style>
 </head>
 <body>
@@ -3479,8 +3524,6 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    remplacés plus tard par le flux d'un fournisseur de données sportives.
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
-/* v74 : le menu du bas reste collé au bas de l'écran visible (Safari iPad/iPhone : zoom, barres qui bougent) */
-(()=>{const vv=window.visualViewport;if(!vv)return;let raf=0;const pin=()=>{raf=0;const n=document.querySelector("nav.tabs");if(!n||getComputedStyle(n).position!=="fixed"||getComputedStyle(n).bottom!=="0px"){if(n)n.style.transform="";return;}const dy=Math.round(vv.offsetTop+vv.height-window.innerHeight);n.style.transform=Math.abs(dy)>1?"translateY("+dy+"px)":"";};const q=()=>{if(!raf)raf=requestAnimationFrame(pin);};vv.addEventListener("resize",q);vv.addEventListener("scroll",q);addEventListener("scroll",q,{passive:true});})();
 const NOW = new Date();
 /* v69 : NOW suit l'heure réelle (avant, il restait figé à l'ouverture : une appli restée ouverte laissait parier après le coup d'envoi) */
 function nowTick(){const a=+NOW,b=Date.now();NOW.setTime(b);return[a,b];}
@@ -5252,21 +5295,21 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
     /* seulement les paris où au moins un joueur a un prono */
     .filter(([b])=>pls.some(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id];return v!=null&&v!=="";}));
   if(!qs.length)return`<p class="muted" style="margin:4px 2px">Aucun prono enregistré sur ce match.</p>`;
-  return`<h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${pls.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;const ph=bubImg(personOf(p,pl));
+  return`<h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${pls.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;const ph=bubImg(personOf(p,pl));
     return`<div class="rcp${pl.id===me?" me":""}"><span class="rcn"><i class="lrav">${ph||esc(String(pl.name||"?").charAt(0).toUpperCase())}</i>${esc(pl.id===me?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc((()=>{const sd0=sides(r.it),sh=shortSides(r.it),ix=sd0?sd0.indexOf(v):-1;return ix>=0&&sh?sh[ix]:tnL(r,b.id,v);})()):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}`;}
 function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},k=m.k,sv=srvSide(it),short=shortSides(it)||sd;
   S.lrSel=S.lrSel||{};let sel=m.rows.find(x=>x.p.id===S.lrSel[k])||m.rows[0];const p=sel.p,r=sel.r;
-  const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${esc(short[k2])}${sv===k2?SRV_BALL:""}</b>${natOf(sd[k2])&&!CLUB[sd[k2]]?`<span class="mhf">${FLAG[natOf(sd[k2])]||""}</span>`:""}</div>`;
-  const center=`<div class="mhc">${inGrace(it)?`<span class="mhlive" style="background:rgba(243,224,166,.2);color:#F3E0A6">TERMINÉ</span>`:`<span class="mhlive">● EN DIRECT</span>`}${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
-  const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>${sp==="tennis"?tnGrid(sd,L.line,!inGrace(it)):""}`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
+  const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${natOf(sd[k2])&&!CLUB[sd[k2]]&&!NATION[sd[k2]]?`<span class="mhfi">${FLAG[natOf(sd[k2])]||""}</span>`:""}${esc(short[k2])}${sv===k2?SRV_BALL:""}</b></div>`;
+  const center=`<div class="mhc">${inGrace(it)?`<span class="mhlive" style="background:rgba(243,224,166,.2);color:#F3E0A6">TERMINÉ</span>`:`<span class="mhlive">● EN DIRECT</span>`}${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>${tnChips(sd,L.line,!inGrace(it))}`:""}`:`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
+  const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
   const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
-  let h=`<div class="lrc${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
+  let h=`<div class="lrc lrc-${sp}${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
     <span class="lrtop">${compBadge(c,26)}<span><b>${esc(c.name)}</b><small>${esc(it.label||"")}</small></span><i class="lrchev" aria-hidden="true">${open?"▴":"▾"}</i></span>
     <span class="lrbody mh-${sp}">${duoBg(sd,sp,"lr")}${body}</span>
     <span class="lrfoot"><span class="lrwhere">${where}</span><span class="lrcta">${open?"Refermer":"Voir les paris"}</span></span></button>`;
   if(open){const mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
     h+=`<div class="lrx">${m.rows.length>1?`<div class="lrtabs" role="tablist">${m.rows.map(x=>`<button type="button" role="tab" class="lrtab${x===sel?" on":""}" aria-selected="${x===sel}" data-act="lrPick" data-k="${esc(k)}" data-p="${esc(x.p.id)}">${esc(partyLabel(x.p))}</button>`).join("")}</div>`:`<div class="lrone">${esc(partyLabel(p))}</div>`}
-      ${isOwner(p)&&!p.free&&itemState(p,r)==="closed"?reopenBtn(p,r):""}${mine?`<div class="lrmine">Ton prono : <em>${mine}</em></div>`:""}${rawPlayers(p).length>1?`<div class="card ptacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}${projLine(p).replace('<div class="pad" style="margin-top:12px">','<div>')}${liveBetsHTML(p,r,c)}<button type="button" class="btn ghost block" data-act="party" data-id="${esc(p.id)}">Ouvrir la partie « ${esc(partyLabel(p))} »</button></div>`;}
+      ${isOwner(p)&&!p.free&&itemState(p,r)==="closed"?reopenBtn(p,r):""}${mine?`<div class="lrmine">Ton prono : <em>${mine}</em></div>`:""}${rawPlayers(p).length>1?`<div class="card ptacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}${projLine(p,r).replace('<div class="pad" style="margin-top:12px">','<div>')}${liveBetsHTML(p,r,c)}<button type="button" class="btn ghost block" data-act="party" data-id="${esc(p.id)}">Ouvrir la partie « ${esc(partyLabel(p))} »</button></div>`;}
   return h+`</div>`;}
 function vLiveRoom(){const M=liveMatches();let h=pageHead("LE SALON <b>DES LIVES</b>",M.length?M.length+" match"+(M.length>1?"s":"")+" en direct dans tes parties":"Rien en direct pour l'instant",`<button type="button" class="back phback" data-act="lrBack" aria-label="Retour à Mes parties"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>`);
   if(!M.length)return h+`<p class="empty">Aucun match en direct en ce moment. Le salon s'anime dès qu'un match de tes parties commence.</p>`;
@@ -6708,6 +6751,9 @@ function oddsOf(sp,it,sd){if(sd){const a=strengthOf(sd[0])*(sp==="foot"||sp==="r
   let L=null;if(sp==="f1")L=F1_FORM.map(x=>[x[0],x[1]]);else if(sp==="golf"){const B=it.live&&LIVE[it.lid]&&LIVE[it.lid].board;L=(B&&B.length?B.map(x=>[x[1],1]):GOLF_ABU.slice(0,8).map((x,i)=>[x[0],1/(1+i*.2)])).map((x,i)=>[x[0],x[1]*Math.pow(.72,i)]);}
   if(!L)return null;const tot=L.reduce((s2,x)=>s2+x[1],0)*1.15;return L.slice(0,4).map(x=>["",x[0],odd(x[1]/tot)]);}
 /* tennis : tableau des jeux set par set (ligne stockée du point de vue du 1er joueur) */
+/* v77 : jeux de chaque set en pastilles compactes (haut = joueur de gauche, bas = joueur de droite ; set en cours en rouge) */
+function tnChips(sd,line,live){const t=String(line||"").replace(/\([^)]*\)/g,"").match(/\d+-\d+/g);if(!t||!sd)return"";const sets=t.map(x=>x.split("-").map(Number));
+  return`<span class="tnch">${sets.map((x,k)=>{const cur=live&&k===sets.length-1;return`<i class="${cur?"cur":""}" title="${cur?"Set en cours":"Set "+(k+1)}"><em>${cur?"en cours":"S"+(k+1)}</em><b class="${!cur&&x[0]>x[1]?"w":""}">${x[0]}</b><b class="${!cur&&x[1]>x[0]?"w":""}">${x[1]}</b></i>`;}).join("")}</span>`;}
 function tnGrid(sd,line,live){const t=String(line||"").replace(/\([^)]*\)/g,"").match(/\d+-\d+/g);if(!t||!sd)return"";const sets=t.map(x=>x.split("-").map(Number));
   const ln=n=>{const w=String(n).trim().split(/\s+/);return w[w.length-1];};
   const cell=(k,side)=>{const s=sets[k],cur=live&&k===sets.length-1,won=!cur&&s[side]>s[1-side];return`<td class="${won?"w":""}${cur?" cur":""}">${s[side]}</td>`;};
@@ -6881,6 +6927,8 @@ function rcNow(c,r,b,d){try{const it=r.it;if(!it||!it.live||c.custom)return"";co
   const fmt=v=>(Array.isArray(v)?v:[v]).map(x=>{const sd0=sides(it),sh=shortSides(it),ix=sd0?sd0.indexOf(x):-1;return(d[2]==="choice"&&ix>=0?mark(x):"")+esc(ix>=0&&sh?sh[ix]:tnL(r,b.id,x));}).join(" · ");
   if(st==="FT"){const res=liveResult(it);if(!res||res.pending||!res.ans||res.ans[b.id]==null)return"";return`<em class="rcnow fin">✓ ${fmt(res.ans[b.id])}</em>`;}
   if(st!=="LIVE")return"";const pr=provResult(it);let t=pr&&pr.ans?pr.ans[b.id]:null;
+  if(c.sport.id==="tennis"){try{const F=tnFinals(c,it);if(F&&F.length){const T=F.map(a=>a[b.id]);if(T.every(x=>x!=null&&x!=="")&&T.every(x=>String(x)===String(T[0])))return`<em class="rcnow fin">✓ ${fmt(T[0])}</em>`;}}catch(_){}}
+  if((t==null||t==="")&&c.sport.id==="tennis"&&["win","score"].includes(b.id))return`<em class="rcnow prov">⏳ <small>pour l'instant</small> à égalité</em>`;
   if((t==null||t==="")&&c.sport.id==="tennis"){const L=LIVE[it.lid]||{};const sets=tnSets(String(L.line||"").replace(/·.*$/,""),null,null);if(sets.length){const A=tnAns(sets,sides(it))||{};t=A[b.id];}}
   if(t==null||t==="")return`<em class="rcnow wait">⏳ pas encore dispo</em>`;
   if(liveVerdict(c,r,b,d[2],Array.isArray(t)?t[0]:t)==="win")return`<em class="rcnow fin">✓ ${fmt(t)}</em>`;
@@ -6888,10 +6936,11 @@ function rcNow(c,r,b,d){try{const it=r.it;if(!it||!it.live||c.custom)return"";co
 const LVV={win:["✓ Gagné","win"],lose:["✕ Perdu","lose"],open:["⏳ En jeu","open"]};
 function lvvTag(k){const x=LVV[k];return x?`<span class="lvv ${x[1]}">${x[0]}</span>`:"";}
 /* « Si ça finit comme ça » : classement provisoire de la partie avec le score en direct */
-function projLine(p){let sc=null;try{sc=scoreProv(Object.assign({},p,{players:playersOf(p)}));}catch(_){return"";}if(!sc||!sc.rows||!sc.rows.length)return"";const me=myId(p),R=sc.rows.slice().sort((a,b)=>b.pts-a.pts);
+/* v76 : avec un match (r), on ne compte QUE les points de ce match */
+function projLine(p,r){let sc=null;try{sc=scoreProv(Object.assign({},p,{players:playersOf(p)}));}catch(_){return"";}if(!sc||!sc.rows||!sc.rows.length)return"";const me=myId(p),pm=r?((sc.per||{})[r.key]||{}):null,R=sc.rows.map(x=>pm?Object.assign({},x,{pts:pm[x.id]||0}):x).sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name)));
   const rk=id=>1+R.filter(x=>x.pts>(R.find(y=>y.id===id)||{pts:0}).pts).length,mine=R.find(x=>x.id===me);
   const nm=x=>x.id===me||x.name==="Toi"?"Toi":esc(x.name||"?");
-  return`<div class="pad" style="margin-top:12px"><div class="card projc"><div class="projh">🔮 Si ça finit comme ça</div>${mine?`<div class="projme">Tu serais <b>${rk(me)}${rk(me)>1?"e":"er"}</b> avec <b>${mine.pts} pts</b></div>`:""}<div class="projl">${R.slice(0,5).map(x=>`<span class="${x.id===me?"me":""}"><i>${rk(x.id)}</i>${nm(x)}<b>${x.pts}</b></span>`).join("")}</div></div></div>`;}
+  return`<div class="pad" style="margin-top:12px"><div class="card projc"><div class="projh">🔮 Si ça finit comme ça${r?" · sur ce match":""}</div>${mine?`<div class="projme">Tu serais <b>${rk(me)}${rk(me)>1?"e":"er"}</b> avec <b>${mine.pts} pts</b></div>`:""}<div class="projl">${R.slice(0,5).map(x=>`<span class="${x.id===me?"me":""}"><i>${rk(x.id)}</i>${nm(x)}<b>${x.pts}</b></span>`).join("")}</div></div></div>`;}
 function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div><button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button></div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
   const mine=R.board.find(x=>x.pl.id===me);let place=1;const ranks=R.board.map((x,i)=>{if(i&&x.pts<R.board[i-1].pts)place=i+1;return place;});const myPlace=ranks[R.board.indexOf(mine)];
   const arrow=m=>m>0?`<span class="mvup">▲${m}</span>`:m<0?`<span class="mvdn">▼${-m}</span>`:`<span class="mveq">=</span>`;
@@ -6924,8 +6973,8 @@ function vBet(){
   else if(c.custom&&+r.it.date<=+NOW&&!r.it.res)h+=`<div class="pad"><div class="lockban" style="border-color:#FFB547">⏳ <span><b>En attente du résultat</b> L'organisateur doit encoder le score de ce match.</span></div></div>`;
   if(locked&&st==="done")h+=`<div class="pad"><div class="lockban" style="border-color:${st==="done"?"var(--line)":"#FFB547"}">${st==="done"?"🏁":"🔒"} <span><b>${st==="done"?"Match terminé":"Paris fermés"}</b> ${st==="done"?(res&&res.pending?"Le résultat arrive automatiquement · les points seront calculés tout seuls.":res?esc(res.line)+(gain!=null?` · tu marques <b style="color:var(--lime)">+${gain} pts</b>`:""):""):"Le match a commencé ou l'organisateur a fermé les paris. Tes pronos sont figés."}</span></div></div>`;
   if(locked&&st!=="done"){const pls=playersOf(p),pk=picksOf(p);const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text");
-    if(onAir)h+=projLine(p);
-    const others=pls.filter(pl=>pl.id!==myId(p));if(others.length)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v)):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
+    if(onAir)h+=projLine(p,r);
+    const others=pls.filter(pl=>pl.id!==myId(p));if(others.length)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v)):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
   let qn=0;h+=`<div class="pad" style="margin-top:12px">${locked?`<h3 class="rch">Mes pronos</h3>`:""}<div class="qlist">${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
      if(locked&&t==="text"&&!has)return"";
      qn++;return`<section class="qcard${has?" has":""}${!has&&(S.missHi||[]).includes(r.key+"|"+b.id)?" miss":""}"><header class="qh"><span class="qn">${has&&!locked?"✓":qn}</span><span class="ql"><b>${esc(label)}</b>${has?`<small>Ton choix : <em>${esc(tnL(r,b.id,mv))}</em>${(()=>{if(Array.isArray(mv)){const fo=myVal(p,r.key+"|"+b.id+"@odd");const l=mv.map(x=>{const o=fixedOdd(fo,x)||oddFor(c,r.it,"top10",x);return o?esc(x.split(" ").slice(-1)[0])+" "+ptsW(c,r.it,b,x,o)+" pts":"";}).filter(Boolean);return l.length?" · si T10 : "+l.join(", "):"";}const od=fixedOdd(myVal(p,r.key+"|"+b.id+"@odd"),mv)||oddFor(c,r.it,b.id,mv);return od?` · cote ${od.toFixed(2)} → <em>${ptsW(c,r.it,b,mv,od)} pts</em> si gagné`:"";})()}</small>`:`<small class="qto">À choisir</small>`}${truth!=null?`<small>Réponse : ${esc(Array.isArray(truth)?truth.join(", "):tnL(r,b.id,truth))} ${good?"✓":"✗"}</small>`:""}</span><span class="qp">${ODD_BETS.has(b.id)&&!c.custom?`${b.pts} pt${b.pts>1?"s":""} × cote`:`${b.pts} pt${b.pts>1?"s":""}`}</span></header>${betInput(p,r,b,t,label,ro)}</section>`;}).join("")}</div>
