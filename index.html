@@ -3464,6 +3464,10 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    remplacés plus tard par le flux d'un fournisseur de données sportives.
    ===================================================================== */
 const NOW = new Date();
+/* v69 : NOW suit l'heure réelle (avant, il restait figé à l'ouverture : une appli restée ouverte laissait parier après le coup d'envoi) */
+function nowTick(){const a=+NOW,b=Date.now();NOW.setTime(b);return[a,b];}
+setInterval(()=>{const[a,b]=nowTick();try{if(typeof S==="undefined"||!S.parties)return;const hit=(S.parties||[]).some(p=>{try{return!p.free&&rowsOfParty(p).some(r=>r.it&&+r.it.date>a&&+r.it.date<=b);}catch(_){return false;}});if(hit&&S.screen!=="chat")render();}catch(_){}},15000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){nowTick();try{render();}catch(_){}}});
 const D = (y,m,d,h=0,mi=0)=>new Date(y,m-1,d,h,mi);
 const addDays=(dt,n)=>{const x=new Date(dt);x.setDate(x.getDate()+n);return x;};
 const fmtD=d=>d.toLocaleDateString("fr-BE",{weekday:"short",day:"numeric",month:"short"});
@@ -6308,7 +6312,7 @@ const LATE={feeRate:1.5,minPlayer:1.49,reopen:0.99};
 const r99=v=>Math.max(0.99,Math.ceil(v)-0.01);
 function partyStarted(p){if(p.free)return!!p.started;const c=FIND[p.comp];if(!c)return false;const subs=subsOf(c);
   return rowsOfParty(p).some(r=>r.it&&!lateOk(r.it)&&(+r.it.date<=+NOW))||Object.values(p.state||{}).includes("closed");}
-function itemState(p,r){const st=(p.state||{})[r.key];if(r.it&&isDone(r.it))return"done";if(st)return st;return r.it&&!lateOk(r.it)&&closeAt(r.it)<=+NOW?"closed":"open";}
+function itemState(p,r){const st=(p.state||{})[r.key];if(r.it&&isDone(r.it))return"done";if(st)return st;return r.it&&!lateOk(r.it)&&(closeAt(r.it)<=Date.now()||(r.it.live&&["LIVE","FT","END"].includes(liveSt(r.it))))?"closed":"open";}
 function isOwner(p){return!p.owner||p.owner===S.uid;}
 /* ===================================================================== JOUEURS PAR E-MAIL
    L'organisateur inscrit chaque pote (prénom + e-mail). Le pote ouvre l'appli avec son compte Claude :
@@ -6622,7 +6626,7 @@ const dkeyMatch=(pre,k)=>pre==="free"?/^q\d+$/.test(k):k.startsWith(pre+"|");
 function draftDirty(p,pre){const d=S.myDraft||{};return Object.keys(d).some(k=>dkeyMatch(pre,k)&&JSON.stringify(d[k]==null?null:d[k])!==JSON.stringify(savedVal(p,k)==null?null:savedVal(p,k)));}
 function hasSaved(p,pre){const m=picksOf(p)[myId(p)]||{};return Object.keys(m).some(k=>dkeyMatch(pre,k)&&m[k]!=null&&m[k]!=="");}
 function needKeys(p,pre){if(pre==="free")return(p.items||[]).map((q,i)=>"q"+i);const r=rowsOfParty(p).find(x=>x.key===pre);if(!r)return[];const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat);return cfg.bets.map((b,bi)=>b.on&&BETS[r.cat][bi][2]!=="text"?pre+"|"+b.id:null).filter(Boolean);}
-function commitPick(p,pre){const miss=needKeys(p,pre).filter(k=>{const v=myVal(p,k);return v==null||v===""||(Array.isArray(v)&&!v.some(x=>x))||(betTypeOf(p,k)==="multi"&&(!Array.isArray(v)||v.filter(Boolean).length<3));});
+function commitPick(p,pre){nowTick();try{const r=rowsOfParty(p).find(x=>x.key===pre);if(r&&r.it&&itemState(p,r)!=="open"){discardDraft(pre);toast("Trop tard : le match a commencé, les paris sont fermés.");S.ptab="games";S.myDraft={};back();return false;}}catch(_){}const miss=needKeys(p,pre).filter(k=>{const v=myVal(p,k);return v==null||v===""||(Array.isArray(v)&&!v.some(x=>x))||(betTypeOf(p,k)==="multi"&&(!Array.isArray(v)||v.filter(Boolean).length<3));});
   if(miss.length){toast(miss.length===1?"Il te manque 1 prono avant de valider.":"Il te manque "+miss.length+" pronos avant de valider.");S.missHi=miss;render();const el=document.querySelector(".qcard.miss,.mb.miss");if(el)el.scrollIntoView({behavior:"smooth",block:"center"});return false;}
   const me=myId(p),d=S.myDraft||{},first=!hasSaved(p,pre);const mine=Object.assign({},picksOf(p)[me]);
   Object.keys(d).forEach(k=>{if(dkeyMatch(pre,k)){if(d[k]==null)delete mine[k];else mine[k]=d[k];delete d[k];}});S.editKey=null;S.missHi=null;
@@ -6848,9 +6852,9 @@ function liveVerdict(c,r,b,t,v){if(v==null||v===""||!c||!r.it||!r.it.live||liveS
 const LVV={win:["✓ Gagné","win"],lose:["✕ Perdu","lose"],open:["⏳ En jeu","open"]};
 function lvvTag(k){const x=LVV[k];return x?`<span class="lvv ${x[1]}">${x[0]}</span>`:"";}
 /* « Si ça finit comme ça » : classement provisoire de la partie avec le score en direct */
-function projLine(p){let sc=null;try{sc=scoreProv(p);}catch(_){return"";}if(!sc||!sc.rows||!sc.rows.length)return"";const me=myId(p),R=sc.rows.slice().sort((a,b)=>b.pts-a.pts);
+function projLine(p){let sc=null;try{sc=scoreProv(Object.assign({},p,{players:playersOf(p)}));}catch(_){return"";}if(!sc||!sc.rows||!sc.rows.length)return"";const me=myId(p),R=sc.rows.slice().sort((a,b)=>b.pts-a.pts);
   const rk=id=>1+R.filter(x=>x.pts>(R.find(y=>y.id===id)||{pts:0}).pts).length,mine=R.find(x=>x.id===me);
-  const nm=x=>x.id===me?"Toi":esc(x.name||"?");
+  const nm=x=>x.id===me||x.name==="Toi"?"Toi":esc(x.name||"?");
   return`<div class="pad" style="margin-top:12px"><div class="card projc"><div class="projh">🔮 Si ça finit comme ça</div>${mine?`<div class="projme">Tu serais <b>${rk(me)}${rk(me)>1?"e":"er"}</b> avec <b>${mine.pts} pts</b></div>`:""}<div class="projl">${R.slice(0,5).map(x=>`<span class="${x.id===me?"me":""}"><i>${rk(x.id)}</i>${nm(x)}<b>${x.pts}</b></span>`).join("")}</div></div></div>`;}
 function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div><button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button></div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
   const mine=R.board.find(x=>x.pl.id===me);let place=1;const ranks=R.board.map((x,i)=>{if(i&&x.pts<R.board[i-1].pts)place=i+1;return place;});const myPlace=ranks[R.board.indexOf(mine)];
@@ -7368,7 +7372,7 @@ function suAct(a,t){const s=suS();
 function busyUI(){return !!(window._tkF||window._touching||document.querySelector(".prowbox.tkmove,.prowbox.closing,.vtmove,.morphov"));}
 function dataRender(){if(window._drT)return;const go=()=>{window._drT=null;if(busyUI()){window._drT=setTimeout(go,250);return;}render();};go();}
 if(!window._touchOn){window._touchOn=1;const on=()=>{clearTimeout(window._touchT);window._touching=1;},off=()=>{clearTimeout(window._touchT);window._touchT=setTimeout(()=>{window._touching=0;},400);};addEventListener("touchstart",on,{passive:true,capture:true});addEventListener("touchend",off,{passive:true,capture:true});addEventListener("touchcancel",off,{passive:true,capture:true});}
-function render(){try{goldDefs();}catch(_){}if(["events","sports","sport"].includes(S.screen)&&S.hm&&S.hm.fromTab)evFlowClear();if(S.justNew&&(S.screen!=="parties"||Date.now()-S.justNew.t>120000))S.justNew=null;try{requestAnimationFrame(()=>{h3Fit();flFit();h3cwSync();ensureCreateVisible();});let nh=document.getElementById("ntfHost");if(!nh){nh=document.createElement("div");nh.id="ntfHost";document.body.appendChild(nh);}const wasOpen=nh.dataset.open==="1";nh.innerHTML=S.ntf?ntfPop():"";nh.classList.toggle("ntfstill",!!S.ntf&&wasOpen);nh.dataset.open=S.ntf?"1":"0";document.documentElement.style.overflow=S.ntf?"hidden":"";}catch(e){}
+function render(){nowTick();try{goldDefs();}catch(_){}if(["events","sports","sport"].includes(S.screen)&&S.hm&&S.hm.fromTab)evFlowClear();if(S.justNew&&(S.screen!=="parties"||Date.now()-S.justNew.t>120000))S.justNew=null;try{requestAnimationFrame(()=>{h3Fit();flFit();h3cwSync();ensureCreateVisible();});let nh=document.getElementById("ntfHost");if(!nh){nh=document.createElement("div");nh.id="ntfHost";document.body.appendChild(nh);}const wasOpen=nh.dataset.open==="1";nh.innerHTML=S.ntf?ntfPop():"";nh.classList.toggle("ntfstill",!!S.ntf&&wasOpen);nh.dataset.open=S.ntf?"1":"0";document.documentElement.style.overflow=S.ntf?"hidden":"";}catch(e){}
   const md=document.getElementById("mdefs");if(md&&!md.firstChild)md.innerHTML=MEDAL_DEFS;
   const v={home:vHome,events:vEvents,sports:vSports,sport:vSport,comp:vComp,rounds:vRounds,clubs:vClubs,sub:vSub,match:vMatch,free:vFree,create:vCreate,parties:vParties,party:vParty,groups:vFriends,group:vGroup,chats:vChats,lives:vLiveRoom,chatroom:vChatRoom,bet:vBet,profile:vProfile,search:vSearch,member:vMember,custom:vCustom,cfg:vCfg,setup:vSetup,mpick:vMpick,pay:vPay}[S.screen]||vHome;
   const _pd=document.getElementById("tkpad"),_ph=_pd?_pd.style.height:"",_y=window.scrollY,_sk=S.screen+"|"+(S.partyView||"")+"|"+(S.comp||"")+"|"+(S.sport||""),_same=render._sk===_sk;render._sk=_sk;
