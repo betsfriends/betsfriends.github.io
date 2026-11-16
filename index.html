@@ -3675,7 +3675,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v95";
+const APP_VER="v96";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6618,7 +6618,10 @@ const LATE={feeRate:1.5,minPlayer:1.49,reopen:0.99};
 const r99=v=>Math.max(0.99,Math.ceil(v)-0.01);
 function partyStarted(p){if(p.free)return!!p.started;const c=FIND[p.comp];if(!c)return false;const subs=subsOf(c);
   return rowsOfParty(p).some(r=>r.it&&!lateOk(r.it)&&(+r.it.date<=+NOW))||Object.values(p.state||{}).includes("closed");}
-function itemState(p,r){const st=(p.state||{})[r.key];if(r.it&&isDone(r.it))return"done";const started=!!(r.it&&!lateOk(r.it)&&(closeAt(r.it)<=Date.now()||(r.it.live&&["LIVE","FT","END"].includes(liveSt(r.it)))));if(st==="closed")return"closed";if(st&&st!=="open")return st;return started?"closed":"open";}
+function itemState(p,r){const st=(p.state||{})[r.key];if(r.it&&isDone(r.it))return"done";const started=!!(r.it&&!lateOk(r.it)&&(closeAt(r.it)<=Date.now()||(r.it.live&&["LIVE","FT","END"].includes(liveSt(r.it)))));if(st==="closed")return"closed";if(st&&st!=="open")return st;
+  /* v96 : l'organisateur a toujours la main — une réouverture faite APRÈS le coup d'envoi reste ouverte jusqu'à ce qu'il referme ; une réouverture faite avant le match expire au coup d'envoi */
+  if(st==="open"&&started){const L=(p.rlog||[]).filter(e=>e.k===r.key);const last=L[L.length-1];if(last&&last.act==="open"&&last.st!=="before")return"open";}
+  return started?"closed":"open";}
 function isOwner(p){return!p.owner||p.owner===S.uid;}
 /* ===================================================================== JOUEURS PAR E-MAIL
    L'organisateur inscrit chaque pote (prénom + e-mail). Le pote ouvre l'appli avec son compte Claude :
