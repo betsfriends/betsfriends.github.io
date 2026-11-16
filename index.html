@@ -3675,7 +3675,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v101";
+const APP_VER="v102";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6140,7 +6140,19 @@ function lvTkScore(it){const L=LIVE[it.lid]||{},sd=shortSides(it),sv=srvSide(it)
   if(sd)return`<span class="lvm"><b class="lvn">${esc(sd[0])}</b><span class="lvs">–</span><b class="lvn">${esc(sd[1])}</b><span class="lvs">–</span></span>`;
   const lead=(L.winners&&L.winners[0])||L.winner||"";return`<span class="lvm1"><b class="lvn">${esc(it.label||"")}</b>${lead?`<small class="lvg">En tête : ${esc(lead)}${L.score!=null?" ("+esc(String(L.score))+")":""}</small>`:""}</span>`;}
 /* v45 : un match joué dans plusieurs parties = UN seul match en direct */
-function liveMatches(){const by={},out=[];const st=it=>{const L=LIVE[it.lid]||{};return L.status==="LIVE"&&lvEndOk(it.lid,L)?2:(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)?1:0;};
+/* v102 : un match entré dans le Salon y reste tant qu'il n'a pas de vrai résultat final (ou 6 h après le début), quoi que fassent les sources ;
+   chaque « disparition » évitée est notée (localStorage bf_lrdiag) pour comprendre la cause */
+const LR_SEEN={};
+function lrKey(it,fb){let k=it.lid||fb;try{const sd=sides(it);if(sd&&sd.length===2)k="m:"+sd.map(normS).sort().join("|")+":"+new Date(it.date).toDateString();}catch(_){}return k;}
+function liveMatches(){const out=liveMatches0(),by={},now=+NOW;out.forEach(m=>{by[m.k]=1;LR_SEEN[m.k]={k:m.k,it:m.it,c:m.c,rows:m.rows};});
+  Object.values(LR_SEEN).forEach(s=>{if(by[s.k])return;const rows=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;try{rowsOfParty(p).forEach(r=>{if(r.it&&lrKey(r.it,r.key)===s.k)rows.push({p,r});});}catch(_){}});
+    const its=rows.map(x=>x.r.it).concat([s.it]),fin=its.some(it=>{const L=LIVE[it.lid]||{};return(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)&&!inGrace(it);});
+    if(fin||now>+new Date(s.it.date)+6*3600e3){delete LR_SEEN[s.k];return;}
+    const it=its.find(i=>liveSt(i)==="LIVE")||its[0];
+    try{const D=JSON.parse(localStorage.getItem("bf_lrdiag")||"[]");D.push({at:new Date().toISOString(),k:s.k,its:its.map(i=>i.lid+":"+liveSt(i)+":"+(+new Date(i.date))),rows:rows.length,v:APP_VER});localStorage.setItem("bf_lrdiag",JSON.stringify(D.slice(-30)));}catch(_){}
+    out.push({k:s.k,it,c:s.c,rows:rows.length?rows:s.rows});});
+  return out;}
+function liveMatches0(){const by={},out=[];const st=it=>{const L=LIVE[it.lid]||{};return L.status==="LIVE"&&lvEndOk(it.lid,L)?2:(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)?1:0;};
   liveRowsAll().forEach(x=>{const it=x.r.it;let k=it.lid||x.r.key;try{const sd=sides(it);if(sd&&sd.length===2)k="m:"+sd.map(normS).sort().join("|")+":"+new Date(it.date).toDateString();}catch(_){}
     if(!by[k]){by[k]={k,it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}else if(st(it)>st(by[k].it)){by[k].it=it;by[k].c=FIND[x.p.comp];}by[k].rows.push(x);});return out;}
 /* nom lisible d'une partie : son groupe, sinon « avec Alexandre, Maxime », sinon son nom */
@@ -7201,7 +7213,7 @@ function stageWinner(p,r,sc){const per=sc.per[r.key];if(!per)return null;const p
    Foot : règles sûres (score exact dépassé, les deux équipes ont marqué, nombre de buts dépassé). Sinon : en jeu. */
 function tnFinals(c,it){const L=LIVE[it.lid]||{};if(L.sa==null||L.sb==null)return null;const bo=["ao","rg","wim","uso"].includes(c.id)?5:3,N=Math.ceil(bo/2),out=[];
   for(let y=L.sb;y<N;y++)if(L.sa<=N)out.push([N,y]);for(let x=L.sa;x<N;x++)if(L.sb<=N)out.push([x,N]);
-  return out.map(([x,y])=>{const save=LIVE[it.lid];let r=null;LIVE[it.lid]={status:"FT",sa:x,sb:y,line:""};try{r=liveResult(it);}catch(_){}finally{LIVE[it.lid]=save;}return r&&r.ans||{};});}
+  return out.map(([x,y])=>{const save=LIVE[it.lid];let r=null;LV_RAW=true;try{LIVE[it.lid]={status:"FT",sa:x,sb:y,line:""};try{r=liveResult(it);}catch(_){}}finally{LIVE[it.lid]=save;LV_RAW=false;}return r&&r.ans||{};});}
 function tnDoneSets(it){const L=LIVE[it.lid]||{};const sets=tnSets(String(L.line||"").replace(/·.*$/,""),null,null);const done=sets.filter(([a,b])=>(Math.max(a,b)>=6&&Math.abs(a-b)>=2)||(Math.max(a,b)===7&&Math.min(a,b)>=5));return done;}
 function liveVerdict(c,r,b,t,v){if(v==null||v===""||!c||!r.it||!r.it.live||liveSt(r.it)!=="LIVE")return null;const sp=c.sport.id,L=LIVE[r.it.lid]||{},sd=sides(r.it);
   try{if(sp==="tennis"&&sd){
