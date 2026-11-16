@@ -3675,7 +3675,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v96";
+const APP_VER="v97";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -3884,7 +3884,17 @@ const LIVE_AT="7 nov. 2026, 17:15";
 /* v81 : l'heure de fin est mémorisée une seule fois (même si plusieurs téléphones renvoient l'info) ; un match terminé ne redevient jamais « en direct » */
 const FTAT=(()=>{try{return JSON.parse(localStorage.getItem("bf_ftat")||"{}")||{};}catch(_){return{};}})();
 function ftatSave(){try{const ks=Object.keys(FTAT);if(ks.length>400)ks.slice(0,ks.length-400).forEach(k=>delete FTAT[k]);localStorage.setItem("bf_ftat",JSON.stringify(FTAT));}catch(_){}}
+/* v97 : un « terminé » impossible est refusé (tennis à 1 set à 0, foot avant la 80e, F1 avant le dernier tour) ; un vrai direct peut corriger un « terminé » douteux */
+function lvSportOf(k){try{const c=FIND[String(k).split(/[-~]/)[0]];return c&&c.sport?c.sport.id:"";}catch(_){return"";}}
+function lvEndOk(k,v){if(!v||v.manual||!(v.status==="FT"||v.status==="END"))return true;const sp=lvSportOf(k),line=String(v.line||"");
+  const tn=sp==="tennis"||(!sp&&/^\s*\d{1,2}-\d{1,2}(\(\d+\))?(\s+\d{1,2}-\d{1,2}(\(\d+\))?)*\s*$/.test(line)&&v.sa!=null&&v.sa+v.sb<=5);
+  if(tn&&v.sa!=null&&v.sb!=null&&Math.max(+v.sa,+v.sb)<2&&!/abandon|forfait|retired|w\/o|walkover|ret\./i.test(line+" "+(v.note||"")))return false;
+  if(sp==="foot"){const m=parseInt(String(v.minute||""),10);if(m&&m<80)return false;}
+  if(sp==="f1"){const t=line.match(/Tour\s*(\d+)\s*\/\s*(\d+)/i);if(t&&+t[1]<+t[2])return false;}
+  return true;}
 function liveWrap(o){return new Proxy(o,{set(t,k,v){const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+  if(v&&typeof v==="object"&&isEnd(v)&&!lvEndOk(k,v)){if(FTAT[k]){delete FTAT[k];ftatSave();}if(old&&old.status==="LIVE")return true;v=Object.assign({},v,{status:"LIVE"});delete v.ftAt;t[k]=v;return true;}
+  if(v&&typeof v==="object"&&isEnd(old)&&!lvEndOk(k,old)&&v.status==="LIVE"){if(FTAT[k]){delete FTAT[k];ftatSave();}delete v.ftAt;t[k]=v;return true;}
   if(v&&typeof v==="object"&&isEnd(old)&&(v.status==="LIVE"||v.status==="NS")&&!v.manual)return true;
   if(v&&typeof v==="object"&&isEnd(v)){if(FTAT[k])v.ftAt=FTAT[k];else if(!v.ftAt){if(old&&old.ftAt)v.ftAt=old.ftAt;else if(old&&old.status&&!isEnd(old))v.ftAt=new Date().toISOString();}if(v.ftAt&&!FTAT[k]){FTAT[k]=v.ftAt;ftatSave();}}
   t[k]=v;return true;}});}
@@ -6104,7 +6114,7 @@ function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK
 /* v51 : un match est « en direct » si la source le dit, OU si son heure de début est passée sans résultat (source muette, ex. ATP Finals sur ESPN) — pendant la durée normale du match */
 function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END"||st==="PST")return false;const t=+new Date(it.date),now=+NOW;return t<=now&&now<t+(it.dur||3)*3600e3;}
 const GRACE=15*60e3;
-function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;if(+NOW>+new Date(it.date)+6*3600e3)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
+function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;if(!lvEndOk(it.lid,LIVE[it.lid]))return false;if(+NOW>+new Date(it.date)+6*3600e3)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
 function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it)||inGrace(it));}
 function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{const cl=isClosed(p);rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it)&&!(cl&&inGrace(r.it)));}catch(_){}rows.forEach(r=>out.push({p,r}));});
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
@@ -6115,7 +6125,9 @@ function lvTkScore(it){const L=LIVE[it.lid]||{},sd=shortSides(it),sv=srvSide(it)
   if(sd)return`<span class="lvm"><b class="lvn">${esc(sd[0])}</b><span class="lvs">–</span><b class="lvn">${esc(sd[1])}</b><span class="lvs">–</span></span>`;
   const lead=(L.winners&&L.winners[0])||L.winner||"";return`<span class="lvm1"><b class="lvn">${esc(it.label||"")}</b>${lead?`<small class="lvg">En tête : ${esc(lead)}${L.score!=null?" ("+esc(String(L.score))+")":""}</small>`:""}</span>`;}
 /* v45 : un match joué dans plusieurs parties = UN seul match en direct */
-function liveMatches(){const by={},out=[];liveRowsAll().forEach(x=>{const k=x.r.it.lid||x.r.key;if(!by[k]){by[k]={k,it:x.r.it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}by[k].rows.push(x);});return out;}
+function liveMatches(){const by={},out=[];const st=it=>{const L=LIVE[it.lid]||{};return L.status==="LIVE"&&lvEndOk(it.lid,L)?2:(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)?1:0;};
+  liveRowsAll().forEach(x=>{const it=x.r.it;let k=it.lid||x.r.key;try{const sd=sides(it);if(sd&&sd.length===2)k="m:"+sd.map(normS).sort().join("|")+":"+new Date(it.date).toDateString();}catch(_){}
+    if(!by[k]){by[k]={k,it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}else if(st(it)>st(by[k].it)){by[k].it=it;by[k].c=FIND[x.p.comp];}by[k].rows.push(x);});return out;}
 /* nom lisible d'une partie : son groupe, sinon « avec Alexandre, Maxime », sinon son nom */
 const SPLIT_ALL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"],["perso","Personnalisée"]];
 function splitOk(k,n){n=+n||2;if(k==="perso")return n>=3;return String(k).split("-").length<n;}
