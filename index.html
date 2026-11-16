@@ -3216,7 +3216,7 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 
 /* ===== v36 : historique des réouvertures sur la carte de match ===== */
 .rlog{display:flex;flex-direction:column;gap:3px;margin:8px 0 0;padding:7px 10px;border-radius:10px;border:1px dashed rgba(255,181,71,.55);background:rgba(255,181,71,.08);text-align:left}
-.rlh{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#FFB547;margin-bottom:2px} .rlg.pkl{color:#FFE3B8}.rlg.pkl em{font-style:normal;color:#FFB3AC}.rlg.pkl small{display:block;font-size:11.5px;font-weight:600;color:#E9DFC6;margin:1px 0 2px 18px} .rlog .rlg.pkl{display:block!important;text-align:left} .rcv{flex-wrap:wrap;row-gap:2px} .rcv .chgm{flex:0 0 auto;margin:0} .chgm{display:inline-block;margin-left:0;font-style:normal;font-size:10px;font-weight:900;padding:1px 6px;border-radius:999px;background:rgba(255,120,80,.16);color:#FFB08A;border:1px solid rgba(255,140,90,.5);vertical-align:1px;white-space:nowrap} .rlg{font-size:12px;font-weight:700;color:#FFD9A0;line-height:1.3}.rlg.close{color:#C9C3D6}
+.potlock{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(243,224,166,.08);border:1px solid rgba(243,224,166,.35)}.potlock b{display:block;font-size:14px;color:#F3E0A6}.potlock small{display:block;margin-top:4px;font-size:12px;color:var(--muted);line-height:1.35} .rlfold{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 14px;border-radius:14px;border:1px dashed rgba(255,181,71,.55);background:rgba(255,181,71,.08);color:#FFD9A0;font:inherit;font-size:13.5px;font-weight:800;text-align:left;cursor:pointer}.rlfold em{font-style:normal;opacity:.75}.rlfold i{font-style:normal;font-size:18px;transition:transform .2s}.rlfold.on i{transform:rotate(90deg)}.rlfold.on{border-radius:14px 14px 0 0;border-bottom:0}.rlfold+.rlog{margin-top:0;border-radius:0 0 12px 12px} .rlh{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#FFB547;margin-bottom:2px} .rlg.pkl{color:#FFE3B8}.rlg.pkl em{font-style:normal;color:#FFB3AC}.rlg.pkl small{display:block;font-size:11.5px;font-weight:600;color:#E9DFC6;margin:1px 0 2px 18px} .rlog .rlg.pkl{display:block!important;text-align:left} .rcv{flex-wrap:wrap;row-gap:2px} .rcv .chgm{flex:0 0 auto;margin:0} .chgm{display:inline-block;margin-left:0;font-style:normal;font-size:10px;font-weight:900;padding:1px 6px;border-radius:999px;background:rgba(255,120,80,.16);color:#FFB08A;border:1px solid rgba(255,140,90,.5);vertical-align:1px;white-space:nowrap} .rlg{font-size:12px;font-weight:700;color:#FFD9A0;line-height:1.3}.rlg.close{color:#C9C3D6}
 
 /* ===== v36 : bannière d'accueil en mode direct ===== */
 .hbn.hblive{border-color:rgba(255,90,80,.75)!important;box-shadow:0 0 18px rgba(255,60,50,.25)}
@@ -3712,7 +3712,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v106";
+const APP_VER="v109";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6128,12 +6128,13 @@ function myPronoSt(p){try{if(p.free||isClosed(p))return"";const rows=rowsOfParty
   const todo=todoRows(p),op=rows.filter(r=>itemState(p,r)==="open"),reo=op.filter(r=>+r.it.date<=nw);
   if(todo.length){const fut=todo.map(r=>+r.it.date).filter(t=>t>nw),n=todo.length;return`<span class="rttodo">✏️ ${n} prono${n>1?"s":""} à faire${fut.length&&!reo.length?` · jusqu'${fm(Math.min(...fut)).replace(/^à /,"à ").replace(/^au /,"au ")}`:""}</span>`;}
   if(reo.length){const o=ownerNm(p.owner);return`<span class="rtok reo">🔓 Rouvert${o?" par "+esc(o):""} · tu peux modifier</span>`;}
-  if(op.length)return`<span class="rtok">✓ Pronos faits · modifiables jusqu'${fm(Math.min(...op.map(r=>+r.it.date)))}</span>`;
+  if(op.length){const w=fm(Math.min(...op.map(r=>+r.it.date)));return`<span class="rtok">✓ ${/^à /.test(w)?"Pronos faits":"Faits"} · modifiables jusqu'${w}</span>`;}
   const miss=rows.some(r=>!hasSaved(p,r.key));
   return`<span class="rtlock">🔒 ${miss?"Pas de prono · paris fermés":"Pronos verrouillés · match en cours"}</span>`;}catch(_){return"";}}
 function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done",D);
   const sp=c.sport.id,rows=rowsOfParty(p).filter(r=>r.it),one=rows.length===1?rows[0].it:null,fin=isClosed(p);
-  const sub=one?(one.label||""):String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
+  /* v108 : un match → l'affiche ; plusieurs → « N matchs » (sessions / étapes / sélections selon le sport) ; compétition entière → « Tout le tournoi · N matchs » */
+  const sub=one?(one.label||""):(()=>{const n=rows.length,u=sp==="f1"?"session":sp==="velo"?"étape":sp==="golf"?"sélection":"match";const t=n?n+" "+u+(n>1?(u==="match"?"s":"s"):""):"";return p.full?("Tout le tournoi"+(t?" · "+t:"")):t;})();
   let sc=null;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(_){}
   const R=sc?sc.rows.slice().sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name))):[],me=myId(p),pot=(+p.amount||0)*effPeople(p),hasPot=pot>0&&(p.split||[]).length;
   const meI=R.findIndex(x=>x.id===me||x.name==="Toi"),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
@@ -6697,6 +6698,9 @@ function commonRows(p){const rows=rowsOfParty(p).filter(r=>r.it);const by={};row
 /* ===================================================================== GESTION D'UNE PARTIE EN COURS */
 const LATE={feeRate:1.5,minPlayer:1.49,reopen:0.99};
 const r99=v=>Math.max(0.99,Math.ceil(v)-0.01);
+/* v109 : mise et répartition de la cagnotte verrouillées pour tout le monde (organisateur compris) dès le coup d'envoi du 1er match */
+function potLockAt(p){try{if(p.free)return p.started?+new Date(p.started)||1:0;const t=rowsOfParty(p).filter(r=>r.it).map(r=>+r.it.date).filter(x=>x<=+NOW);return t.length?Math.min(...t):(isClosed(p)?1:0);}catch(_){return 0;}}
+function potLocked(p){return!!potLockAt(p);}
 function partyStarted(p){if(p.free)return!!p.started;const c=FIND[p.comp];if(!c)return false;const subs=subsOf(c);
   return rowsOfParty(p).some(r=>r.it&&!lateOk(r.it)&&(+r.it.date<=+NOW))||Object.values(p.state||{}).includes("closed");}
 function itemState(p,r){const st=(p.state||{})[r.key];if(r.it&&isDone(r.it))return"done";const started=!!(r.it&&!lateOk(r.it)&&(closeAt(r.it)<=Date.now()||(r.it.live&&["LIVE","FT","END"].includes(liveSt(r.it)))));if(st==="closed")return"closed";if(st&&st!=="open")return st;
@@ -6807,6 +6811,9 @@ function chgAll(p){let L=(p.chg||[]).slice();const pp=PP[p.id]||{};Object.keys(p
 function chgMark(p,pid,key){try{const[pre,bid]=String(key).split("|");return chgAll(p).some(e=>e.who===pid&&e.k===pre&&e.ch.some(c=>c[0]===bid))?`<i class="chgm" title="Posé ou changé pendant le match">⚠️ pendant le match</i>`:"";}catch(_){return"";}}
 function chgNotify(p,e){try{const nm=e.by||"Un joueur",txt=e.first?`${nm} a fait ses pronos pendant le match ${e.t}${e.sc?" ("+e.sc+")":""} · « ${p.name} »`:`${nm} a changé ${e.ch.length} prono${e.ch.length>1?"s":""} pendant le match ${e.t}${e.sc?" ("+e.sc+")":""} · « ${p.name} »`;
   const uids=[...new Set(rawPlayers(p).map(x=>x.uid).concat([p.owner]).filter(Boolean))];uids.forEach(u=>notify(u,"reo",txt,{pid:p.id}));}catch(_){}}
+/* v107 : l'historique n'apparaît plus sur les cartes de la liste ; dans le détail du match, replié sur une ligne, déplié d'un appui */
+function rlogFold(p,k){try{const n=(p.rlog||[]).filter(e=>e.k===k).length+chgAll(p).filter(e=>e.k===k).length;if(!n)return"";const op=!!(S.rlOpen||{})[p.id+"|"+k];
+  return`<div class="pad" style="margin-top:12px"><button type="button" class="rlfold${op?" on":""}" data-act="rlTog" data-k="${esc(p.id+"|"+k)}" aria-expanded="${op}"><span>🔓 Historique de la réouverture <em>(${n})</em></span><i aria-hidden="true">›</i></button>${op?rlogHTML(p,k):""}</div>`;}catch(_){return"";}}
 function rlogHTML(p,k){const L=(p.rlog||[]).filter(e=>e.k===k);if(!L.length&&!chgAll(p).some(e=>e.k===k))return"";
   const tm=iso=>{try{return new Date(iso).toLocaleString("fr-BE",{timeZone:"Europe/Brussels",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}catch(_){return"";}};
   const A=L.concat(chgAll(p).filter(e=>e.k===k)).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
@@ -6908,7 +6915,7 @@ function myBetsTab(p,sc){
       ${vs}
       <span class="mcmeta"><span style="color:${stCol}">● ${esc(stTxt)}</span>${r.sub&&!sd?"":` · ${esc((r.sub||"").split(" · ")[0])}`}${res&&res.line&&!(res.sa!=null&&/^Score final/.test(res.line))?" · "+esc(res.line):""}</span>
       <span class="mcfoot"><span class="mcmine${pl?"":" none"}">${pl?`Ton prono : <em>${pl}</em>`:can?"Pas encore de prono":"Pas de prono"}</span>${ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:""}</span>
-      ${rlogHTML(p,r.key)}${kind==="todo"?"":extra}${orgL}</button>${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}</div>`;};
+      ${kind==="todo"?"":extra}${orgL}</button>${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}</div>`;};
   /* filtres : À faire (paris ouverts) · En cours (commencés ou fermés) · Terminés · Tous */
   const FILT={edit:["todo","ready"],done:["live","wait","locked","done"]}; /* 2 filtres seulement : on parie (En attente) ou on regarde le résultat (Terminés) */ /* un prono fait quitte « À faire » : il attend son résultat dans « En cours » */
   const SECT=[["todo","Pronos en attente"],["ready","Pronos faits · encore modifiables"],["later","À venir"],["live","En cours"],["locked","Paris fermés"],["done","Terminés"]];
@@ -7311,7 +7318,7 @@ function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Mat
    else body=`<p class="rsl big">${esc(res.line)}</p>`;
    if(L.board&&L.board.length)body+=`<div class="rsb">${L.board.slice(0,8).map(x=>`<div><span>${esc(x[0])}</span>${mark(x[1])}<b>${esc(x[1])}</b><em>${esc(x[2])}</em></div>`).join("")}</div>`;
    }
-  if(mine)h+=`<div class="pad" style="margin-top:12px"><div class="rcme"><div><small>Ton étape</small><b>+${mine.pts} pts</b></div><div><small>Ta place sur l'étape</small><b>${mine.pts?`${myPlace}<sup>${myPlace===1?"re":"e"}</sup> / ${R.board.length}`:"—"}</b></div>${mv[me]?`<div><small>Classement de la partie</small><b>${mv[me].rank}<sup>${mv[me].rank===1?"er":"e"}</sup> ${arrow(mv[me].mv)}</b></div>`:""}</div></div>`;
+  h+=rlogFold(p,r.key);if(mine)h+=`<div class="pad" style="margin-top:12px"><div class="rcme"><div><small>Ton étape</small><b>+${mine.pts} pts</b></div><div><small>Ta place sur l'étape</small><b>${mine.pts?`${myPlace}<sup>${myPlace===1?"re":"e"}</sup> / ${R.board.length}`:"—"}</b></div>${mv[me]?`<div><small>Classement de la partie</small><b>${mv[me].rank}<sup>${mv[me].rank===1?"er":"e"}</sup> ${arrow(mv[me].mv)}</b></div>`:""}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Les points de l'étape</h3><div class="card" style="padding:4px 14px">${R.board.map((x,i)=>`<div class="br${x.pl.id===me?" me":""}">${x.pts>0&&ranks[i]<=3?medalIcon(ranks[i],34,sp.id):`<span class="rk">${x.pts?ranks[i]:"–"}</span>`}<span class="nm">${esc(x.pl.id===me?"Toi":x.pl.name)}<small>${mv[x.pl.id]?`Partie : ${mv[x.pl.id].tot} pts · ${mv[x.pl.id].rank}${mv[x.pl.id].rank===1?"er":"e"} `+arrow(mv[x.pl.id].mv):""}</small></span><span class="pt" style="color:${x.pts?"var(--lime)":"var(--muted)"}">+${x.pts}<small>pts</small></span></div>`).join("")}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Question par question</h3>${R.qs.map(q=>`<div class="card rcq"><div class="rcqh"><b>${esc(q.label)}</b><span>${q.w?q.pts+" pts × cote":q.pts+" pts"}</span></div><div class="rcqa">${q.truth==null?"Pas encore relevé":`Bonne réponse : <b>${esc(Array.isArray(q.truth)?q.truth.join(", "):tnL(q.row,q.bid,q.truth))}</b>`}</div>
     ${q.picks.map(x=>{const has=x.v!=null&&x.v!=="";return`<div class="rcp${x.won?" ok":""}${x.pl.id===me?" me":""}"><span class="rcn">${esc(x.pl.id===me?"Toi":x.pl.name)}</span><span class="rcv">${has?(q.t==="choice"?mark(x.v):"")+esc(tnL(q.row,q.bid,x.v))+chgMark(p,x.pl.id,q.row.key+"|"+q.bid):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${x.odd&&has?`<small class="rco">@${x.odd.toFixed(2)}</small> `:""}${q.truth==null||!has?"":x.won?`✓ +${x.won}${x.near?(q.t==="near"?' <small>(à ±2)</small>':' <small>(le + proche)</small>'):""}`:"✗ 0"}</span></div>`;}).join("")}</div>`).join("")}
@@ -7326,7 +7333,7 @@ function vBet(){
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
   /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
-  {const rb=reoBtnFor(p,r);if(rb)h+=`<div class="pad" style="margin-top:12px">${rb}</div>`;}
+  {const rb=reoBtnFor(p,r);if(rb)h+=`<div class="pad" style="margin-top:12px">${rb}</div>`;}h+=rlogFold(p,r.key);
   try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.id===me?"Toi":x.name,st:done?"in":"wait"};});
     h+=`<div class="pad" style="margin-top:12px"><div class="card ptacc whop">${bubRow(L,"ont joué ce match")}</div></div>`;}}catch(_){}
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
@@ -7461,14 +7468,15 @@ function vParty(){
     h+=`<div class="pad" style="margin-top:2px"><div class="ptabs rtabs">${[["party","La partie"],["bets","Les paris"],["players","Joueurs"]].map(([k,l])=>`<button type="button" data-act="rtab" data-t="${k}" aria-pressed="${rt===k}">${l}</button>`).join("")}</div>
       <div class="pstate ${isClosed(p)?"end":started?"live":"pre"}" style="margin:8px 2px 0">${isClosed(p)?"Partie terminée":started?"Partie en cours":"Pas encore commencée"}</div></div>`;
     if(rt==="party"){
-    if(own){const D0=S.pset&&S.pset.id===p.id?S.pset:{id:p.id,name:p.name,amount:+p.amount||0,split:(p.split||[]).join("-")||"100"};S.pset=D0;const lk=started,SPL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"]].filter(([k])=>splitOk(k,+p.people||rawPlayers(p).length)),AM=[...new Set([0,5,10,20,50,100,+p.amount||0])].sort((x,y)=>x-y);
+    if(own){const D0=S.pset&&S.pset.id===p.id?S.pset:{id:p.id,name:p.name,amount:+p.amount||0,split:(p.split||[]).join("-")||"100"};S.pset=D0;const lk=potLocked(p),SPL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"]].filter(([k])=>splitOk(k,+p.people||rawPlayers(p).length)),AM=[...new Set([0,5,10,20,50,100,+p.amount||0])].sort((x,y)=>x-y);
       const dirty=D0.name.trim()!==p.name||D0.amount!==(+p.amount||0)||D0.split!==((p.split||[]).join("-")||"100");
       h+=`<div class="pad" style="margin-top:12px"><div class="card psetc"><div class="fhead"><b>Réglages de la partie</b></div>
         <div class="lab">Nom de la partie</div><input class="inp" data-pset="name" maxlength="70" value="${esc(D0.name)}" placeholder="Nom de la partie">
+        ${lk?(()=>{const t=potLockAt(p),am=+p.amount||0,n=effPeople(p),sp=(p.split||[]).join("-")||"100",sl=(SPL.find(x=>x[0]===sp)||[0,sp.replace(/-/g," / ")])[1];let w="";try{if(t>1)w=new Date(t).toLocaleString("fr-BE",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}catch(_){}
+          return`<div class="potlock"><b>🔒 ${am?`Mise ${am} cr. × ${n} joueur${n>1?"s":""} = ${(am*n).toLocaleString("fr-BE")} cr. · ${esc(sl)}`:"Partie sans mise"}</b><small>Verrouillé${w?" depuis le début du 1er match ("+esc(w)+")":""} : plus personne ne peut changer la mise ni la répartition, organisateur compris.</small></div>`;})():`
         <div class="lab" style="margin-top:14px">Mise par joueur (crédits)</div><div class="seg pset-am">${AM.map(v=>`<button type="button" class="opt" data-act="psetAmt" data-v="${v}" aria-pressed="${D0.amount===v}">${v?v:"Sans"}</button>`).join("")}</div>
         ${D0.amount?`<div class="lab" style="margin-top:14px">Répartition de la cagnotte</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">${SPL.map(([k,l])=>`<button type="button" class="opt" data-act="psetSplit" data-v="${k}" aria-pressed="${D0.split===k}">${l}</button>`).join("")}</div>
-        <div class="pl2" style="margin-top:10px"><span>Cagnotte · ${D0.amount} cr. × ${p.people} joueurs</span><b>${(D0.amount*p.people).toLocaleString("fr-BE")} cr.</b></div>`:""}
-        ${lk?`<p style="font-size:12px;margin:8px 0 0;color:#FFB547;font-weight:700">⚠️ La partie a déjà commencé : si tu changes la mise ou la répartition, préviens tes potes (le chat est juste en dessous).</p>`:""}
+        <div class="pl2" style="margin-top:10px"><span>Cagnotte · ${D0.amount} cr. × ${p.people} joueurs</span><b>${(D0.amount*p.people).toLocaleString("fr-BE")} cr.</b></div>`:""}`}
         <button type="button" class="btn block" style="margin-top:14px" data-act="psetSave">Enregistrer les réglages</button></div></div>`;}
     if(own){const pays=p.payments||[];
     h+=`<div class="pad" style="margin-top:18px;display:grid;gap:8px">${pays.length?`<div class="card"><div class="lab">Paiements de la partie</div>${pays.map(x=>`<div class="pl2"><span>${esc(x.what)}</span><b>${eur(x.amount)}</b></div>`).join("")}</div>`:""}
@@ -7954,9 +7962,10 @@ document.addEventListener("click",e=>{
       else{const w=v("winner");if(!w){toast("Écris le nom du vainqueur.");break;}d={status:"FT",winner:w,winners:[w],line:"Vainqueur : "+w,manual:true};}
       LIVE[lid]=Object.assign({},LIVE[lid],d);S.resEdit=null;const done=()=>{toast("Résultat enregistré · points recalculés");render();};
       if(db)db.collection("live").doc(lid).set(Object.assign({},LIVE[lid])).then(done,()=>{toast("Enregistrement impossible, réessaie.");render();});else done();break;}
-    case "psetAmt":case "psetSplit":{const ni=document.querySelector('[data-pset="name"]');if(S.pset&&ni)S.pset.name=ni.value;if(S.pset){if(a==="psetAmt")S.pset.amount=+t.dataset.v;else S.pset.split=t.dataset.v;}render();break;}
+    case "psetAmt":case "psetSplit":{{const pp=partyById(S.partyView);if(pp&&potLocked(pp)){toast("🔒 Mise et cagnotte verrouillées depuis le 1er match");break;}}const ni=document.querySelector('[data-pset="name"]');if(S.pset&&ni)S.pset.name=ni.value;if(S.pset){if(a==="psetAmt")S.pset.amount=+t.dataset.v;else S.pset.split=t.dataset.v;}render();break;}
     case "psetSave":{const p=partyById(S.partyView),d=S.pset;if(!p||!d)break;const ni=document.querySelector('[data-pset="name"]');const nm=((ni?ni.value:d.name)||"").trim();if(!nm){toast("Donne un nom à la partie.");break;}
-      p.name=nm;p.amount=d.amount;p.split=d.amount?d.split.split("-").map(Number):[];S.pset=null;savePartyDoc(p,"Réglages enregistrés ✓");break;}
+      p.name=nm;if(potLocked(p)){const ch=d.amount!==(+p.amount||0)||d.split!==((p.split||[]).join("-")||"100");S.pset=null;savePartyDoc(p,ch?"Nom enregistré · la mise et la cagnotte sont verrouillées depuis le 1er match":"Réglages enregistrés ✓");break;}
+      p.amount=d.amount;p.split=d.amount?d.split.split("-").map(Number):[];S.pset=null;savePartyDoc(p,"Réglages enregistrés ✓");break;}
     case "orgToggle":{const p=partyById(S.partyView);if(!p)break;S.orgMode=S.orgMode===p.id?null:p.id;if(!S.orgMode&&S.ptOpen==="pt-settings"){S.ptOpen=null;S.ptab=null;}toast(S.orgMode?"Mode organisateur activé":"Tu es repassé en mode joueur");render();break;}
     case "pmatch":{S.myDraft={};S.editKey=null;S.missHi=null;S.betQueue=[t.dataset.key];S.betIdx=0;go("bet");break;}
     case "betGo":{S.myDraft={};S.editKey=null;S.missHi=null;const p=partyById(S.partyView);S.betQueue=todoRows(p).map(r=>r.key);if(!S.betQueue.length)S.betQueue=rowsOfParty(p).filter(r=>r.it&&itemState(p,r)==="open").map(r=>r.key);S.betIdx=0;go("bet");break;}
@@ -8124,6 +8133,7 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
   /* pas encore ami : demande d'ami en même temps */
   {const mine=me();if(!(mine.friends||[]).some(f=>normS(f)===normS(n))){mine.friends=[...new Set((mine.friends||[]).concat([n]))];try{saveFriends();}catch(_){}if(mm&&mm.uid)notify(mm.uid,"friend",(mine.name||"Un pote")+" t'a ajouté à ses amis");}}
   const k=groupInviteOpen(g,n);toast(n+" ajouté au groupe"+(k?" et invité à "+k+" partie"+(k>1?"s":"")+" en cours":""));}S["mq_"+ctx]="";render();break;}
+    case "rlTog":{S.rlOpen=S.rlOpen||{};const k=t.dataset.k;S.rlOpen[k]=!S.rlOpen[k];const y=scrollY;render();scrollTo(0,y);break;}
     case "gTab":S.gTab=t.dataset.v;render();break;
     case "gArch":{const g=groupById(S.groupView);if(!g||!myGroup(g))break;const n=t.dataset.n;g.archived=[...new Set((g.archived||[]).concat([n]))];gSave(g);toast(n+" archivé");render();break;}
     case "gUnarch":{const g=groupById(S.groupView);if(!g||!myGroup(g))break;const n=t.dataset.n;g.archived=(g.archived||[]).filter(x=>normS(x)!==normS(n));gSave(g);toast(n+" est de retour dans le groupe");render();break;}
