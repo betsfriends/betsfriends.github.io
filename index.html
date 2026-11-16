@@ -3216,7 +3216,7 @@ body:has(#app .pfhero),body:has(#app .frwrap){background:radial-gradient(90% 40%
 
 /* ===== v36 : historique des réouvertures sur la carte de match ===== */
 .rlog{display:flex;flex-direction:column;gap:3px;margin:8px 0 0;padding:7px 10px;border-radius:10px;border:1px dashed rgba(255,181,71,.55);background:rgba(255,181,71,.08);text-align:left}
-.rlg{font-size:12px;font-weight:700;color:#FFD9A0;line-height:1.3}.rlg.close{color:#C9C3D6}
+.rlh{font-size:10.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#FFB547;margin-bottom:2px} .rlg.pkl{color:#FFE3B8}.rlg.pkl em{font-style:normal;color:#FFB3AC}.rlg.pkl small{display:block;font-size:11.5px;font-weight:600;color:#E9DFC6;margin:1px 0 2px 18px} .rlog .rlg.pkl{display:block!important;text-align:left} .rcv{flex-wrap:wrap;row-gap:2px} .rcv .chgm{flex:0 0 auto;margin:0} .chgm{display:inline-block;margin-left:0;font-style:normal;font-size:10px;font-weight:900;padding:1px 6px;border-radius:999px;background:rgba(255,120,80,.16);color:#FFB08A;border:1px solid rgba(255,140,90,.5);vertical-align:1px;white-space:nowrap} .rlg{font-size:12px;font-weight:700;color:#FFD9A0;line-height:1.3}.rlg.close{color:#C9C3D6}
 
 /* ===== v36 : bannière d'accueil en mode direct ===== */
 .hbn.hblive{border-color:rgba(255,90,80,.75)!important;box-shadow:0 0 18px rgba(255,60,50,.25)}
@@ -3509,7 +3509,7 @@ html{background:#0B0905}
 .rtwhen{font-size:15px;color:#fff;font-weight:800}
 .rttodo{font-size:12.5px;font-weight:900;padding:5px 12px;border-radius:999px;background:rgba(255,181,71,.16);color:#FFC46B;border:1px solid rgba(255,181,71,.45)}
 .rtok{font-size:12.5px;font-weight:900;padding:5px 12px;border-radius:999px;background:rgba(70,200,120,.14);color:#58D68D;border:1px solid rgba(88,214,141,.45)}
-.rtsort{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 12px}
+.rtile .rtl u.pv{color:#FFC46B!important;font-style:italic} .rtile .rtc.cur .rtlist>.rtok,.rtile .rtc.cur .rtlist>.rttodo,.rtile .rtc.cur .rtlist>.rtlock{padding:2px 10px!important} .rtok.reo{background:rgba(243,224,166,.14);color:#F3E0A6;border-color:rgba(243,224,166,.5)} .rtlock{font-size:12.5px;font-weight:900;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.07);color:#CFC6B4;border:1px solid rgba(255,255,255,.22)} .rtile .rtlock{padding:3px 10px;font-size:11.5px} .rtile .rttodo,.rtile .rtok,.rtile .rtlock{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis} .rtile .rtc.cur .rtlist>.rttodo,.rtile .rtc.cur .rtlist>.rtok,.rtile .rtc.cur .rtlist>.rtlock{align-self:center;margin-top:3px} .rtsort{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 12px}
 .rtsb{flex:1 1 auto;min-width:0;padding:8px 12px;border-radius:999px;border:1px solid rgba(243,224,166,.35);background:rgba(0,0,0,.3);color:#E9DFC6;font:inherit;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer}
 .rtsb.on{background:linear-gradient(135deg,#EED9AA 0%,#C7A04A 48%,#9C7432 100%);color:#2A0705;border-color:transparent}
 .rtcat{margin:6px 2px 8px}
@@ -3558,7 +3558,7 @@ html{background:#0B0905}
 @media (min-width:1024px) and (hover:hover) and (pointer:fine){html:not(.tch) #appver{bottom:8px}}
 /* v91 : toutes les tuiles à la même hauteur ; place en chiffre + petite photo de chacun */
 .rtile .lrtop>span{min-width:0}.rtile .lrtop b,.rtile .lrtop small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.rtile .lrbody{height:132px!important;display:flex!important;align-items:center;justify-content:center;overflow:hidden}
+.rtile .lrbody{height:140px!important;display:flex!important;align-items:center;justify-content:center;overflow:hidden}
 .rtile .rtc{width:100%}
 .rtile .rtl{grid-template-columns:16px 24px minmax(0,1fr) auto auto!important;gap:7px}
 .rtile .rtl i{width:auto!important;height:auto!important;background:none!important;font-family:var(--display);font-size:15px!important;font-weight:900;color:#C9D0DC;text-align:center}
@@ -3675,7 +3675,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v98";
+const APP_VER="v101";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -3889,12 +3889,15 @@ function lvSportOf(k){try{const c=FIND[String(k).split(/[-~]/)[0]];return c&&c.s
 function lvEndOk(k,v){if(!v||v.manual||!(v.status==="FT"||v.status==="END"))return true;const sp=lvSportOf(k),line=String(v.line||"");
   const tn=sp==="tennis"||(!sp&&/^\s*\d{1,2}-\d{1,2}(\(\d+\))?(\s+\d{1,2}-\d{1,2}(\(\d+\))?)*\s*$/.test(line)&&v.sa!=null&&v.sa+v.sb<=5);
   if(tn&&v.sa!=null&&v.sb!=null&&Math.max(+v.sa,+v.sb)<2&&!/abandon|forfait|retired|w\/o|walkover|ret\./i.test(line+" "+(v.note||"")))return false;
+  if(tn&&(v.sa==null||v.sb==null)&&!v.winner&&!(v.ans&&v.ans.win))return false;
   if(sp==="foot"){const m=parseInt(String(v.minute||""),10);if(m&&m<80)return false;}
   if(sp==="f1"){const t=line.match(/Tour\s*(\d+)\s*\/\s*(\d+)/i);if(t&&+t[1]<+t[2])return false;}
   return true;}
 /* v98 : écritures temporaires (« si ça finit comme ça ») = sans aucune règle ni heure de fin */
 let LV_RAW=false;
 function liveWrap(o){return new Proxy(o,{set(t,k,v){if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+  /* v101 : LIVE → NS/PST (source qui « perd » le match) : on garde le direct */
+  if(v&&typeof v==="object"&&!v.manual&&old&&old.status==="LIVE"&&(v.status==="NS"||v.status==="PST"||!v.status))return true;
   if(v&&typeof v==="object"&&v.status==="LIVE"&&!isEnd(old)&&FTAT[k]){delete FTAT[k];ftatSave();}
   if(v&&typeof v==="object"&&isEnd(v)&&!lvEndOk(k,v)){if(FTAT[k]){delete FTAT[k];ftatSave();}if(old&&old.status==="LIVE")return true;v=Object.assign({},v,{status:"LIVE"});delete v.ftAt;t[k]=v;return true;}
   if(v&&typeof v==="object"&&isEnd(old)&&!lvEndOk(k,old)&&v.status==="LIVE"){if(FTAT[k]){delete FTAT[k];ftatSave();}delete v.ftAt;t[k]=v;return true;}
@@ -4289,9 +4292,9 @@ function go(screen,extra){S.stack.push({screen:S.screen,sport:S.sport,comp:S.com
 function back(){const p=S.stack.pop(),from=S.screen,mf=S.morphFrom,he=mf&&from===mf.to&&(document.querySelector("#app .evhero")||document.querySelector("#app .hero.chichero")),hr=he&&he.getBoundingClientRect();let hH="";if(he){const c=he.cloneNode(true);c.style.background=getComputedStyle(he).background;c.style.margin="0";c.style.width="100%";c.style.height="100%";c.querySelectorAll("[data-act]").forEach(e=>e.removeAttribute("data-act"));hH=c.outerHTML;}S.morphFrom=null;let y=p&&p._y||0;if(p){delete p._y;Object.assign(S,p);}else S.screen="home";
   /* retour sur « Mes parties » depuis une partie : si on venait d'une carte, on revient sur son ticket ouvert, à la même hauteur, avec l'animation inverse ; sinon tickets refermés, en haut */
   const rev=!!(mf&&hr&&S.screen===mf.scr&&from===mf.to);
-  if(rev){S.pfOpen=mf.pf;y=mf.y;}else if(S.screen==="parties"&&from==="party"){S.pfOpen=S.backPf||null;y=0;}S.backPf=null;
+  if(rev){S.pfOpen=mf.pf;y=mf.y;}else if(S.screen==="parties"&&from==="party"){const rp=S.retPf;if(rp&&rp.pid===S.partyView){if(rp.pf)S.pfOpen=rp.pf;y=rp.y;}else{S.pfOpen=S.backPf||null;y=0;}}if(S.screen==="parties")S.retPf=null;S.backPf=null;
   document.body.classList.remove("morphing","morphin","mhold");if(rev)document.body.classList.add("backmorph");
-  render();window.scrollTo(0,y);if(y)requestAnimationFrame(()=>window.scrollTo(0,y));
+  render();if(y){const pd=document.getElementById("tkpad"),mx=document.documentElement.scrollHeight-innerHeight;if(y>mx){let pad=pd;if(!pad){pad=document.createElement("div");pad.id="tkpad";pad.setAttribute("aria-hidden","true");(document.getElementById("app")||document.body).appendChild(pad);}pad.style.height=(y-mx)+"px";}}window.scrollTo(0,y);if(y)requestAnimationFrame(()=>window.scrollTo(0,y));
   if(rev)requestAnimationFrame(()=>requestAnimationFrame(()=>heroBack(hr,mf.pid,hH)));}
 const selCount=()=>Object.keys(S.sel.items).length;
 
@@ -4635,8 +4638,8 @@ function ntfRefresh(){const nh=document.getElementById("ntfHost");if(nh&&S.ntf){
   const on=!(S.ntfSeen&&!unreadN());document.querySelectorAll(".ntfbell").forEach(b=>{const d=b.querySelector(".ntfdot");if(on&&!d)b.insertAdjacentHTML("afterbegin",'<i class="ntfdot" aria-hidden="true"></i>');if(!on&&d)d.remove();b.setAttribute("aria-label","Notifications"+(unreadN()?" : "+unreadN()+" nouvelle"+(unreadN()>1?"s":""):""));});}
 function ntfMarkRead(){const sv=LS("bf_invseen")||{};invNotifs().forEach(n=>sv[n.pid]=1);LS("bf_invseen",sv);Object.values(NOTIFS).forEach(n=>{if(n.read)return;n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});});}
 const agoTxt=iso=>{const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1?"À l'instant":m<60?"Il y a "+m+" min":m<1440?"Il y a "+Math.round(m/60)+" h":new Date(iso).toLocaleDateString("fr-BE",{day:"numeric",month:"short"});};
-function ntfItems(){return allNotifs().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":n.type==="pend"?"🏁":n.type==="pchg"?"📈":n.type==="joined"?"✅":n.type==="declined"?"✗":n.type==="deleted"?"🗑️":"🤝"}</span>`;
-  const act=(n.type==="pend"||n.type==="pchg")&&n.pid?`<button type="button" class="pfpl" data-act="ntfRes" data-id="${esc(n.pid)}" data-fin="${n.type==="pend"?1:0}">Voir le classement</button>`:(n.type==="party"||n.type==="joined")&&n.pid?`<button type="button" class="pfpl" data-act="ntfParty" data-id="${esc(n.pid)}">Voir la partie</button>`:n.type==="friend"&&n.fromName&&!(me().friends||[]).some(x=>normS(x)===normS(n.fromName))?`<button type="button" class="pfpl" data-act="ntfBack" data-n="${esc(n.fromName)}" data-uid="${esc(n.from||"")}">Ajouter en retour</button>`:"";
+function ntfItems(){return allNotifs().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":n.type==="pend"?"🏁":n.type==="pchg"?"📈":n.type==="reo"?"🔓":n.type==="joined"?"✅":n.type==="declined"?"✗":n.type==="deleted"?"🗑️":"🤝"}</span>`;
+  const act=(n.type==="pend"||n.type==="pchg")&&n.pid?`<button type="button" class="pfpl" data-act="ntfRes" data-id="${esc(n.pid)}" data-fin="${n.type==="pend"?1:0}">Voir le classement</button>`:(n.type==="party"||n.type==="joined"||n.type==="reo")&&n.pid?`<button type="button" class="pfpl" data-act="ntfParty" data-id="${esc(n.pid)}">Voir la partie</button>`:n.type==="friend"&&n.fromName&&!(me().friends||[]).some(x=>normS(x)===normS(n.fromName))?`<button type="button" class="pfpl" data-act="ntfBack" data-n="${esc(n.fromName)}" data-uid="${esc(n.from||"")}">Ajouter en retour</button>`:"";
   return`<li class="ntfi${n.read?"":" new"}">${av}<div><b>${esc(n.text||"")}</b><small>${agoTxt(n.at)}</small>${act?`<div class="ntfa">${act}</div>`:""}</div></li>`;}).join("");}
 /* v94 : bandeaux de l'accueil — glisser vers la gauche puis « Supprimer » (comme Messages sur iPhone) */
 function ntfDis(){try{return JSON.parse(localStorage.getItem("bf_ntfdis")||"{}")||{};}catch(_){return{};}}
@@ -5491,7 +5494,7 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
     .filter(([b])=>pls.some(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id];return v!=null&&v!=="";}));
   if(!qs.length)return`<p class="muted" style="margin:4px 2px">Aucun prono enregistré sur ce match.</p>`;
   return`<h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${pls.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;const ph=bubImg(personOf(p,pl));
-    return`<div class="rcp${pl.id===me?" me":""}"><span class="rcn"><i class="lrav">${ph||esc(String(pl.name||"?").charAt(0).toUpperCase())}</i>${esc(pl.id===me?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc((()=>{const sd0=sides(r.it),sh=shortSides(r.it),ix=sd0?sd0.indexOf(v):-1;return ix>=0&&sh?sh[ix]:tnL(r,b.id,v);})()):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}`;}
+    return`<div class="rcp${pl.id===me?" me":""}"><span class="rcn"><i class="lrav">${ph||esc(String(pl.name||"?").charAt(0).toUpperCase())}</i>${esc(pl.id===me?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc((()=>{const sd0=sides(r.it),sh=shortSides(r.it),ix=sd0?sd0.indexOf(v):-1;return ix>=0&&sh?sh[ix]:tnL(r,b.id,v);})())+chgMark(p,pl.id,r.key+"|"+b.id):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}`;}
 function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},k=m.k,sv=srvSide(it),short=shortSides(it)||sd,os=(()=>{try{return c.custom||!sd?null:oddsOf(sp,it,sd);}catch(_){return null;}})(),odd=n=>{if(!os||!os.length)return"";const o=os.find(x=>x[1]===n)||os.find(x=>lvSame(x[1],n));return o?`<small class="mhod">cote ${o[2]}</small>`:"";};
   S.lrSel=S.lrSel||{};let sel=m.rows.find(x=>x.p.id===S.lrSel[k])||m.rows[0];const p=sel.p,r=sel.r;
   const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${natOf(sd[k2])&&!CLUB[sd[k2]]&&!NATION[sd[k2]]?`<span class="mhfi">${FLAG[natOf(sd[k2])]||""}</span>`:""}${esc(short[k2])}${sv===k2?SRV_BALL:""}</b>${odd(sd[k2])}</div>`;
@@ -6077,6 +6080,15 @@ function rtPend(p,k,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,k,D
   /* v87 : le groupe n'est plus répété (il est dans le pied) ; l'événement en grand sur toute la largeur */
   const center=`<div class="rtc rtpend">${u?`<span class="rtu u-${u[1]}" title="Échéance de ton prochain prono">${u[0]}</span>`:""}<b class="rtev">${esc(sub||c.name)}</b><span class="rtside">${st?`<span class="rtst cur">En cours</span>`:""}${r?`<span class="rtplace">${r.rank}${r.rank>1?"e":"er"} sur ${r.n||nPl}${fin?"":" — provisoire"}</span>`:""}</span></div>`;
   return rtileWrap(p,c,sp,"",center);}
+/* v99 : statut de MES pronos, identique sur toutes les tuiles (À venir, En cours, En direct) */
+function myPronoSt(p){try{if(p.free||isClosed(p))return"";const rows=rowsOfParty(p).filter(r=>r.it&&!isDone(r.it));if(!rows.length)return"";
+  const nw=+NOW,td=new Date(nw).toDateString(),fm=t=>{const d=new Date(t),hm=d.toLocaleTimeString("fr-BE",{hour:"2-digit",minute:"2-digit"});return d.toDateString()===td?"à "+hm:"au "+d.toLocaleDateString("fr-BE",{weekday:"short",day:"numeric"})+", "+hm;};
+  const todo=todoRows(p),op=rows.filter(r=>itemState(p,r)==="open"),reo=op.filter(r=>+r.it.date<=nw);
+  if(todo.length){const fut=todo.map(r=>+r.it.date).filter(t=>t>nw),n=todo.length;return`<span class="rttodo">✏️ ${n} prono${n>1?"s":""} à faire${fut.length&&!reo.length?` · jusqu'${fm(Math.min(...fut)).replace(/^à /,"à ").replace(/^au /,"au ")}`:""}</span>`;}
+  if(reo.length){const o=ownerNm(p.owner);return`<span class="rtok reo">🔓 Rouvert${o?" par "+esc(o):""} · tu peux modifier</span>`;}
+  if(op.length)return`<span class="rtok">✓ Pronos faits · modifiables jusqu'${fm(Math.min(...op.map(r=>+r.it.date)))}</span>`;
+  const miss=rows.some(r=>!hasSaved(p,r.key));
+  return`<span class="rtlock">🔒 ${miss?"Pas de prono · paris fermés":"Pronos verrouillés · match en cours"}</span>`;}catch(_){return"";}}
 function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done",D);
   const sp=c.sport.id,rows=rowsOfParty(p).filter(r=>r.it),one=rows.length===1?rows[0].it:null,fin=isClosed(p);
   const sub=one?(one.label||""):String(tileTitle(p.name)).replace(new RegExp("^"+c.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*·\\s*"),"");
@@ -6085,18 +6097,18 @@ function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done"
   const meI=R.findIndex(x=>x.id===me||x.name==="Toi"),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
   let PL=[];try{PL=playersOf(p);}catch(_){}
   const face=x=>{const pl=PL.find(y=>y.id===x.id)||{id:x.id,name:x.name};let im="";try{im=bubImg(personOf(p,pl));}catch(_){}return`<span class="rtfc" style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(nm(x)||"?").charAt(0).toUpperCase())}</span>`;};
-  const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i>${face(x)}<b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?"up":""}">${cr>0?"+"+cr:"0"} cr.</u>`:""}</span>`;};
+  const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i>${face(x)}<b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?(fin?"up":"up pv"):""}">${cr>0?(fin?"+":"≈ +")+cr:"0"} cr.</u>`:""}</span>`;};
   let list=(meI>2?[0,1,meI]:[0,1,2]).filter(i=>i<R.length).map(line).join("");
   const att=rows.filter(r=>{try{return!isDone(r.it)&&+r.it.date+3*3600e3<+NOW;}catch(_){return false;}}).length;
   const started=(sc&&sc.done>0)||rows.some(r=>+r.it.date<=+NOW),onAir=!fin&&rows.some(r=>{try{return inPlay(r.it);}catch(_){return false;}});
   if(!started){const t0=rows.length?Math.min(...rows.map(r=>+r.it.date)):0,todo=(()=>{try{return D.todoN(p);}catch(_){return 0;}})();
     const when=t0?new Date(t0).toLocaleString("fr-BE",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
     const plN=(()=>{try{return playersOf(p).filter(x=>!x.fake).length;}catch(_){return 0;}})();
-    return rtileWrap(p,c,sp,sub,`<div class="rtc cur"><div class="rtlist rtsoon"><span class="rtst soon">À venir</span>${when?`<b class="rtwhen">1er match · ${esc(when)}</b>`:""}<small class="rtprov">${rows.length} ${sp==="f1"?"session":sp==="golf"?"sélection":sp==="velo"?"étape":"match"}${rows.length>1?"s":""} · ${plN} joueur${plN>1?"s":""}${hasPot?` · mise ${p.amount} cr.`:""}</small>${todo?`<span class="rttodo">✏️ ${todo} prono${todo>1?"s":""} à faire</span>`:`<span class="rtok">✓ Tes pronos sont faits</span>`}</div></div>`);}
-  const head=fin?`<span class="rtst fin">Terminée</span>`:onAir?`<span class="rtst live">● En direct · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""}</span>`:`<span class="rtst cur">En cours · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""}${att?` · ${att} résultat${att>1?"s":""} attendu${att>1?"s":""}`:""}</span>`;
+    return rtileWrap(p,c,sp,sub,`<div class="rtc cur"><div class="rtlist rtsoon"><span class="rtst soon">À venir</span>${when?`<b class="rtwhen">1er match · ${esc(when)}</b>`:""}<small class="rtprov">${rows.length} ${sp==="f1"?"session":sp==="golf"?"sélection":sp==="velo"?"étape":"match"}${rows.length>1?"s":""} · ${plN} joueur${plN>1?"s":""}${hasPot?` · mise ${p.amount} cr.`:""}</small>${myPronoSt(p)}</div></div>`);}
+  const head=fin?`<span class="rtst fin">Terminée</span>`:onAir?`<span class="rtst live">● En direct · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""} · provisoire</span>`:`<span class="rtst cur">En cours · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""} · provisoire${att?` · ${att} résultat${att>1?"s":""} attendu${att>1?"s":""}`:""}</span>`;
   const myRk=meI>=0?tieRank(R,meI):null;
   const center=fin?`<div class="rtc fin">${myRk?`<div class="rtme2"><b>${myRk}<sup>${myRk>1?"e":"er"}</sup></b><small>sur ${R.length}</small></div>`:""}<div class="rtlist">${head}${list}</div></div>`
-    :`<div class="rtc cur"><div class="rtlist">${head}<small class="rtprov">Classement provisoire${hasPot?" · crédits si ça tient":""}</small>${list}</div></div>`;
+    :`<div class="rtc cur"><div class="rtlist">${head}${list}${myPronoSt(p)||`<small class="rtprov">Classement provisoire${hasPot?" · crédits si ça tient":""}</small>`}</div></div>`;
   return rtileWrap(p,c,sp,sub,center);}
 function rtileWrap(p,c,sp,sub,center){const deco="";
   const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
@@ -6115,7 +6127,7 @@ function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK
 /* ===================================================================== v36 : TICKET « LIVE » (Mes parties) — rouge, coupon déchiré
    Visible uniquement quand un match d'une de mes parties est en direct. Lien direct vers la fiche du pari. */
 /* v51 : un match est « en direct » si la source le dit, OU si son heure de début est passée sans résultat (source muette, ex. ATP Finals sur ESPN) — pendant la durée normale du match */
-function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END"||st==="PST")return false;const t=+new Date(it.date),now=+NOW;return t<=now&&now<t+(it.dur||3)*3600e3;}
+function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END")return false;if(st==="PST"){const L=LIVE[it.lid]||{};if(L.sa==null&&!L.line)return false;}const t=+new Date(it.date),now=+NOW;return t<=now&&now<t+(it.dur||3)*3600e3;}
 const GRACE=15*60e3;
 function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;if(!lvEndOk(it.lid,LIVE[it.lid]))return false;if(+NOW>+new Date(it.date)+6*3600e3)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
 function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it)||inGrace(it));}
@@ -6675,7 +6687,7 @@ function plStatus(p,pl){if(!pl)return"wait";if(pl.id===p.owner||p.test||p.demo||
 function myStatus(p){const m=meP(p);return m?plStatus(p,m):"in";}
 const effPeople=p=>{const n=+p.people||rawPlayers(p).length;return Math.max(1,n-rawPlayers(p).filter(x=>plStatus(p,x)==="out").length);};
 async function invAnswer(p,st){const m=meP(p);if(!m)return;const ref=db?db.doc("partypicks/"+p.id+"__"+m.id):null;const cur=(PP[p.id]||{})[m.id]||{};
-  const doc={pid:p.id,player:m.id,uid:S.uid||null,email:S.email||null,picks:cur.picks||{},st,at:new Date().toISOString()};(PP[p.id]=PP[p.id]||{})[m.id]=doc;MYCLAIMS[p.id]=m.id;
+  const doc={pid:p.id,player:m.id,uid:S.uid||null,email:S.email||null,picks:cur.picks||{},st,at:new Date().toISOString(),chg:cur.chg||[]};(PP[p.id]=PP[p.id]||{})[m.id]=doc;MYCLAIMS[p.id]=m.id;
   try{if(ref)await ref.set(JSON.parse(JSON.stringify(doc)));}catch(_){}
   Object.values(NOTIFS).forEach(n=>{if(n.pid===p.id&&!n.read){n.read=true;NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});}});const sv=LS("bf_invseen")||{};sv[p.id]=1;LS("bf_invseen",sv);
   if(p.owner)notify(p.owner,st==="in"?"joined":"declined",(myLabel()||"Ton pote")+(st==="in"?" a accepté":" a refusé")+" la partie « "+p.name+" »",{pid:p.id});
@@ -6690,11 +6702,11 @@ function syncEmails(p){if(!p.players)return;const pp=PP[p.id]||{};
 function ensureJoined(p){if(!db||!isMemberView(p)||JOINED[p.id])return;const me=meP(p);JOINED[p.id]=1;
   const ref=db.doc("partypicks/"+p.id+"__"+me.id);
   ref.get().then(s=>{if(s.exists)return;const doc={pid:p.id,player:me.id,uid:S.uid||null,email:S.email||null,picks:{},at:new Date().toISOString()};(PP[p.id]=PP[p.id]||{})[me.id]=doc;return ref.set(doc).then(()=>notify(p.owner,"joined",(myLabel()||me.name||"Un pote")+" a rejoint ta partie « "+p.name+" »",{pid:p.id}));}).catch(()=>{JOINED[p.id]=0;});}
-function writeMyPicks(p,mine,msg){const me=myId(p);
-  if(isMemberView(p)){const doc={pid:p.id,player:me,uid:S.uid||null,email:S.email||null,picks:mine,at:new Date().toISOString()};(PP[p.id]=PP[p.id]||{})[me]=doc;
+function writeMyPicks(p,mine,msg,ce){const me=myId(p);
+  if(isMemberView(p)){const o=(PP[p.id]||{})[me]||{},doc={pid:p.id,player:me,uid:S.uid||null,email:S.email||null,picks:mine,at:new Date().toISOString(),chg:((o.chg||[]).concat(ce?[ce]:[])).slice(-200)};if(o.st)doc.st=o.st;(PP[p.id]=PP[p.id]||{})[me]=doc;
     if(db)db.doc("partypicks/"+p.id+"__"+me).set(doc).catch(e=>toast(e&&e.code==="invalid_argument"?"Pronos non enregistrés : demande à l'organisateur de te donner le droit de modifier l'appli (menu Partager).":"Enregistrement impossible, réessaie."));
     if(msg)toast(msg);return;}
-  p.picks=Object.assign({},p.picks,{[me]:mine});ROWS_MEMO.delete&&ROWS_MEMO.delete(p);const doc=Object.assign({},p);delete doc.id;if(db&&!p.demo)db.doc("parties/"+p.id).set(doc).catch(()=>toast("Enregistrement impossible, réessaie."));if(msg)toast(msg);}
+  p.picks=Object.assign({},p.picks,{[me]:mine});if(ce)p.chg=(p.chg||[]).concat([ce]).slice(-300);ROWS_MEMO.delete&&ROWS_MEMO.delete(p);const doc=Object.assign({},p);delete doc.id;if(db&&!p.demo)db.doc("parties/"+p.id).set(doc).catch(()=>toast("Enregistrement impossible, réessaie."));if(msg)toast(msg);}
 /* invitations par e-mail (mailto) */
 function partyWhat(p){if(p.free)return(p.freeTitle||"pari libre")+" · "+(p.items||[]).length+" question"+((p.items||[]).length>1?"s":"");const c=FIND[p.comp];if(!c)return"";
   if(p.full)return c.name+" · la compétition entière";const rows=rowsOfParty(p).filter(r=>r.it),t=rows.slice(0,6).map(r=>r.title).join(", ");return c.name+" · "+t+(rows.length>6?" et "+(rows.length-6)+" autre"+(rows.length>7?"s":""):"");}
@@ -6718,12 +6730,31 @@ function addPlayerPrice(p){const free=p.people-playersOf(p).length;if(free>0)ret
    et l'état du match à ce moment-là. Tous les joueurs la voient sur la carte du match. */
 /* v46 : bouton « Rouvrir les paris » pour l'organisateur (carte du match, page du match, salon des lives) */
 function reopenBtn(p,r){const paid=false;return`<button type="button" class="reobtn" data-act="reopenQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}"><span class="reoi">🔓</span><span><b>Rouvrir les paris</b><small>Un pote a oublié ? Tout le monde verra la réouverture${paid?" · "+eur(LATE.reopen):""}</small></span></button>`;}
+function reoCloseNtf(p,r){try{const sc=r&&r.it?lvSnap(r.it):"",tx=`${myLabel()||""} a refermé les paris de ${r?r.title:"un match"}${sc?" ("+sc+")":""} · « ${p.name} »`;[...new Set(rawPlayers(p).map(x=>x.uid).filter(Boolean))].forEach(u=>notify(u,"reo",tx,{pid:p.id}));}catch(_){}}
 function rlogAdd(p,k,r,act){const it=r&&r.it,L=it&&it.live?(LIVE[it.lid]||{}):{},sd=it?sides(it):null;
   const sc=L.status==="LIVE"&&L.sa!=null?(L.sa+"-"+L.sb):"";const e={k,act,at:new Date().toISOString(),by:myLabel()||"L'organisateur",t:r?r.title:"",st:it&&+it.date<=+NOW?(L.status==="LIVE"?"live":"after"):"before",sc,min:L.minute||""};
   p.rlog=(p.rlog||[]).concat([e]).slice(-200);}
-function rlogHTML(p,k){const L=(p.rlog||[]).filter(e=>e.k===k);if(!L.length)return"";
+/* v100 : ANTI-TRICHE — tout prono posé ou changé après le coup d'envoi (paris rouverts) est inscrit :
+   qui, quel pari, ancienne → nouvelle valeur, heure, score du match à ce moment. Organisateur : p.chg ; joueurs : leur doc partypicks (chg). */
+function lvSnap(it){const L=it&&it.live?(LIVE[it.lid]||{}):{};if(L.status!=="LIVE")return"";const ln=String(L.line||"").replace(/\s*·\s*en cours/,"").trim();
+  return(ln||(L.sa!=null?L.sa+"-"+L.sb:""))+(L.minute?" · "+L.minute+(/'|′/.test(String(L.minute))?"":"'"):"");}
+function pkChg(p,pre,oldM,newM){try{const r=rowsOfParty(p).find(x=>x.key===pre);if(!r||!r.it||+r.it.date>+NOW)return null;
+  const keys=[...new Set(Object.keys(oldM||{}).concat(Object.keys(newM||{})))].filter(k=>dkeyMatch(pre,k));
+  const ch=[];keys.forEach(k=>{const a=(oldM||{})[k],b=(newM||{})[k];if(JSON.stringify(a==null?null:a)===JSON.stringify(b==null?null:b))return;const bid=k.split("|")[1],d=(BETS[r.cat]||[]).find(x=>x[0]===bid);
+    ch.push([bid,d?d[1]:bid,a==null||a===""?"":tnL(r,bid,a),b==null||b===""?"":tnL(r,bid,b)]);});
+  if(!ch.length)return null;const first=!keys.some(k=>{const a=(oldM||{})[k];return a!=null&&a!=="";});
+  return{k:pre,act:"pick",at:new Date().toISOString(),who:myId(p),by:(()=>{const x=rawPlayers(p).find(y=>y.id===myId(p));return x&&x.name&&!/^toi$/i.test(x.name)?x.name:(myLabel()||"");})(),first,ch,sc:lvSnap(r.it),t:r.title||""};}catch(_){return null;}}
+function chgAll(p){let L=(p.chg||[]).slice();const pp=PP[p.id]||{};Object.keys(pp).forEach(id=>{const d=pp[id];if(d&&Array.isArray(d.chg))L=L.concat(d.chg.filter(e=>e&&e.who===id));});return L;}
+function chgMark(p,pid,key){try{const[pre,bid]=String(key).split("|");return chgAll(p).some(e=>e.who===pid&&e.k===pre&&e.ch.some(c=>c[0]===bid))?`<i class="chgm" title="Posé ou changé pendant le match">⚠️ pendant le match</i>`:"";}catch(_){return"";}}
+function chgNotify(p,e){try{const nm=e.by||"Un joueur",txt=e.first?`${nm} a fait ses pronos pendant le match ${e.t}${e.sc?" ("+e.sc+")":""} · « ${p.name} »`:`${nm} a changé ${e.ch.length} prono${e.ch.length>1?"s":""} pendant le match ${e.t}${e.sc?" ("+e.sc+")":""} · « ${p.name} »`;
+  const uids=[...new Set(rawPlayers(p).map(x=>x.uid).concat([p.owner]).filter(Boolean))];uids.forEach(u=>notify(u,"reo",txt,{pid:p.id}));}catch(_){}}
+function rlogHTML(p,k){const L=(p.rlog||[]).filter(e=>e.k===k);if(!L.length&&!chgAll(p).some(e=>e.k===k))return"";
   const tm=iso=>{try{return new Date(iso).toLocaleString("fr-BE",{timeZone:"Europe/Brussels",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}catch(_){return"";}};
-  return`<span class="rlog" aria-label="Historique des réouvertures">${L.slice(-4).map(e=>`<span class="rlg ${e.act}">${e.act==="open"?"🔓 Rouvert":"🔒 Refermé"} par ${esc(e.by)} · ${esc(tm(e.at))}${e.st==="live"?` · match en cours${e.sc?" ("+esc(e.sc)+(e.min?", "+esc(e.min):"")+")":""}`:e.st==="after"?" · après le début":" · avant le début"}</span>`).join("")}${L.length>4?`<span class="rlg">+ ${L.length-4} plus ancien${L.length-4>1?"s":""}</span>`:""}</span>`;}
+  const A=L.concat(chgAll(p).filter(e=>e.k===k)).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
+  const pk=e=>{const pl=rawPlayers(p).find(x=>x.id===e.who),nm=esc((e.who===p.owner&&ownerNm(p.owner))||(pl&&pl.name&&!/^toi$/i.test(pl.name)&&(typeof aliasNm==="function"?aliasNm(pl.name):pl.name))||e.by||"Un joueur");const det=e.ch.map(c=>e.first||!c[2]?`<b>${esc(c[1])}</b> : ${esc(c[3]||"—")}`:`<b>${esc(c[1])}</b> : ${esc(c[2])} → ${esc(c[3]||"—")}`).join("<br>");
+    return`<span class="rlg pkl">✏️ ${esc(tm(e.at))} · ${nm} ${e.first?"a fait ses pronos":"a changé"}${e.sc?` <em>(score : ${esc(e.sc)})</em>`:""}<small>${det}</small></span>`;};
+  const one=e=>e.act==="pick"?pk(e):`<span class="rlg ${e.act}">${e.act==="open"?"🔓 Rouvert":"🔒 Refermé"} par ${esc(e.by)} · ${esc(tm(e.at))}${e.st==="live"?` · match en cours${e.sc?" ("+esc(e.sc)+(e.min?", "+esc(e.min):"")+")":""}`:e.st==="after"?" · après le début":" · avant le début"}</span>`;
+  return`<span class="rlog" aria-label="Historique des réouvertures"><span class="rlh">Historique de la réouverture</span>${A.map(one).join("")}</span>`;}
 function savePartyDoc(p,msg){if(!p.demo&&!isOwner(p)){toast("Seul l'organisateur peut modifier la partie.");return;}if(!p.demo)syncEmails(p);const doc=Object.assign({},p);delete doc.id;
   const done=()=>{if(msg)toast(msg);if(S.screen==="party"&&S.ptv&&S.ptv[p.id]==="settings"&&S.partyView===p.id){S.ptv[p.id]="games";S.orgMode=null;S.rtab=null;window.scrollTo(0,0);}render();};
   if(db&&!p.demo)db.doc("parties/"+p.id).set(doc).then(done,()=>toast("Enregistrement impossible, réessaie."));else done();}
@@ -6959,8 +6990,9 @@ function needKeys(p,pre){if(pre==="free")return(p.items||[]).map((q,i)=>"q"+i);c
 function commitPick(p,pre){nowTick();try{const r=rowsOfParty(p).find(x=>x.key===pre);if(r&&r.it&&itemState(p,r)!=="open"){discardDraft(pre);toast("Trop tard : le match a commencé, les paris sont fermés.");S.ptab="games";S.myDraft={};back();return false;}}catch(_){}const miss=needKeys(p,pre).filter(k=>{const v=myVal(p,k);return v==null||v===""||(Array.isArray(v)&&!v.some(x=>x))||(betTypeOf(p,k)==="multi"&&(!Array.isArray(v)||v.filter(Boolean).length<3));});
   if(miss.length){toast(miss.length===1?"Il te manque 1 prono avant de valider.":"Il te manque "+miss.length+" pronos avant de valider.");S.missHi=miss;render();const el=document.querySelector(".qcard.miss,.mb.miss");if(el)el.scrollIntoView({behavior:"smooth",block:"center"});return false;}
   const me=myId(p),d=S.myDraft||{},first=!hasSaved(p,pre);const mine=Object.assign({},picksOf(p)[me]);
-  Object.keys(d).forEach(k=>{if(dkeyMatch(pre,k)){if(d[k]==null)delete mine[k];else mine[k]=d[k];delete d[k];}});S.editKey=null;S.missHi=null;
-  writeMyPicks(p,mine,first?"Prono validé ✓":"Modification validée ✓");return true;}
+  const old0=Object.assign({},mine);Object.keys(d).forEach(k=>{if(dkeyMatch(pre,k)){if(d[k]==null)delete mine[k];else mine[k]=d[k];delete d[k];}});S.editKey=null;S.missHi=null;
+  const ce=pkChg(p,pre,old0,mine);
+  writeMyPicks(p,mine,first?"Prono validé ✓":"Modification validée ✓",ce);if(ce)chgNotify(p,ce);return true;}
 function discardDraft(pre){const d=S.myDraft||{};Object.keys(d).forEach(k=>{if(dkeyMatch(pre,k))delete d[k];});S.editKey=null;S.missHi=null;}
 function curBetKey(){const q=S.betQueue||[];return q[S.betIdx||0];}
 const HORIZON=3650*864e5; /* tous les matchs futurs sont ouverts aux pronostics */
@@ -7223,7 +7255,7 @@ function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Mat
   if(mine)h+=`<div class="pad" style="margin-top:12px"><div class="rcme"><div><small>Ton étape</small><b>+${mine.pts} pts</b></div><div><small>Ta place sur l'étape</small><b>${mine.pts?`${myPlace}<sup>${myPlace===1?"re":"e"}</sup> / ${R.board.length}`:"—"}</b></div>${mv[me]?`<div><small>Classement de la partie</small><b>${mv[me].rank}<sup>${mv[me].rank===1?"er":"e"}</sup> ${arrow(mv[me].mv)}</b></div>`:""}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Les points de l'étape</h3><div class="card" style="padding:4px 14px">${R.board.map((x,i)=>`<div class="br${x.pl.id===me?" me":""}">${x.pts>0&&ranks[i]<=3?medalIcon(ranks[i],34,sp.id):`<span class="rk">${x.pts?ranks[i]:"–"}</span>`}<span class="nm">${esc(x.pl.id===me?"Toi":x.pl.name)}<small>${mv[x.pl.id]?`Partie : ${mv[x.pl.id].tot} pts · ${mv[x.pl.id].rank}${mv[x.pl.id].rank===1?"er":"e"} `+arrow(mv[x.pl.id].mv):""}</small></span><span class="pt" style="color:${x.pts?"var(--lime)":"var(--muted)"}">+${x.pts}<small>pts</small></span></div>`).join("")}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Question par question</h3>${R.qs.map(q=>`<div class="card rcq"><div class="rcqh"><b>${esc(q.label)}</b><span>${q.w?q.pts+" pts × cote":q.pts+" pts"}</span></div><div class="rcqa">${q.truth==null?"Pas encore relevé":`Bonne réponse : <b>${esc(Array.isArray(q.truth)?q.truth.join(", "):tnL(q.row,q.bid,q.truth))}</b>`}</div>
-    ${q.picks.map(x=>{const has=x.v!=null&&x.v!=="";return`<div class="rcp${x.won?" ok":""}${x.pl.id===me?" me":""}"><span class="rcn">${esc(x.pl.id===me?"Toi":x.pl.name)}</span><span class="rcv">${has?(q.t==="choice"?mark(x.v):"")+esc(tnL(q.row,q.bid,x.v)):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${x.odd&&has?`<small class="rco">@${x.odd.toFixed(2)}</small> `:""}${q.truth==null||!has?"":x.won?`✓ +${x.won}${x.near?(q.t==="near"?' <small>(à ±2)</small>':' <small>(le + proche)</small>'):""}`:"✗ 0"}</span></div>`;}).join("")}</div>`).join("")}
+    ${q.picks.map(x=>{const has=x.v!=null&&x.v!=="";return`<div class="rcp${x.won?" ok":""}${x.pl.id===me?" me":""}"><span class="rcn">${esc(x.pl.id===me?"Toi":x.pl.name)}</span><span class="rcv">${has?(q.t==="choice"?mark(x.v):"")+esc(tnL(q.row,q.bid,x.v))+chgMark(p,x.pl.id,q.row.key+"|"+q.bid):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${x.odd&&has?`<small class="rco">@${x.odd.toFixed(2)}</small> `:""}${q.truth==null||!has?"":x.won?`✓ +${x.won}${x.near?(q.t==="near"?' <small>(à ±2)</small>':' <small>(le + proche)</small>'):""}`:"✗ 0"}</span></div>`;}).join("")}</div>`).join("")}
         <div style="margin-top:10px"><button type="button" class="btn block" data-act="back">Retour</button></div></div>`;
   return h;}
 function vBet(){
@@ -7243,7 +7275,7 @@ function vBet(){
   if(locked&&st==="done")h+=`<div class="pad"><div class="lockban" style="border-color:${st==="done"?"var(--line)":"#FFB547"}">${st==="done"?"🏁":"🔒"} <span><b>${st==="done"?"Match terminé":"Paris fermés"}</b> ${st==="done"?(res&&res.pending?"Le résultat arrive automatiquement · les points seront calculés tout seuls.":res?esc(res.line)+(gain!=null?` · tu marques <b style="color:var(--lime)">+${gain} pts</b>`:""):""):"Le match a commencé ou l'organisateur a fermé les paris. Tes pronos sont figés."}</span></div></div>`;
   if(locked&&st!=="done"){const pls=playersOf(p),pk=picksOf(p);const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text");
     if(onAir)h+=projLine(p,r);
-    const others=pls.filter(pl=>pl.id!==myId(p));if(others.length)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v)):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
+    const others=pls.filter(pl=>pl.id!==myId(p));if(others.length)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v))+chgMark(p,pl.id,r.key+"|"+b.id):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
   let qn=0;h+=`<div class="pad" style="margin-top:12px">${locked?`<h3 class="rch">Mes pronos</h3>`:""}<div class="qlist">${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
      if(locked&&t==="text"&&!has)return"";
      qn++;return`<section class="qcard${has?" has":""}${!has&&(S.missHi||[]).includes(r.key+"|"+b.id)?" miss":""}"><header class="qh"><span class="qn">${has&&!locked?"✓":qn}</span><span class="ql"><b>${esc(label)}</b>${has?`<small class="qodd">${(()=>{if(Array.isArray(mv)){const fo=myVal(p,r.key+"|"+b.id+"@odd");const l=mv.map(x=>{const o=fixedOdd(fo,x)||oddFor(c,r.it,"top10",x);return o?esc(x.split(" ").slice(-1)[0])+" "+ptsW(c,r.it,b,x,o)+" pts":"";}).filter(Boolean);return l.length?"Si T10 : "+l.join(", "):"";}const od=fixedOdd(myVal(p,r.key+"|"+b.id+"@odd"),mv)||oddFor(c,r.it,b.id,mv);return od?`Cote ${od.toFixed(2)} → <em>${ptsW(c,r.it,b,mv,od)} pts</em> si gagné`:"";})()}</small>`:`<small class="qto">À choisir</small>`}${truth!=null?`<small>Réponse : ${esc(Array.isArray(truth)?truth.join(", "):tnL(r,b.id,truth))} ${good?"✓":"✗"}</small>`:""}</span><span class="qp">${ODD_BETS.has(b.id)&&!c.custom?`${b.pts} pt${b.pts>1?"s":""} × cote`:`${b.pts} pt${b.pts>1?"s":""}`}</span></header>${betInput(p,r,b,t,label,ro)}</section>`;}).join("")}</div>
@@ -7829,16 +7861,16 @@ document.addEventListener("click",e=>{
     case "optDone":S.optEdit=null;render();break;
     case "ptab":S.ptab=t.dataset.t;if(S.ptab==="chat")chatSubscribe(partyById(S.partyView));render();if(S.ptab==="chat")chatScroll();break;
     case "liveRoom":S.lrOpen={};go("lives");break;
-    case "lockQuick":{const p=partyById(t.dataset.id);if(!p)break;S.partyView=p.id;p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});rlogAdd(p,t.dataset.key,rowsOfParty(p).find(x=>x.key===t.dataset.key),"close");savePartyDoc(p,"Paris refermés");break;}
+    case "lockQuick":{const p=partyById(t.dataset.id);if(!p)break;S.partyView=p.id;p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});{const r=rowsOfParty(p).find(x=>x.key===t.dataset.key);rlogAdd(p,t.dataset.key,r,"close");reoCloseNtf(p,r);}savePartyDoc(p,"Paris refermés");break;}
     case "lrPick":{S.lrSel=S.lrSel||{};S.lrSel[t.dataset.k]=t.dataset.p;render();break;}
     case "lrTog":{const k=t.dataset.k,A=liveMatches();S.lrOpen=S.lrOpen||{};S.lrOpen[k]=!lrIsOpen(A.length,k);render();if(S.lrOpen[k]){const el=document.getElementById("lr-"+k.replace(/[^\w-]/g,"_"));if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),60);}break;}
     case "chatOpen":{const p=partyById(t.dataset.id);if(!p)break;S.chatParty=p.id;S.partyView=p.id;chatSubscribe(p);go("chatroom");setTimeout(()=>{try{chatScroll();}catch(_){}},250);break;}
     case "gAcc":{const g=groupById(S.groupView);if(g)gAnswer(g,t.dataset.v);break;}
     case "chatSend":{const i=document.querySelector("[data-chat]");chatSend(i?i.value:S.chatDraft);break;}
     case "chatQuick":chatSend(t.dataset.v);break;
-    case "lockItem":{const p=partyById(S.partyView);if((p.state||{})[t.dataset.key]!=="open"){toast("Les paris se ferment tout seuls au coup d'envoi.");break;}p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});rlogAdd(p,t.dataset.key,rowsOfParty(p).find(x=>x.key===t.dataset.key),"close");savePartyDoc(p,"Paris fermés");break;}
+    case "lockItem":{const p=partyById(S.partyView);if((p.state||{})[t.dataset.key]!=="open"){toast("Les paris se ferment tout seuls au coup d'envoi.");break;}p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});{const r=rowsOfParty(p).find(x=>x.key===t.dataset.key);rlogAdd(p,t.dataset.key,r,"close");reoCloseNtf(p,r);}savePartyDoc(p,"Paris fermés");break;}
     case "reopenQuick":S.partyView=t.dataset.id;/* falls through */
-    case "reopenItem":{const p=partyById(S.partyView),k=t.dataset.key,r=rowsOfParty(p).find(x=>x.key===k);const apply=()=>{p.state=Object.assign({},p.state,{[k]:"open"});rlogAdd(p,k,r,"open");};
+    case "reopenItem":{const p=partyById(S.partyView),k=t.dataset.key,r=rowsOfParty(p).find(x=>x.key===k);const apply=()=>{p.state=Object.assign({},p.state,{[k]:"open"});rlogAdd(p,k,r,"open");try{const sc=r&&r.it?lvSnap(r.it):"",tx=`${myLabel()||""} a rouvert les paris de ${r?r.title:"un match"}${sc?" ("+sc+")":""} · « ${p.name} »`;[...new Set(rawPlayers(p).map(x=>x.uid).filter(Boolean))].forEach(u=>notify(u,"reo",tx,{pid:p.id}));}catch(_){}};
       /* v47 : la réouverture est toujours gratuite (on ne repaie jamais une partie) */
       apply();savePartyDoc(p,"Paris rouverts");break;}
     case "addPlayer":{const p=partyById(S.partyView),nm=(S.npName||"").trim(),em=p.demo?"":normEmail(S.npEmail);if(!nm)return toast("Écris le prénom du joueur.");if(rawPlayers(p).some(x=>x.name.toLowerCase()===nm.toLowerCase()))return toast("Ce prénom est déjà dans la partie.");
@@ -8151,7 +8183,9 @@ case "hmGx":{const H=hmS(),x=H.multi[+t.dataset.i];if(x&&x.k==="g"){x.ex=(x.ex||
     case "party":case "partyBet":S.fromGroup=S.screen==="group";S.partyView=t.dataset.id;chatSubscribe(partyById(t.dataset.id));ensureJoined(partyById(t.dataset.id)||{});S.mailSheet=null;S.emEdit=null;{/* ticket ouvert selon le chemin : depuis Historique → Classement ; depuis Pronos en attente / Paris pris (ou le crayon) → Matchs */
       const src=(t.closest(".pflip")||{}).dataset,sk=src&&src.k,pp0=partyById(t.dataset.id),fin0=a!=="partyBet"&&sk!=="pending"&&sk!=="ready"&&pp0&&(isClosed(pp0)||(()=>{try{return rowsOfParty(pp0).every(r=>!r.it||isDone(r.it));}catch(_){return false;}})());let tab=a==="partyBet"||sk==="pending"||sk==="ready"||sk==="done"?"games":null;if(fin0){tab="board";S.ptv=Object.assign({},S.ptv);}S.ptab=tab;S.ptOpen=tab==="games"?"pt-games":null;
       /* le ticket d'entrée choisit le filtre : à faire → En attente, Paris pris → Modifier mon prono, Résultats → Terminés */
-      S.kf=Object.assign({},S.kf,{[t.dataset.id]:"all"});}S.orgMode=null;if(S.ptv)delete S.ptv[t.dataset.id];S.myDraft={};S.mbOpen=null;S.pay=null;{const cd=t.closest(".pcard,.prow"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&cd.closest(".prowbox.open .pflip");S.morphFrom=bx&&S.screen==="parties"?{pid:t.dataset.id,pf:bx.dataset.k,y:window.scrollY,scr:"parties",to:"party"}:null;document.body.classList.remove("mcomp");const bgH=bg?bg.outerHTML:"";window._mSrc=cd?mBgOf(cd):null;go("party");if(r0)heroMorph(r0,bgH);}break;
+      S.kf=Object.assign({},S.kf,{[t.dataset.id]:"all"});
+      /* v99 : on retient le ticket ouvert (Pronos en attente, Prono fait…, Résultats, Toutes) et la hauteur, pour y revenir au retour */
+      {const fl0=t.closest(".pflip");S.retPf=S.screen==="parties"?{pid:t.dataset.id,pf:fl0?fl0.dataset.k:null,y:window.scrollY}:null;}}S.orgMode=null;if(S.ptv)delete S.ptv[t.dataset.id];S.myDraft={};S.mbOpen=null;S.pay=null;{const cd=t.closest(".pcard,.prow"),r0=cd&&cd.getBoundingClientRect(),bg=cd&&cd.querySelector(".pcbg"),bx=cd&&cd.closest(".prowbox.open .pflip");S.morphFrom=bx&&S.screen==="parties"?{pid:t.dataset.id,pf:bx.dataset.k,y:window.scrollY,scr:"parties",to:"party"}:null;document.body.classList.remove("mcomp");const bgH=bg?bg.outerHTML:"";window._mSrc=cd?mBgOf(cd):null;go("party");if(r0)heroMorph(r0,bgH);}break;
     case "invite":{const p=partyById(S.partyView);copyText(`Rejoins ma partie « ${p?p.name:"Bet's Friends"} » sur Bet's Friends : ${APP_LINK}\nConnecte-toi à Claude avec l'adresse e-mail que je t'ai inscrite, la partie s'affiche à l'accueil.`,"Lien d'invitation copié");break;}
     case "joinCode":{const i=document.querySelector("[data-jc]");const v=String((i&&i.value)||"").trim().toUpperCase();S.jcode=v;if(!v)return toast("Tape le code reçu dans l'invitation.");
       const f=(S.rawParties||[]).find(x=>!x.demo&&partyCode(x)===v);if(!f)return toast(S.rawParties?"Code introuvable. Vérifie-le dans l'e-mail.":"Connexion à la base impossible : connecte-toi à ton compte Claude puis recharge.");JC.add(v);LS("bf_codes",[...JC]);S.claim=f.id;render();break;}
