@@ -3675,7 +3675,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v97";
+const APP_VER="v98";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -3892,7 +3892,10 @@ function lvEndOk(k,v){if(!v||v.manual||!(v.status==="FT"||v.status==="END"))retu
   if(sp==="foot"){const m=parseInt(String(v.minute||""),10);if(m&&m<80)return false;}
   if(sp==="f1"){const t=line.match(/Tour\s*(\d+)\s*\/\s*(\d+)/i);if(t&&+t[1]<+t[2])return false;}
   return true;}
-function liveWrap(o){return new Proxy(o,{set(t,k,v){const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+/* v98 : écritures temporaires (« si ça finit comme ça ») = sans aucune règle ni heure de fin */
+let LV_RAW=false;
+function liveWrap(o){return new Proxy(o,{set(t,k,v){if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+  if(v&&typeof v==="object"&&v.status==="LIVE"&&!isEnd(old)&&FTAT[k]){delete FTAT[k];ftatSave();}
   if(v&&typeof v==="object"&&isEnd(v)&&!lvEndOk(k,v)){if(FTAT[k]){delete FTAT[k];ftatSave();}if(old&&old.status==="LIVE")return true;v=Object.assign({},v,{status:"LIVE"});delete v.ftAt;t[k]=v;return true;}
   if(v&&typeof v==="object"&&isEnd(old)&&!lvEndOk(k,old)&&v.status==="LIVE"){if(FTAT[k]){delete FTAT[k];ftatSave();}delete v.ftAt;t[k]=v;return true;}
   if(v&&typeof v==="object"&&isEnd(old)&&(v.status==="LIVE"||v.status==="NS")&&!v.manual)return true;
@@ -3957,7 +3960,7 @@ function provResult(it){const L=LIVE[it.lid];if(!L||["FT","END"].includes(L.stat
   try{if(L.sa!=null&&L.sb!=null&&sides(it)&&/en cours/.test(String(L.line||""))){const cur=tnSets(String(L.line).replace(/·.*$/,""),null,null),last=cur[cur.length-1];const fin=([a,b])=>(Math.max(a,b)>=6&&Math.abs(a-b)>=2)||(Math.max(a,b)===7&&Math.min(a,b)>=5);
     if(last&&!fin(last)&&last[0]!==last[1]){fx.sa=L.sa+(last[0]>last[1]?1:0);fx.sb=L.sb+(last[1]>last[0]?1:0);fx.line=cur.slice(0,-1).map(x=>x.join("-")).join(" ");}
     else if(L.sa===L.sb){return null;}}}catch(_){}
-  LIVE[it.lid]=Object.assign({},save,fx);try{r=liveResult(it);}catch(e){r=null;}finally{LIVE[it.lid]=save;}if(r)r.prov=true;
+  LV_RAW=true;try{LIVE[it.lid]=Object.assign({},save,fx);try{r=liveResult(it);}catch(e){r=null;}}finally{LIVE[it.lid]=save;LV_RAW=false;}if(r)r.prov=true;
   /* v38 : les sets déjà terminés comptent déjà (score du 1er / 2e set, vainqueur du 1er set) */
   try{const sd=sides(it);if(r&&r.ans&&sd&&L.sa!=null){const ds=tnDoneSets(it);if(ds[0]&&r.ans.set1==null){r.ans.set1=ds[0].join("-");r.ans.first=ds[0][0]>ds[0][1]?sd[0]:sd[1];}if(ds[1]&&r.ans.set2==null)r.ans.set2=ds[1].join("-");}}catch(_){}
   return r;}
