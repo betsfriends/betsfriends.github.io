@@ -3712,7 +3712,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v110";
+const APP_VER="v111";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6669,7 +6669,12 @@ function genPicks(p,players,seedBase){
 }
 /* v110 : heure de fin d'une partie (dernier coup de sifflet connu) ; l'onglet Organisateur reste 48 h après, pour corriger un résultat, puis disparaît */
 function partyEndAt(p){try{if(p.closedAt)return+new Date(p.closedAt);if(p.free)return 0;const L=rowsOfParty(p).filter(r=>r.it).map(r=>{const it=r.it,f=FTAT[it.lid]||((LIVE[it.lid]||{}).ftAt);return f?+new Date(f):+new Date(it.date)+(it.dur||3)*3600e3;});return L.length?Math.max(...L):0;}catch(_){return 0;}}
-function orgVisible(p){if(!isOwner(p))return false;if(!isClosed(p))return true;const e=partyEndAt(p);return!e||+NOW<e+48*3600e3;}
+function orgVisible(p){return isOwner(p)&&!isClosed(p);}
+/* v111 : « Corriger le résultat » — gros bouton dans le détail d'un match terminé, pour l'organisateur, jusqu'à 48 h après la fin de la partie */
+function fixOk(p,r){try{if(!isOwner(p)||p.free||!r||!r.it||!r.it.live||!isDone(r.it))return false;if(!isClosed(p))return true;const e=partyEndAt(p);return!e||+NOW<e+48*3600e3;}catch(_){return false;}}
+function fixBlock(p,r){if(!fixOk(p,r))return"";const it=r.it,L=LIVE[it.lid]||{};const e=partyEndAt(p);let w="";try{if(isClosed(p)&&e)w=new Date(e+48*3600e3).toLocaleString("fr-BE",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}catch(_){}
+  const ed=S.resEdit===r.key||S.resEdit===it.lid;
+  return`<div class="pad" style="margin-top:12px">${ed?`<div class="card" style="padding:12px 0 2px">${resEditor(it,L)}</div>`:`<button type="button" class="reobtn" data-act="resEdit" data-key="${esc(r.key)}"><span class="reoi">✏️</span><span><b>Corriger le résultat</b><small>Tout le monde verra la correction${w?" · possible jusqu'au "+esc(w):""}</small></span></button>`}</div>`;}
 function partyInviteOk(p){try{if(isClosed(p))return false;if(p.free)return true;return rowsOfParty(p).some(r=>r.it&&+r.it.date>+NOW);}catch(_){return false;}}
 function isClosed(p){if(p.closedAt)return true;if(p.free||!FIND[p.comp])return false;const c=FIND[p.comp],subs=subsOf(c),rows=rowsOfParty(p).filter(r=>r.it);
   const v=rows.length>0&&rows.every(r=>{if(!isDone(r.it))return false;const su=subs.find(x=>x.id===r.key.split("/")[0]);const res=resultOf(c,su,r.it);return res&&!res.pending;});return v;}
@@ -7322,7 +7327,7 @@ function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Mat
    else body=`<p class="rsl big">${esc(res.line)}</p>`;
    if(L.board&&L.board.length)body+=`<div class="rsb">${L.board.slice(0,8).map(x=>`<div><span>${esc(x[0])}</span>${mark(x[1])}<b>${esc(x[1])}</b><em>${esc(x[2])}</em></div>`).join("")}</div>`;
    }
-  h+=rlogFold(p,r.key);if(mine)h+=`<div class="pad" style="margin-top:12px"><div class="rcme"><div><small>Ton étape</small><b>+${mine.pts} pts</b></div><div><small>Ta place sur l'étape</small><b>${mine.pts?`${myPlace}<sup>${myPlace===1?"re":"e"}</sup> / ${R.board.length}`:"—"}</b></div>${mv[me]?`<div><small>Classement de la partie</small><b>${mv[me].rank}<sup>${mv[me].rank===1?"er":"e"}</sup> ${arrow(mv[me].mv)}</b></div>`:""}</div></div>`;
+  h+=fixBlock(p,r)+rlogFold(p,r.key);if(mine)h+=`<div class="pad" style="margin-top:12px"><div class="rcme"><div><small>Ton étape</small><b>+${mine.pts} pts</b></div><div><small>Ta place sur l'étape</small><b>${mine.pts?`${myPlace}<sup>${myPlace===1?"re":"e"}</sup> / ${R.board.length}`:"—"}</b></div>${mv[me]?`<div><small>Classement de la partie</small><b>${mv[me].rank}<sup>${mv[me].rank===1?"er":"e"}</sup> ${arrow(mv[me].mv)}</b></div>`:""}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Les points de l'étape</h3><div class="card" style="padding:4px 14px">${R.board.map((x,i)=>`<div class="br${x.pl.id===me?" me":""}">${x.pts>0&&ranks[i]<=3?medalIcon(ranks[i],34,sp.id):`<span class="rk">${x.pts?ranks[i]:"–"}</span>`}<span class="nm">${esc(x.pl.id===me?"Toi":x.pl.name)}<small>${mv[x.pl.id]?`Partie : ${mv[x.pl.id].tot} pts · ${mv[x.pl.id].rank}${mv[x.pl.id].rank===1?"er":"e"} `+arrow(mv[x.pl.id].mv):""}</small></span><span class="pt" style="color:${x.pts?"var(--lime)":"var(--muted)"}">+${x.pts}<small>pts</small></span></div>`).join("")}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Question par question</h3>${R.qs.map(q=>`<div class="card rcq"><div class="rcqh"><b>${esc(q.label)}</b><span>${q.w?q.pts+" pts × cote":q.pts+" pts"}</span></div><div class="rcqa">${q.truth==null?"Pas encore relevé":`Bonne réponse : <b>${esc(Array.isArray(q.truth)?q.truth.join(", "):tnL(q.row,q.bid,q.truth))}</b>`}</div>
     ${q.picks.map(x=>{const has=x.v!=null&&x.v!=="";return`<div class="rcp${x.won?" ok":""}${x.pl.id===me?" me":""}"><span class="rcn">${esc(x.pl.id===me?"Toi":x.pl.name)}</span><span class="rcv">${has?(q.t==="choice"?mark(x.v):"")+esc(tnL(q.row,q.bid,x.v))+chgMark(p,x.pl.id,q.row.key+"|"+q.bid):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${x.odd&&has?`<small class="rco">@${x.odd.toFixed(2)}</small> `:""}${q.truth==null||!has?"":x.won?`✓ +${x.won}${x.near?(q.t==="near"?' <small>(à ±2)</small>':' <small>(le + proche)</small>'):""}`:"✗ 0"}</span></div>`;}).join("")}</div>`).join("")}
