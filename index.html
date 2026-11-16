@@ -3590,6 +3590,17 @@ html{background:#0B0905}
 .gpropw .evsps{padding:0}
 .gboardall .br .rk2{flex:none;width:18px;text-align:center;font-family:var(--display);font-weight:900;font-size:17px;color:#C9D0DC}
 .gboardall .br .rk2.r1{color:#F3D98A}.gboardall .br .rk2.r2{color:#E3E7ED}.gboardall .br .rk2.r3{color:#E6B086}
+/* v94 : glisser pour supprimer */
+.swrow{position:relative;overflow:hidden;border-radius:18px}
+.swrow+.swrow{margin-top:inherit}
+.swdel{position:absolute;top:0;right:0;bottom:0;width:104px;border:0;border-radius:0 18px 18px 0;background:#E5352B;color:#fff;font:800 14px/1 inherit;cursor:pointer}
+.swin{position:relative;z-index:1;transition:transform .22s ease;touch-action:pan-y;will-change:transform}
+.swrow.open .swin{transform:translateX(-104px)}
+.swrow.drag .swin{transition:none}
+.swrow.gone{transition:opacity .2s,max-height .22s;opacity:0;max-height:0!important}
+.swin>.invrow{width:100%}
+/* v95 : toute la notification est cliquable (le texte ne capte plus le toucher) */
+.invrow{cursor:pointer;-webkit-tap-highlight-color:transparent}.invrow *{pointer-events:none}
 </style>
 </head>
 <body>
@@ -3664,8 +3675,15 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v92";
+const APP_VER="v95";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
+(()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
+  const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
+  document.addEventListener("touchstart",e=>{const r=e.target.closest&&e.target.closest(".swrow");if(!r||e.target.closest(".swdel")){if(!r)reset();return;}el=r;x0=e.touches[0].clientX;y0=e.touches[0].clientY;dx=0;mv=false;lock=null;},{passive:true});
+  document.addEventListener("touchmove",e=>{if(!el)return;const x=e.touches[0].clientX-x0,y=e.touches[0].clientY-y0;if(lock===null&&(Math.abs(x)>8||Math.abs(y)>8))lock=Math.abs(x)>Math.abs(y)?"x":"y";if(lock!=="x")return;mv=true;el.classList.add("drag");const base=el.classList.contains("open")?-W:0;dx=Math.max(-W-30,Math.min(0,base+x));el.querySelector(".swin").style.transform="translateX("+dx+"px)";},{passive:true});
+  document.addEventListener("touchend",()=>{if(!el)return;const r=el;el=null;r.classList.remove("drag");const s=r.querySelector(".swin");if(s)s.style.transform="";if(mv){r.dataset.sw="1";setTimeout(()=>{delete r.dataset.sw;},350);if(dx<-W/2){reset(r);r.classList.add("open");}else r.classList.remove("open");}},{passive:true});
+  document.addEventListener("click",e=>{const r=e.target.closest&&e.target.closest(".swrow");if(!r||e.target.closest(".swdel"))return;if(r.dataset.sw||r.classList.contains("open")){e.preventDefault();e.stopPropagation();r.classList.remove("open");}},true);
+})();
 const NOW = new Date();
 /* v69 : NOW suit l'heure réelle (avant, il restait figé à l'ouverture : une appli restée ouverte laissait parier après le coup d'envoi) */
 function nowTick(){const a=+NOW,b=Date.now();NOW.setTime(b);return[a,b];}
@@ -4607,10 +4625,13 @@ const agoTxt=iso=>{const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1
 function ntfItems(){return allNotifs().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,30).map(n=>{const av=n.fromPhoto?`<span class="uav" style="width:40px;height:40px"><img src="${n.fromPhoto}" alt=""></span>`:`<span class="ntfic" aria-hidden="true">${n.type==="party"?"🎟️":n.type==="group"?"👥":n.type==="pend"?"🏁":n.type==="pchg"?"📈":n.type==="joined"?"✅":n.type==="declined"?"✗":n.type==="deleted"?"🗑️":"🤝"}</span>`;
   const act=(n.type==="pend"||n.type==="pchg")&&n.pid?`<button type="button" class="pfpl" data-act="ntfRes" data-id="${esc(n.pid)}" data-fin="${n.type==="pend"?1:0}">Voir le classement</button>`:(n.type==="party"||n.type==="joined")&&n.pid?`<button type="button" class="pfpl" data-act="ntfParty" data-id="${esc(n.pid)}">Voir la partie</button>`:n.type==="friend"&&n.fromName&&!(me().friends||[]).some(x=>normS(x)===normS(n.fromName))?`<button type="button" class="pfpl" data-act="ntfBack" data-n="${esc(n.fromName)}" data-uid="${esc(n.from||"")}">Ajouter en retour</button>`:"";
   return`<li class="ntfi${n.read?"":" new"}">${av}<div><b>${esc(n.text||"")}</b><small>${agoTxt(n.at)}</small>${act?`<div class="ntfa">${act}</div>`:""}</div></li>`;}).join("");}
-function resBanner(){const seen=new Set();const L=allNotifs().filter(n=>(n.type==="pend"||n.type==="pchg")&&n.pid&&!n.read&&partyById(n.pid)).sort((a,b)=>String(b.at).localeCompare(String(a.at))).filter(n=>{if(seen.has(n.pid))return false;seen.add(n.pid);return true;});if(!L.length)return"";
-  return L.slice(0,3).map(n=>`<button type="button" class="invrow resrow" data-act="ntfRes" data-id="${esc(n.pid)}" data-fin="${n.type==="pend"?1:0}"><span class="invic" aria-hidden="true">${n.type==="pend"?"🏁":"📈"}</span><span class="invt"><b>${n.type==="pend"?"Partie terminée !":"Du changement !"}</b><small>${esc(n.text)}</small></span><span class="invgo">Voir</span></button>`).join("");}
-function invBanner(){const RB=resBanner();const seenP=new Set();const L=allNotifs().filter(n=>{if(n.type!=="party"||!n.pid||seenP.has(n.pid))return false;const p=partyById(n.pid);if(!p||myStatus(p)!=="wait")return false;seenP.add(n.pid);return true;});if(!L.length)return RB?`<div class="invban" role="status">${RB}</div>`:"";
-  return`<div class="invban" role="status">${RB}${L.slice(0,3).map(n=>`<button type="button" class="invrow" data-act="ntfParty" data-id="${esc(n.pid)}"><span class="invic" aria-hidden="true">🎟️</span><span class="invt"><b>Tu es invité !</b><small>${esc(n.text)}</small></span><span class="invgo">Voir</span></button>`).join("")}${L.length>3?`<button type="button" class="invmore" data-act="ntfOpen">+ ${L.length-3} autre${L.length-3>1?"s":""} invitation${L.length-3>1?"s":""}</button>`:""}</div>`;}
+/* v94 : bandeaux de l'accueil — glisser vers la gauche puis « Supprimer » (comme Messages sur iPhone) */
+function ntfDis(){try{return JSON.parse(localStorage.getItem("bf_ntfdis")||"{}")||{};}catch(_){return{};}}
+function swWrap(k,inner){return`<div class="swrow" data-swk="${esc(k)}"><button type="button" class="swdel" data-act="ntfDismiss" data-k="${esc(k)}">Supprimer</button><div class="swin">${inner}</div></div>`;}
+function resBanner(){const seen=new Set();const DS=ntfDis();const L=allNotifs().filter(n=>(n.type==="pend"||n.type==="pchg")&&n.pid&&!n.read&&!DS["res:"+n.pid]&&partyById(n.pid)).sort((a,b)=>String(b.at).localeCompare(String(a.at))).filter(n=>{if(seen.has(n.pid))return false;seen.add(n.pid);return true;});if(!L.length)return"";
+  return L.slice(0,3).map(n=>swWrap("res:"+n.pid,`<button type="button" class="invrow resrow" data-act="ntfRes" data-id="${esc(n.pid)}" data-fin="${n.type==="pend"?1:0}"><span class="invic" aria-hidden="true">${n.type==="pend"?"🏁":"📈"}</span><span class="invt"><b>${n.type==="pend"?"Partie terminée !":"Du changement !"}</b><small>${esc(n.text)}</small></span><span class="invgo">Voir</span></button>`)).join("");}
+function invBanner(){const RB=resBanner(),DS=ntfDis();const seenP=new Set();const L=allNotifs().filter(n=>{if(n.type!=="party"||!n.pid||seenP.has(n.pid)||DS["inv:"+n.pid])return false;const p=partyById(n.pid);if(!p||myStatus(p)!=="wait")return false;seenP.add(n.pid);return true;});if(!L.length)return RB?`<div class="invban" role="status">${RB}</div>`:"";
+  return`<div class="invban" role="status">${RB}${L.slice(0,3).map(n=>swWrap("inv:"+n.pid,`<button type="button" class="invrow" data-act="ntfParty" data-id="${esc(n.pid)}"><span class="invic" aria-hidden="true">🎟️</span><span class="invt"><b>Tu es invité !</b><small>${esc(n.text)}</small></span><span class="invgo">Voir</span></button>`)).join("")}${L.length>3?`<button type="button" class="invmore" data-act="ntfOpen">+ ${L.length-3} autre${L.length-3>1?"s":""} invitation${L.length-3>1?"s":""}</button>`:""}</div>`;}
 /* partout à l'écran, « Toi » devient mon vrai prénom (les données gardent « Toi » en interne) */
 /* v92 : nom de profil de l'organisateur (jamais « L'organisateur ») */
 function ownerNm(uid){if(!uid)return"";if(uid===S.uid)return myLabel()||"Toi";const m=MEMBERS.find(x=>x.uid===uid);return(typeof ORGN!=="undefined"&&ORGN[uid])||(m&&(m.short||m.name))||"";}
@@ -5417,9 +5438,9 @@ function saveGroup(g,msg){S.groups=(S.groups||[]).map(x=>x.id===g.id?g:x);if(db)
 /* ===================================================================== v37 : ONGLET CHAT
    Une page générale : toutes mes parties, la dernière réplique et les messages non lus ; on choisit une partie pour y chatter. */
 /* v40 : messages non lus de toutes mes parties → pastille rouge sur l'onglet « Chat » du menu du bas */
-function chatUnreadAll(){let n=0;const A=chArch();(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{chatSubscribe(p);const a=+A[p.id]||0;if(a){const me=myId(p),seen=Math.max(chatSeen(p.id),a);n+=chatMsgs(p).filter(x=>!x.sys&&!String(x.id||"").startsWith("seed")&&x.uid!==me&&chAt(x)>seen).length;}else n+=chatUnread(p);}catch(_){}});return n;}
+function chatUnreadAll(){let n=0;const A=chArch();(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{chatSubscribe(p);const a=+A[p.id]||0;if(a){const me=myId(p),seen=Math.max(chatSeen(p.id),a,chatSeenG());n+=chatMsgs(p).filter(x=>!x.sys&&!String(x.id||"").startsWith("seed")&&x.uid!==me&&chT(x)>seen).length;}else n+=chatUnread(p);}catch(_){}});return n;}
 /* v80 : ouvrir l'onglet Chat = tu as vu les derniers messages → la pastille du menu s'efface */
-function chatSeenAll(){(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{const m=chatMsgs(p);if(m.length)chatSeen(p.id,Math.max(chatSeen(p.id),Date.now(),...m.map(chAt)));}catch(_){}});try{navChatBadge();}catch(_){}}
+function chatSeenAll(){const t=Date.now();try{localStorage.setItem("bf_chat_all",String(t));}catch(_){}(S.parties||[]).forEach(p=>{if(!p||p.demo)return;try{chatSeen(p.id,Math.max(chatSeen(p.id),t));}catch(_){}});try{navChatBadge();}catch(_){}}
 function navChatBadge(){const b=document.querySelector('#tabs [data-tab="chats"]');if(!b)return;const n=chatUnreadAll();let i=b.querySelector(".tbdot");if(!n){if(i)i.remove();return;}if(!i){i=document.createElement("i");i.className="tbdot";b.appendChild(i);}i.textContent=n>9?"9+":String(n);}
 function vChats(){setTimeout(chatSeenAll,0);const L=(S.parties||[]).filter(p=>p&&!p.demo);L.forEach(p=>{try{chatSubscribe(p);}catch(_){}});
   const last=p=>{const m=chatMsgs(p).filter(x=>!x.sys);return m.length?m[m.length-1]:null;};
@@ -5678,7 +5699,10 @@ function findMembers(q,excl){q=normS(q).replace(/^@/,"");const fr=friendsSet(),e
     const hit=!q||normS(m.name).includes(q)||normS(m.pseudo).includes(q)||normS(m.short).includes(q);
     const isFr=fr.has(normS(m.short))||fr.has(normS(m.name))||fr.has(normS(m.pseudo));
     return hit;});}
-const memberByName=n=>{const k=normS(String(n||"").replace(/^@/,""));if(!k)return undefined;return MEMBERS.find(m=>normS(m.short)===k||normS(m.name)===k)||MEMBERS.find(m=>m.pseudo&&normS(m.pseudo)===k);};
+/* v93 : anciens noms d'une même personne → un seul profil (Sodakin, DaKi = Walter) */
+const NM_ALIAS={sodakin:"Walter",daki:"Walter"};
+function aliasNm(n){const k=normS(String(n||"").replace(/^@/,"").trim());return NM_ALIAS[k]||n;}
+const memberByName=n=>{n=aliasNm(n);const k=normS(String(n||"").replace(/^@/,""));if(!k)return undefined;return MEMBERS.find(m=>normS(m.short)===k||normS(m.name)===k)||MEMBERS.find(m=>m.pseudo&&normS(m.pseudo)===k);};
 const okPhoto=v=>typeof v==="string"&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v);
 const isMeName=n=>normS(n)==="toi";
 const avatar=(m,sz=36)=>{if(m&&isMeName(m.short||"")&&!m.photo)m=me();return`<span class="uav" style="width:${sz}px;height:${sz}px;background:${m&&m.color||"#4A5280"};font-size:${Math.round(sz*.42)}px">${m&&okPhoto(m.photo)?`<img src="${m.photo}" alt="">`:esc(((m&&(m.short||m.name))||"?").slice(0,1).toUpperCase())}</span>`;};
@@ -5724,7 +5748,8 @@ function vProfile(){
 function inviteBase(){try{return/claude\.ai|claudeusercontent|claude\.site/.test(location.host)?APP_LINK:location.origin+location.pathname;}catch(_){return APP_LINK;}}
 function inviteLink(){return inviteBase()+"#invite="+encodeURIComponent(me().pseudo||me().name||"");}
 /* mes amis : ceux que j'ai ajoutés, les joueurs de mes parties et les membres de mes groupes */
-function myFriends(){const by={};const add=(n,src,uid)=>{n=String(n||"").trim();if(!n||isMeName(n)||normS(n)===normS(me().name)||(me().pseudo&&normS(n.replace(/^@/,""))===normS(me().pseudo))||(uid&&uid===S.uid))return;/* v39 : on relie d'abord par le compte (uid) — le prénom affiché peut différer du nom d'inscription */const byU=uid&&uid!==S.uid?MEMBERS.find(m=>m.uid===uid):null;const mm=byU||memberByName(n);if(mm&&S.uid&&mm.uid===S.uid)return;const k=normS(mm?mm.short:n);if(byU&&by[k]&&!by[k].m)by[k].m=byU;const e=by[k]||(by[k]={name:mm?mm.short:n,full:mm?mm.name:n,m:mm,src:new Set(),parties:0});e.src.add(src);};
+function aliasClean(){if(window._aliasDone)return;const m=me();if(!m||!m.friends)return;const f=m.friends.map(aliasNm),u=[...new Set(f.map(x=>String(x)))];if(u.length!==m.friends.length||f.some((x,i)=>x!==m.friends[i])){m.friends=u;window._aliasDone=1;try{saveFriends();}catch(_){}}else window._aliasDone=1;}
+function myFriends(){try{aliasClean();}catch(_){}const by={};const add=(n,src,uid)=>{n=String(aliasNm(n)||"").trim();if(!n||isMeName(n)||normS(n)===normS(me().name)||(me().pseudo&&normS(n.replace(/^@/,""))===normS(me().pseudo))||(uid&&uid===S.uid))return;/* v39 : on relie d'abord par le compte (uid) — le prénom affiché peut différer du nom d'inscription */const byU=uid&&uid!==S.uid?MEMBERS.find(m=>m.uid===uid):null;const mm=byU||memberByName(n);if(mm&&S.uid&&mm.uid===S.uid)return;const k=normS(mm?mm.short:n);if(byU&&by[k]&&!by[k].m)by[k].m=byU;const e=by[k]||(by[k]={name:mm?mm.short:n,full:mm?mm.name:n,m:mm,src:new Set(),parties:0});e.src.add(src);};
   (me().friends||[]).forEach(n=>add(n,"ami"));try{realFriends().forEach(f=>{add(f.name,"partie",f.uid);const e=by[normS(((f.uid&&MEMBERS.find(m=>m.uid===f.uid))||memberByName(f.name)||{short:f.name}).short)];if(e)e.parties=Math.max(e.parties,f.parties.length);});}catch(_){}
   allGroups().forEach(g=>(g.members||[]).forEach(n=>{let u=null;try{u=isMeName(n)?null:gMemberUid(g,n);}catch(_){}add(n,"groupe",u);}));
   Object.values(by).forEach(e=>{if(e.m){try{e.parties=Math.max(e.parties,commonWith(e.m).length);}catch(_){}}});
@@ -6805,9 +6830,12 @@ function fillParty(p){try{registerCustom(p);}catch(e){}return p;}
 
 /* ===================================================================== CHAT PAR ÉVENT */
 const CHAT={},CHAT_SUBS={},CHAT_LOCAL={};
+/* v94 : ouvrir l'onglet Chat ou une conversation = tout est lu ; heure des messages jamais dans le futur */
+function chatSeenG(){try{return+(localStorage.getItem("bf_chat_all")||0);}catch(_){return 0;}}
+const chT=x=>Math.min(chAt(x),Date.now());
 function chatSeen(pid,v){try{const k="bf_chat_"+pid;if(v!=null)localStorage.setItem(k,String(v));return+(localStorage.getItem(k)||0);}catch(e){return v||0;}}
 function chatSubscribe(p){if(!p||p.demo||!db||CHAT_SUBS[p.id])return;CHAT_SUBS[p.id]=1;
-  try{db.collection("chats/"+p.id+"/msgs").onSnapshot(sn=>{CHAT[p.id]=sn.docs.map(d=>Object.assign({id:d.id},d.data()));
+  try{db.collection("chats/"+p.id+"/msgs").onSnapshot(sn=>{CHAT[p.id]=sn.docs.map(d=>Object.assign({id:d.id},d.data()));if(S.screen==="chats")chatSeenAll();else if(S.screen==="chatroom"&&(S.chatParty||S.partyView)===p.id)chatSeen(p.id,Date.now());
     /* v40 : pastille rouge sur l'onglet Chat + salon de chat rafraîchi */
     try{navChatBadge();}catch(_){}if((S.screen==="chats"||(S.screen==="chatroom"&&(S.chatParty||S.partyView)===p.id))&&!(document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.chat&&S.screen!=="chatroom")){const f=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.chat;const val=f?document.activeElement.value:null;render();if(S.screen==="chatroom"){try{chatScroll();}catch(_){}if(f){const i=document.querySelector("[data-chat]");if(i){i.focus();if(val!=null)i.value=val;}}}}
     if(S.screen==="party"&&S.partyView===p.id&&!document.querySelector(".prowbox.tkmove,.prowbox.closing")){const f=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.chat;render();chatScroll();if(f){const i=document.querySelector("[data-chat]");if(i){i.focus();}}}},()=>{});}catch(e){}}
@@ -6834,7 +6862,7 @@ function chatSeed(p){const pl=playersOf(p),me=myId(p),fakes=pl.filter(x=>x.id!==
   return out.filter(m=>m.at<=+NOW).map((m,i)=>Object.assign({id:"seed"+i},m));}
 function chatMsgs(p){return chatSeed(p).concat(CHAT[p.id]||[],CHAT_LOCAL[p.id]||[]).sort((a,b)=>a.at-b.at);}
 const chAt=x=>{const v=x&&x.at;return typeof v==="number"?v:v&&v.seconds?v.seconds*1e3:+new Date(v)||0;};
-function chatUnread(p){const m=chatMsgs(p),me=myId(p),seen=chatSeen(p.id);return m.filter(x=>!x.sys&&!String(x.id||"").startsWith("seed")&&x.uid!==me&&chAt(x)>seen).length;}
+function chatUnread(p){const m=chatMsgs(p),me=myId(p),seen=Math.max(chatSeen(p.id),chatSeenG());return m.filter(x=>!x.sys&&!String(x.id||"").startsWith("seed")&&x.uid!==me&&chT(x)>seen).length;}
 function fmtChatT(t){const d=new Date(t),n=new Date(+NOW);const same=d.toDateString()===n.toDateString();const y=new Date(+NOW-864e5).toDateString()===d.toDateString();return(same?"":y?"hier ":d.toLocaleDateString("fr-BE",{day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("fr-BE",{hour:"2-digit",minute:"2-digit"});}
 function chatTab(p,mark=true){const m=chatMsgs(p),me=myId(p),pl=playersOf(p);const nm=id=>{const x=pl.find(y=>y.id===id);return x?x.name:"Un pote";};
   if(mark)chatSeen(p.id,Math.max(+NOW,...m.map(x=>x.at)));let last=null;
@@ -7986,6 +8014,9 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "gArch":{const g=groupById(S.groupView);if(!g||!myGroup(g))break;const n=t.dataset.n;g.archived=[...new Set((g.archived||[]).concat([n]))];gSave(g);toast(n+" archivé");render();break;}
     case "gUnarch":{const g=groupById(S.groupView);if(!g||!myGroup(g))break;const n=t.dataset.n;g.archived=(g.archived||[]).filter(x=>normS(x)!==normS(n));gSave(g);toast(n+" est de retour dans le groupe");render();break;}
     case "gRemind":{const g=groupById(S.groupView);if(!g)break;const n=t.dataset.n,uid=gMemberUid(g,n);if(!uid){toast(n+" n'est pas encore inscrit");break;}notify(uid,"group","Rappel : "+(myLabel()||"Ton pote")+" t'attend dans le groupe « "+g.name+" »",{gid:g.id});toast("Rappel envoyé à "+n);break;}
+    case "ntfDismiss":{const k=t.dataset.k,D=ntfDis();D[k]=Date.now();try{localStorage.setItem("bf_ntfdis",JSON.stringify(D));}catch(_){}
+      if(k.startsWith("res:")){const pid=k.slice(4);allNotifs().forEach(n=>{if(n.pid===pid&&(n.type==="pend"||n.type==="pchg")&&!n.read){n.read=true;if(db&&n._id)NTF_COLS.forEach(c=>{try{db.doc(c+"/"+n._id).update({read:true}).catch(()=>{});}catch(_){}});}});}
+      const row=t.closest(".swrow");if(row){row.classList.add("gone");setTimeout(render,220);}else render();break;}
     case "mDel":S.ngSel=(S.ngSel||[]).filter(x=>x!==t.dataset.name);render();break;
     case "back":if(S.screen==="mpick"||S.screen==="setup")suBack();else back();break;
     case "mpTick":{mpUnfull();const k=t.dataset.key;if(S.sel.items[k])delete S.sel.items[k];else S.sel.items[k]=1;const y=scrollY;render();scrollTo(0,y);break;}
