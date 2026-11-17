@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v133";
+const APP_VER="v134";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4642,7 +4642,7 @@ function hmTerrain(){const L=[["foot","Foot"],["tennis","Tennis"],["f1","F1"],["
 function hmBanner(){
   /* v36 : pendant un direct (et seulement à ce moment-là), la bannière devient un lien vers la partie en direct */
   let LV=[];try{LV=liveMatches().map(m=>m.rows[0]);}catch(e){}
-  if(LV.length){const i0=(S.hbI||0)%LV.length;return`<div class="hbn hblive" role="region" aria-label="En direct dans tes parties">${LV.map(({p,r},i)=>{const it=r.it,L0=LIVE[it.lid]||{},c=FIND[p.comp],sd=sides(it),sc=sd&&L0.sa!=null?` ${L0.sa}-${L0.sb}`:"";
+  if(LV.length){const i0=(S.hbI||0)%LV.length;return`<div class="hbn hblive" role="region" aria-label="En direct dans tes parties">${LV.map(({p,r},i)=>{const it=r.it,L0=LIVE[it.lid]||{},c=FIND[p.comp],sd=sides(it),sc=(()=>{try{if(sd&&tnIs(it)){const T=tnState(it);if(T.live&&T.cur)return` · ${T.label.toLowerCase()} ${T.cur[0]}-${T.cur[1]}`;}}catch(_){}return sd&&L0.sa!=null?` ${L0.sa}-${L0.sb}`:"";})();
       return`<button type="button" class="hbs${i===i0?" on":""}" data-act="liveRoom" tabindex="${i===i0?0:-1}"><span class="hblv"><i></i>LIVE</span>${c&&c.sport?goldSp(c.sport.id,22):""}<b>${esc(sd?(shortSides(it)||sd).join(" – "):it.label||p.name)}${esc(sc)}</b><small>Suivre →</small></button>`;}).join("")}</div>`;}
   let L=[];try{L=HOT();}catch(e){}if(!L.length)return"";const i0=(S.hbI||0)%L.length;
   return`<div class="hbn" role="region" aria-label="Évents à l'affiche">${L.map((x,i)=>{const c=FIND[x.cid];return`<button type="button" class="hbs${i===i0?" on":""}" data-act="${x.sid?"sub":"comp"}" data-comp="${esc(x.cid)}"${x.sid?` data-sub="${esc(x.sid)}"`:""} tabindex="${i===i0?0:-1}">${c&&c.sport?goldSp(c.sport.id,22):compBadge(c,20)}<b>${esc(x.name)}</b><small>${esc(x.dates)}</small></button>`;}).join("")}</div>`;}
@@ -5627,7 +5627,7 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
 function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it.lid]||{},k=m.k,sv=srvSide(it),short=shortSides(it)||sd,os=(()=>{try{return c.custom||!sd?null:oddsOf(sp,it,sd);}catch(_){return null;}})(),odd=n=>{if(!os||!os.length)return"";const o=os.find(x=>x[1]===n)||os.find(x=>lvSame(x[1],n));return o?`<small class="mhod">cote ${o[2]}</small>`:"";};
   S.lrSel=S.lrSel||{};let sel=m.rows.find(x=>x.p.id===S.lrSel[k])||m.rows[0];const p=sel.p,r=sel.r;
   const pl=k2=>`<div class="mhp">${bigMark(sd[k2],sp)}<b>${natOf(sd[k2])&&!CLUB[sd[k2]]&&!NATION[sd[k2]]?`<span class="mhfi">${FLAG[natOf(sd[k2])]||""}</span>`:""}${esc(short[k2])}${sv===k2?SRV_BALL:""}</b>${odd(sd[k2])}</div>`;
-  const center=`<div class="mhc">${inGrace(it)?`<span class="mhlive" style="background:rgba(243,224,166,.2);color:#F3E0A6">TERMINÉ</span>`:`<span class="mhlive">● EN DIRECT</span>`}${L.sa!=null?`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>${tnChips(sd,L.line,!inGrace(it))}`:""}`:`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
+  const center=`<div class="mhc">${inGrace(it)?`<span class="mhlive" style="background:rgba(243,224,166,.2);color:#F3E0A6">TERMINÉ</span>`:`<span class="mhlive">● EN DIRECT</span>`}${L.sa!=null?(sp==="tennis"?tnCenter(it,1):`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>`):`<span class="mhv">VS</span>`}<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small></div>`;
   const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
   const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
   let h=`<div class="lrc lrc-${sp}${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
@@ -6268,7 +6268,59 @@ function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)re
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
 /* noms courts, comme sur l'affiche du match (« Tirante – Munar ») */
 function shortSides(it){const sd=sides(it);if(!sd)return null;const l=String(it.label||""),sep=l.includes(" @ ")?" @ ":" – ",pr=l.split(sep);return pr.length===2?pr:sd;}
-function lvTkScore(it){const L=LIVE[it.lid]||{},sd=shortSides(it),sv=srvSide(it);
+
+/* ===================================================================== v134 : TABLEAU DE SCORE TENNIS (façon télé)
+   gros chiffres = jeux du set en cours (« 2E SET »), sets terminés en petites colonnes, points du jeu (15/30/40/AV) si la source les donne */
+function tnIs(it){try{const c=FIND[it._c];if(c&&c.sport)return c.sport.id==="tennis";}catch(_){}return false;}
+function tnState(it){const L=LIVE[it.lid]||{},raw=String(L.line||""),base=raw.split("·")[0].replace(/\([^)]*\)/g,"");
+  const sets=(base.match(/\d+-\d+/g)||[]).map(x=>x.split("-").map(Number));const st=L.status||"NS";
+  const ended=inGrace(it)||st==="FT"||st==="END",live=!ended&&(st==="LIVE"||/en cours/i.test(raw));
+  const fin=([a,b])=>(Math.max(a,b)>=6&&Math.abs(a-b)>=2)||(Math.max(a,b)===7&&Math.min(a,b)>=5);
+  let done=sets,cur=null;
+  if(live){const last=sets[sets.length-1];if(last&&!fin(last)){cur=last;done=sets.slice(0,-1);}else cur=[0,0];}
+  const pm=raw.match(/jeu\s+([0-9A-Za-z]+)\s*-\s*([0-9A-Za-z]+)/i),pv=v=>/^(a|ad|adv|av)$/i.test(v)?"AV":v;
+  const pts=live&&pm?[pv(pm[1]),pv(pm[2])]:null,n=done.length+1;
+  const label=cur&&cur[0]===6&&cur[1]===6?"TIE-BREAK":(n===1?"1ER SET":n+"E SET");
+  const wa=done.filter(([a,b])=>a>b).length,wb=done.filter(([a,b])=>b>a).length;
+  const win=ended?(L.sa!=null&&L.sb!=null&&L.sa!==L.sb?(L.sa>L.sb?0:1):(wa!==wb?(wa>wb?0:1):-1)):-1;
+  return{live,ended,done,cur,pts,label,win,wa,wb};}
+function tnDoneChips(done){if(!done||!done.length)return"";return`<span class="tnch tn134">${done.map((x,k)=>`<i title="Set ${k+1}"><em>S${k+1}</em><b class="${x[0]>x[1]?"w":""}">${x[0]}</b><b class="${x[1]>x[0]?"w":""}">${x[1]}</b></i>`).join("")}</span>`;}
+/* centre de l'affiche (Salon live, fiche match) */
+function tnCenter(it,withDone){const T=tnState(it),L=LIVE[it.lid]||{};
+  if(T.live&&T.cur)return`<small class="mhsl tnlbl">${T.label}</small><span class="mhs tnjeux">${T.cur[0]}<i>–</i>${T.cur[1]}</span><span class="tnjx">jeux${T.done.length?` · sets ${T.wa}-${T.wb}`:""}</span>${T.pts?`<span class="tnpt">Jeu <b>${esc(T.pts[0])}</b>–<b>${esc(T.pts[1])}</b></span>`:""}${withDone?tnDoneChips(T.done):""}`;
+  if(T.ended&&L.sa!=null)return`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span><small class="mhsl">SETS</small>${withDone?tnDoneChips(T.done):""}`;
+  if(T.live)return`<small class="mhsl tnlbl">1ER SET</small><span class="mhs tnjeux">0<i>–</i>0</span><span class="tnjx">jeux</span>`;
+  return`<span class="mhv">VS</span><small>${esc(fmtT(new Date(it.date)))}</small>`;}
+/* carte de match dans une partie (milieu) */
+function tnMid(it){if(!tnIs(it))return"";const T=tnState(it);if(!T.live||!T.cur)return"";
+  return`<small class="mclive tnlbl">${T.label}</small><b class="mcsc">${T.cur[0]}<i>–</i>${T.cur[1]}</b><span class="tnjx">${T.pts?`jeu ${esc(T.pts[0])}-${esc(T.pts[1])}`:"jeux"}${T.done.length?` · sets ${T.wa}-${T.wb}`:""}</span>`;}
+/* ticket « En direct » de Mes parties : un vrai tableau */
+function tnTicket(it,sd,sv){const T=tnState(it);
+  if(!T.live&&!T.ended)return`<span class="lvm"><b class="lvn">${esc(sd[0])}</b><span class="lvs tnko">${esc(fmtT(new Date(it.date)))}</span><b class="lvn">${esc(sd[1])}</b><span class="lvs"></span></span>`;
+  const nd=T.done.length,cols=`minmax(0,1fr)${" var(--tnd,24px)".repeat(nd)}${T.cur?" var(--tnc,44px)":""}${T.pts?" var(--tnp,36px)":""}`;
+  const hd=`<span class="tnr tnhd" style="grid-template-columns:${cols}"><i></i>${T.done.map((_,k)=>`<em>S${k+1}</em>`).join("")}${T.cur?`<em class="c">${T.label}</em>`:""}${T.pts?`<em class="p">JEU</em>`:""}</span>`;
+  const row=k=>`<span class="tnr${T.win===k?" won":""}" style="grid-template-columns:${cols}"><b class="lvn">${esc(sd[k])}${T.live&&sv===k?SRV_BALL:""}</b>${T.done.map(x=>`<i class="${x[k]>x[1-k]?"w":""}">${x[k]}</i>`).join("")}${T.cur?`<span class="lvs">${T.cur[k]}</span>`:""}${T.pts?`<u>${esc(T.pts[k])}</u>`:""}</span>`;
+  return`<span class="lvm tnlv${T.ended?" tnend":""}">${hd}${row(0)}${row(1)}</span>`;}
+
+/* ===================================================================== v134 : HEURE DE DÉBUT ET HEURE DE FERMETURE
+   on garde la 1re heure connue de chaque match (bf_ko0) et l'heure où le direct a été vu la 1re fois (bf_kolv) */
+const KO0=(()=>{try{return JSON.parse(localStorage.getItem("bf_ko0")||"{}")||{};}catch(_){return{};}})(),KOLV=(()=>{try{return JSON.parse(localStorage.getItem("bf_kolv")||"{}")||{};}catch(_){return{};}})();
+function koKey(it){return it&&!it.tbd?(it.lid||((it._c||"")+":"+(it.id||""))):null;}
+function koSeen(it){const k=koKey(it);if(!k)return;const d=+new Date(it.date);if(!(k in KO0)&&d>+NOW-6*36e5){KO0[k]=d;try{localStorage.setItem("bf_ko0",JSON.stringify(KO0));}catch(_){}}
+  try{if(it.live&&liveSt(it)==="LIVE"&&!(k in KOLV)){KOLV[k]=Date.now();localStorage.setItem("bf_kolv",JSON.stringify(KOLV));}}catch(_){}}
+function koNote(p,r,st){try{const it=r&&r.it;if(!it||it.tbd||p.free)return"";koSeen(it);const k=koKey(it),d=+new Date(it.date),d0=KO0[k];
+  const moved=d0&&Math.abs(d-d0)>=60e3,late=moved&&d>d0;
+  if(st==="open")return moved?` <span class="kon kdel">⏱ Début ${late?"repoussé":"avancé"} : ${esc(fmtT(new Date(d)))}</span>`:"";
+  if(st!=="closed")return"";
+  const L=(p.rlog||[]).filter(e=>e.k===r.key),last=L[L.length-1];let t=null;
+  if((p.state||{})[r.key]==="closed"&&last&&last.act!=="open")t=+new Date(last.at);
+  else{const lv=KOLV[k];t=Math.min(d,lv||Infinity);if(last&&last.act!=="open"&&+new Date(last.at)>t)t=+new Date(last.at);}
+  if(!isFinite(t))return"";return` <span class="kon kcl">🔒 Paris fermés à ${esc(fmtT(new Date(t)))}${late?" · début repoussé":""}</span>`;}catch(_){return"";}}
+
+/* ===================================================================== v134 : VALIDATION — ce qui manque reste visible */
+function missKeysOf(p,pre){try{return needKeys(p,pre).filter(k=>{const v=myVal(p,k);return v==null||v===""||(Array.isArray(v)&&!v.some(x=>x))||(betTypeOf(p,k)==="multi"&&(!Array.isArray(v)||v.filter(Boolean).length<3));});}catch(_){return[];}}
+function missBtn(n,need){const all=n>=need;return`<div class="vmissmsg">${all?`✏️ Réponds ${n>1?"aux "+n+" questions":"à la question"} puis valide ton prono.`:`⚠️ Réponds ${n>1?"aux questions entourées":"à la question entourée"} en rouge.`}</div><button type="button" class="btn block vbtn bigact vmiss" data-act="betValidate" aria-label="Il te manque ${n} prono${n>1?"s":""}">Il te manque ${n} prono${n>1?"s":""} ↑</button>`;}
+function lvTkScore(it){const L=LIVE[it.lid]||{},sd=shortSides(it),sv=srvSide(it);try{koSeen(it);}catch(_){}if(sd&&tnIs(it))return tnTicket(it,sd,sv);
   if(sd&&L.sa!=null){const nm=k=>`<b class="lvn">${esc(sd[k])}${sv===k?SRV_BALL:""}</b><span class="lvs">${esc(String(k?L.sb:L.sa))}</span>`;return`<span class="lvm">${nm(0)}${nm(1)}</span>`;}
   if(sd)return`<span class="lvm"><b class="lvn">${esc(sd[0])}</b><span class="lvs">–</span><b class="lvn">${esc(sd[1])}</b><span class="lvs">–</span></span>`;
   const lead=(L.winners&&L.winners[0])||L.winner||"";return`<span class="lvm1"><b class="lvn">${esc(it.label||"")}</b>${lead?`<small class="lvg">En tête : ${esc(lead)}${L.score!=null?" ("+esc(String(L.score))+")":""}</small>`:""}</span>`;}
@@ -6308,7 +6360,7 @@ function partyLabel(p){const b=partyBase(p);let same=[];try{same=(S.parties||[])
   const d=q=>q.made?new Date(q.made).toLocaleDateString("fr-BE",{day:"numeric",month:"short"}):"",dh=q=>q.made?new Date(q.made).toLocaleString("fr-BE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
   {const n=q=>{try{return rowsOfParty(q).filter(r=>r.it).length;}catch(_){return 0;}},np=n(p);if(np&&same.every(q=>n(q)!==np))return b+" · "+(np===1?"ce match seul":np+" matchs");}
   if(d(p)&&same.every(q=>d(q)!==d(p)))return b+" · "+d(p);return dh(p)?b+" · "+dh(p):b;}
-function lvProg(it){const L=LIVE[it.lid]||{};if(inGrace(it))return"Terminé";const cl=v=>String(v||"").replace(/\s*·\s*en cours$/i,"");
+function lvProg(it){const L=LIVE[it.lid]||{};if(inGrace(it))return"Terminé";if(tnIs(it)){const T=tnState(it);return T.live?(T.done.length?"En cours · sets "+T.wa+"-"+T.wb:"En cours"):T.ended?"Terminé":"Pas encore commencé";}const cl=v=>String(v||"").replace(/\s*·\s*en cours$/i,"");
   if(L.minute)return cl(L.minute);if(L.line&&!/^Score final/i.test(L.line))return cl(L.line);return"En cours";}
 function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();if(!MM.length)return"";
   const one=it=>`<span class="lvone">${lvTkScore(it)}<span class="lvx lvpg">${esc(lvProg(it))}</span></span>`;
@@ -7009,7 +7061,7 @@ function myBetsTab(p,sc){
     const sd=sides(r.it),sc0=res&&res.sa!=null?res:(kind==="live"&&L.sa!=null?{sa:L.sa,sb:L.sb}:null),d0=new Date(r.it.date);
     const pr=sd?r.it.label.split(r.it.label.includes(" @ ")?" @ ":" – "):null,nm=k=>{const v=String(pr&&pr.length===2?pr[k]:sd[k]),L=Math.max(...v.split(/\s+/).map(w=>w.length));return`<span style="font-size:${L>10?14:L>8?16:19}px">${esc(v)}</span>`;};
     const vs=sd?`<div class="mcvs"><span class="mcteam"><span class="mccrest">${mark(sd[0])||`<span class="mcini">${esc(String(sd[0]).charAt(0))}</span>`}</span><b>${nm(0)}${kind==="live"&&srvSide(r.it)===0?SRV_BALL:""}</b></span>
-      <span class="mcmid">${sc0?`<b class="mcsc">${sc0.sa}<i>–</i>${sc0.sb}</b>${kind==="live"&&L.minute?`<small class="mclive">${esc(L.minute)}</small>`:""}`:`<small>${esc(fmtD(d0))}</small><b class="mctime">${r.it.tbd?"—":esc(fmtT(d0))}</b>`}</span>
+      <span class="mcmid">${kind==="live"&&tnMid(r.it)?tnMid(r.it):sc0?`<b class="mcsc">${sc0.sa}<i>–</i>${sc0.sb}</b>${kind==="live"&&L.minute?`<small class="mclive">${esc(L.minute)}</small>`:""}`:`<small>${esc(fmtD(d0))}</small><b class="mctime">${r.it.tbd?"—":esc(fmtT(d0))}</b>`}</span>
       <span class="mcteam"><span class="mccrest">${mark(sd[1])||`<span class="mcini">${esc(String(sd[1]).charAt(0))}</span>`}</span><b>${nm(1)}${kind==="live"&&srvSide(r.it)===1?SRV_BALL:""}</b></span></div>`
       :`<div class="mcsolo"><b>${esc(r.title)}</b><small>${esc(fmtD(d0))}${r.it.tbd?"":" · "+esc(fmtT(d0))}</small></div>`;
     const pls=playersOf(p),pk=picksOf(p),pre=r.key+"|";let nOn=0;
@@ -7018,7 +7070,7 @@ function myBetsTab(p,sc){
     return`<div class="mc k-${kind}">${duoBg(sd,(c&&c.sport?c.sport.id:""),"mcb")}<button type="button" class="mch" data-act="betOne" data-key="${esc(r.key)}" aria-label="${esc(r.title)}">
       <span class="mctop">${kind==="todo"||kind==="ready"?"":kind==="live"&&lv==="LIVE"?`<span class="mckind mklive">EN DIRECT</span>`:`<span class="mckind">${KIND[kind][1]} ${KIND[kind][0]}</span>`}${urg?`<span class="mcurg">${urg}</span>`:""}</span>
       ${vs}
-      <span class="mcmeta"><span style="color:${stCol}">● ${esc(stTxt)}</span>${r.sub&&!sd?"":` · ${esc((r.sub||"").split(" · ")[0])}`}${res&&res.line&&!(res.sa!=null&&/^Score final/.test(res.line))?" · "+esc(res.line):""}</span>
+      <span class="mcmeta"><span style="color:${stCol}">● ${esc(stTxt)}</span>${koNote(p,r,st)}${r.sub&&!sd?"":` · ${esc((r.sub||"").split(" · ")[0])}`}${res&&res.line&&!(res.sa!=null&&/^Score final/.test(res.line))?" · "+esc(res.line):""}</span>
       <span class="mcfoot"><span class="mcmine${pl?"":" none"}">${pl?`Ton prono : <em>${pl}</em>`:can?"Pas encore de prono":"Pas de prono"}</span>${ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:""}</span>
       ${kind==="todo"?"":extra}${orgL}</button>${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}</div>`;};
   /* filtres : À faire (paris ouverts) · En cours (commencés ou fermés) · Terminés · Tous */
@@ -7241,17 +7293,17 @@ function oddsOf(sp,it,sd){if(sd){const a=strengthOf(sd[0])*(sp==="foot"||sp==="r
   if(!L)return null;const tot=L.reduce((s2,x)=>s2+x[1],0)*1.15;return L.slice(0,4).map(x=>["",x[0],odd(x[1]/tot)]);}
 /* tennis : tableau des jeux set par set (ligne stockée du point de vue du 1er joueur) */
 /* v77 : jeux de chaque set en pastilles compactes (haut = joueur de gauche, bas = joueur de droite ; set en cours en rouge) */
-function tnChips(sd,line,live){const t=String(line||"").replace(/\([^)]*\)/g,"").match(/\d+-\d+/g);if(!t||!sd)return"";const sets=t.map(x=>x.split("-").map(Number));
+function tnChips(sd,line,live){const t=String(line||"").split("·")[0].replace(/\([^)]*\)/g,"").match(/\d+-\d+/g);if(!t||!sd)return"";const sets=t.map(x=>x.split("-").map(Number));
   return`<span class="tnch">${sets.map((x,k)=>{const cur=live&&k===sets.length-1;return`<i class="${cur?"cur":""}" title="${cur?"Set en cours":"Set "+(k+1)}"><em>${cur?"en cours":"S"+(k+1)}</em><b class="${!cur&&x[0]>x[1]?"w":""}">${x[0]}</b><b class="${!cur&&x[1]>x[0]?"w":""}">${x[1]}</b></i>`;}).join("")}</span>`;}
-function tnGrid(sd,line,live){const t=String(line||"").replace(/\([^)]*\)/g,"").match(/\d+-\d+/g);if(!t||!sd)return"";const sets=t.map(x=>x.split("-").map(Number));
+function tnGrid(sd,line,live){const t=String(line||"").split("·")[0].replace(/\([^)]*\)/g,"").match(/\d+-\d+/g);if(!t||!sd)return"";const sets=t.map(x=>x.split("-").map(Number));
   const ln=n=>{const w=String(n).trim().split(/\s+/);return w[w.length-1];};
   const cell=(k,side)=>{const s=sets[k],cur=live&&k===sets.length-1,won=!cur&&s[side]>s[1-side];return`<td class="${won?"w":""}${cur?" cur":""}">${s[side]}</td>`;};
-  return`<table class="tngrid"><thead><tr><th></th>${sets.map((_,k)=>`<th>${live&&k===sets.length-1?"en cours":"Set "+(k+1)}</th>`).join("")}</tr></thead><tbody>${[0,1].map(side=>`<tr><th>${esc(ln(sd[side]))}</th>${sets.map((_,k)=>cell(k,side)).join("")}</tr>`).join("")}</tbody></table>`;}
+  return`<table class="tngrid"><thead><tr><th></th>${sets.map((_,k)=>`<th>${live&&k===sets.length-1?(k===0?"1er set":(k+1)+"e set")+" ●":"Set "+(k+1)}</th>`).join("")}</tr></thead><tbody>${[0,1].map(side=>`<tr><th>${esc(ln(sd[side]))}</th>${sets.map((_,k)=>cell(k,side)).join("")}</tr>`).join("")}</tbody></table>`;}
 function matchHero(c,it,res,chipTxt,title,extra){const sp=c.sport.id,sd=sides(it),os=c.custom?null:sd?oddsOf(sp,it,sd):(Object.entries(oddsMap(c,it)).sort((a,b)=>a[1]-b[1]).slice(0,4).map(([n,o])=>["",n,o.toFixed(2)])),win=res&&res.ans?(res.ans.win||res.ans.res||res.ans.pole||res.ans.lead):null,isW=n=>win&&(Array.isArray(win)?win.includes(n):win===n);
   const LL=it.live?(LIVE[it.lid]||{}):{},onAir=it.live&&liveSt(it)==="LIVE";
   /* v58 : cote discrète sous le nom (N = match nul, sous le score) */
   const odd=n=>{if(!os||!os.length||!sd)return"";const o=n==="N"?os.find(x=>x[0]==="N"):os.find(x=>x[1]===n)||os.find(x=>lvSame(x[1],n));return o?`<small class="mhod">${n==="N"?"nul ":"cote "}${o[2]}</small>`:"";};
-  const center=sd?(onAir?`${LL.sa!=null?`<span class="mhs">${LL.sa}<i>–</i>${LL.sb}</span>${sp==="tennis"?`<small class="mhsl">SETS</small>`:""}`:`<span class="mhv">VS</span>`}${LL.minute?`<span class="mhchrono">⏱ ${esc(LL.minute)}</span>`:`<small>${esc((sp==="tennis"?"":LL.line)||"Match en cours")}</small>`}${sp==="foot"?goalsHTML(LL.goals):""}`:res&&res.sa!=null?`<span class="mhs">${res.sa}<i>–</i>${res.sb}</span><small>${sp==="tennis"?"Sets · score final":"Score final"}</small>${sp==="foot"?goalsHTML(LL.goals):""}`:(res&&res.void?`<span class="mhv">—</span><small>Match non joué</small>`:`<span class="mhv">VS</span><small>${fmtD(it.date)}${it.custom?"":" · "+fmtT(it.date)}</small>`)):"";
+  const center=sd?(onAir?`${sp==="tennis"?tnCenter(it,0):LL.sa!=null?`<span class="mhs">${LL.sa}<i>–</i>${LL.sb}</span>`:`<span class="mhv">VS</span>`}${LL.minute?`<span class="mhchrono">⏱ ${esc(LL.minute)}</span>`:`<small>${esc((sp==="tennis"?"":LL.line)||"Match en cours")}</small>`}${sp==="foot"?goalsHTML(LL.goals):""}`:res&&res.sa!=null?`<span class="mhs">${res.sa}<i>–</i>${res.sb}</span><small>${sp==="tennis"?"Sets · score final":"Score final"}</small>${sp==="foot"?goalsHTML(LL.goals):""}`:(res&&res.void?`<span class="mhv">—</span><small>Match non joué</small>`:`<span class="mhv">VS</span><small>${fmtD(it.date)}${it.custom?"":" · "+fmtT(it.date)}</small>`)):"";
   const body=sd?`<div class="mhg"><div class="mhp">${bigMark(sd[0],sp)}<b>${esc(sd[0])}</b>${odd(sd[0])}${natOf(sd[0])&&!CLUB[sd[0]]?`<span class="mhf">${FLAG[natOf(sd[0])]||""}</span>`:""}</div><div class="mhc">${center}${odd("N")}</div><div class="mhp">${bigMark(sd[1],sp)}<b>${esc(sd[1])}</b>${odd(sd[1])}${natOf(sd[1])&&!CLUB[sd[1]]?`<span class="mhf">${FLAG[natOf(sd[1])]||""}</span>`:""}</div></div>${sp==="tennis"?tnGrid(sd,onAir?LL.line:(LL.line||""),onAir):""}`
     :`<h1 class="disp mht">${esc(title||it.label)}</h1>${onAir&&(LL.line||LL.minute)?`<p class="mhlivel">${esc(LL.line||LL.minute)}</p>`:""}${os&&os.length?`<div class="mhfav" style="--n:${os.length}">${os.map(o=>`<div class="mhfi${isW(o[1])?" w":""}">${portrait(o[1],sp,58)}<b>${esc(o[1].split(" ").slice(-1)[0])}</b><small class="mhod">cote ${o[2]}</small></div>`).join("")}</div>`:""}`;
   const oddsRow="",_unusedOdds=os&&os.length?`<div class="mho" style="--n:${os.length}">${os.map(o=>`<span class="mhoc${isW(o[1])||(o[0]==="N"&&win==="Match nul")?" w":""}"><small>${o[0]?o[0]+" · ":""}${esc(o[1].length>14?o[1].split(" ").slice(-1)[0]:o[1])}</small><b>${o[2]}</b></span>`).join("")}</div><p class="mhn">Cotes indicatives (démo)</p>`:"";
@@ -7465,6 +7517,8 @@ function vBet(){
   if(!r){return`<div class="night"><div class="hero" style="background:transparent;min-height:0"><div class="bar">${backBtn}<span class="chip">Parier</span></div><h1 class="disp">C'est fait !</h1><p class="muted">Tous tes pronos sont enregistrés.</p></div></div><div class="pad"><button type="button" class="btn block" data-act="back">Retour à la partie</button></div>`;}
   const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),i=S.betIdx||0,sd=sides(r.it);const st=itemState(p,r),locked=st!=="open",one=q.length===1,saved=hasSaved(p,r.key),editing=!locked&&(!saved||S.editKey===r.key),ro=locked||!editing,dirty=draftDirty(p,r.key),subs=subsOf(c),su=subs.find(x=>x.id===r.key.split("/")[0]),res=resultOf(c,su,r.it),sc=scoreParty(Object.assign({},p,{players:playersOf(p)})),gain=res&&sc.per[r.key]?sc.per[r.key][myId(p)]||0:null;
   if(st==="done"&&res&&!res.pending&&one)return vRecap(p,r,res,cfg,c);
+  /* v134 : les réponses manquantes restent entourées dès qu'on a commencé */
+  const MISS=editing?missKeysOf(p,r.key):[],NEED=editing?needKeys(p,r.key).length:0;if(editing&&MISS.length&&NEED-MISS.length>0)S.missHi=MISS;else if(editing&&!MISS.length)S.missHi=null;
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
   /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
@@ -7486,7 +7540,7 @@ function vBet(){
       const vLabel=saved?"Je valide la modification":"Je valide mon prono";
       let b="";
       if(saved&&!editing)b=`<button type="button" class="btn block bigact green" data-act="betEdit">Je modifie mon prono</button>`;
-      else if(saved)b=`<div class="v131ed"><button type="button" class="btn block vbtn bigact green" data-act="betValidate"${dirty?"":" disabled aria-disabled=\"true\""}>Confirmer les modifications</button><button type="button" class="btn ghost block" data-act="betKeep">Garder mon prono</button></div>${dirty?"":`<p class="v131hint">Change un de tes choix pour pouvoir confirmer.</p>`}`;else b=`<button type="button" class="btn block vbtn bigact orange" data-act="betValidate">${vLabel}${one||last?" ✓":" et suivant →"}</button>`;
+      else if(saved)b=`<div class="v131ed">${MISS.length&&dirty?missBtn(MISS.length,NEED):`<button type="button" class="btn block vbtn bigact green" data-act="betValidate"${dirty?"":" disabled aria-disabled=\"true\""}>Confirmer les modifications</button>`}<button type="button" class="btn ghost block" data-act="betKeep">Garder mon prono</button></div>${dirty?"":`<p class="v131hint">Change un de tes choix pour pouvoir confirmer.</p>`}`;else b=MISS.length?missBtn(MISS.length,NEED):`<button type="button" class="btn block vbtn bigact orange" data-act="betValidate">${vLabel}${one||last?" ✓":" et suivant →"}</button>`;
       return`<div style="margin-top:14px">${b}</div>${one?"":`<div class="wnav">${i>0?`<button type="button" class="btn ghost" data-act="betPrev">← Précédent</button>`:"<span></span>"}${saved&&!editing?`<button type="button" class="btn ghost" data-act="betNext">${last?"Terminer":"Suivant →"}</button>`:`<button type="button" class="btn ghost" data-act="betNext">${last?"Terminer":"Passer →"}</button>`}</div>`}`;})()}</div>`;
   return h;
 }
@@ -8749,6 +8803,63 @@ html body #app .lrc.rtile.lrc-golf{background:var(--lc2,#120D07)!important}
 html body #app .lrc.lrc-velo:not(.rtile){background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 170%22 preserveAspectRatio=%22xMidYMin meet%22%3E%3Cg fill=%22none%22 stroke=%22rgba(255,244,214,0.28)%22 stroke-width=%221.6%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M14 150L70 110L110 128L170 50L215 100L250 80L300 130L340 95L386 120%22/%3E%3Cpath d=%22M14 162L90 140L150 150L230 118L300 145L386 135%22 stroke-dasharray=%223 6%22/%3E%3C/g%3E%3C/svg%3E") top/100% auto no-repeat,url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 170%22 preserveAspectRatio=%22xMidYMin meet%22%3E%3Cg fill=%22none%22 stroke=%22rgba(255,244,214,0.28)%22 stroke-width=%221.6%22 stroke-linecap=%22round%22%3E%3Cg transform=%22translate(0,170) scale(1,-1)%22%3E%3Cpath d=%22M14 150L70 110L110 128L170 50L215 100L250 80L300 130L340 95L386 120%22/%3E%3Cpath d=%22M14 162L90 140L150 150L230 118L300 145L386 135%22 stroke-dasharray=%223 6%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") bottom/100% auto no-repeat,radial-gradient(120% 70% at 50% -10%,rgba(184,144,30,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#5D4812,#3A2D06) #3A2D06!important}
 html body #app .lrc.rtile.lrc-velo>.pcart.rtart{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 170%22 preserveAspectRatio=%22xMidYMin meet%22%3E%3Cg fill=%22none%22 stroke=%22rgba(255,244,214,0.28)%22 stroke-width=%221.6%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M14 150L70 110L110 128L170 50L215 100L250 80L300 130L340 95L386 120%22/%3E%3Cpath d=%22M14 162L90 140L150 150L230 118L300 145L386 135%22 stroke-dasharray=%223 6%22/%3E%3C/g%3E%3C/svg%3E") top/100% auto no-repeat,url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 170%22 preserveAspectRatio=%22xMidYMin meet%22%3E%3Cg fill=%22none%22 stroke=%22rgba(255,244,214,0.28)%22 stroke-width=%221.6%22 stroke-linecap=%22round%22%3E%3Cg transform=%22translate(0,170) scale(1,-1)%22%3E%3Cpath d=%22M14 150L70 110L110 128L170 50L215 100L250 80L300 130L340 95L386 120%22/%3E%3Cpath d=%22M14 162L90 140L150 150L230 118L300 145L386 135%22 stroke-dasharray=%223 6%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") bottom/100% auto no-repeat,radial-gradient(120% 70% at 50% -10%,rgba(184,144,30,0.7),rgba(0,0,0,0) 70%),linear-gradient(180deg,#5D4812,#3A2D06) #3A2D06!important}
 html body #app .lrc.rtile.lrc-velo{background:var(--lc2,#120D07)!important}
+
+/* ===================================================================== v134 */
+/* 1 · logo : le fond brun et le liseré seulement sur le carré de l'icône, jamais derrière le texte */
+html body .phbrand .logo{background:none!important;border-color:transparent!important;box-shadow:none!important}
+html body .phbrand .logo .mark{background:linear-gradient(160deg,#2A1F0E,#120D06)!important;border:1.5px solid rgba(199,160,74,.6)!important}
+
+/* 2 · bandeau LIVE / évents : le libellé sortant s'efface AVANT que le suivant n'apparaisse (plus jamais deux noms l'un sur l'autre) */
+html body .hbs{transition:opacity .3s ease!important}
+html body .hbs.on{transition:opacity .4s ease .32s!important}
+@media (prefers-reduced-motion:reduce){html body .hbs,html body .hbs.on{transition:none!important}}
+
+/* 3 · tableau de score tennis */
+.hlvb .lvR .lvm.tnlv{display:block}
+.tnlv .tnr{display:grid;align-items:center;column-gap:6px;min-width:0}
+.tnlv .tnr+.tnr{margin-top:2px}
+.tnlv .tnhd{margin-bottom:2px}
+.tnlv .tnhd em{font-style:normal;font-size:9px;font-weight:900;letter-spacing:.08em;color:rgba(255,236,200,.75);text-align:center;white-space:nowrap}
+.tnlv .tnhd em.c{color:#FFE7A6;justify-self:end;text-align:right;overflow:visible}
+.tnlv .tnhd em.p{justify-self:center}
+.tnlv .tnr .lvn{min-width:0}
+.tnlv .tnr>i{font-style:normal;font-family:var(--display);font-weight:900;font-size:17px;line-height:1;text-align:center;color:rgba(255,236,200,.62)}
+.tnlv .tnr>i.w{color:#F2D28A}
+.tnlv .tnr .lvs{text-align:right}
+.tnlv .tnr>u{text-decoration:none;justify-self:center;min-width:32px;text-align:center;font-weight:900;font-size:14px;line-height:1;padding:5px 4px;border-radius:8px;background:rgba(14,10,6,.55);border:1px solid rgba(242,210,138,.45);color:#FFE7A6}
+.tnlv.tnend .tnr>i{font-size:22px}
+.tnlv .tnr.won .lvn{color:#F2D28A!important;-webkit-text-fill-color:#F2D28A}
+.tnjx{display:block}
+@media (max-width:360px){.tnlv{--tnd:18px;--tnc:34px;--tnp:32px}.tnlv .tnr{column-gap:4px}.tnlv .tnr>i{font-size:15px}.tnlv .tnr>u{min-width:28px;font-size:13px;padding:4px 2px}.hlvb .lvR .tnlv .lvs{font-size:26px}.hlvb .lvR .tnlv .lvn{font-size:15px}}
+.lvs.tnko{font-size:18px!important}
+.mhsl.tnlbl,.mclive.tnlbl{color:#FFE7A6!important;letter-spacing:.14em;font-weight:900}
+.tnjx{font-size:11px!important;letter-spacing:.06em;color:#C9D0DC;text-transform:uppercase;font-weight:800;white-space:nowrap}
+.tnpt{display:inline-flex;gap:4px;align-items:baseline;margin-top:2px;padding:3px 9px;border-radius:999px;background:rgba(14,10,6,.6);border:1px solid rgba(242,210,138,.45);font-size:12px;font-weight:800;color:#C9D0DC;white-space:nowrap}
+.tnpt b{color:#FFE7A6;font-size:14px}
+.tnch.tn134 i b.w,.tnch i b.w{color:#F2D28A!important}
+.tngrid td.w{color:#F2D28A!important;font-weight:900}
+
+/* 4 · « Les pronos de tes potes » et « Si ça finit comme ça » : cartes opaques, lisibles sur la photo */
+html body #app .card.rcq,html body #app .mhero ~ * .card.rcq,html body #app .card.projc,html body #app .mhero ~ * .card.projc,html body #app .mhero ~ * .qcard{background:linear-gradient(180deg,#1D150C,#130E08)!important;background-color:#16100A!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid rgba(199,160,74,.38)!important;box-shadow:0 8px 22px rgba(0,0,0,.45)!important}
+html body #app .card.rcq .rcp{background:rgba(255,255,255,.035)!important}
+html body #app .card.rcq .rcv,html body #app .card.rcq .rcn{color:#F4EBDD!important}
+html body #app .card.rcq .rcv .muted,html body #app .card.rcq .rcv i.muted{color:#A89A85!important}
+html body #app .card.rcq .rcqh b{color:#fff!important}
+html body #app .card.rcq .rcqh span,html body #app .card.rcq .rco{color:#D9C08A!important}
+html body #app .card.projc .projl span{background:rgba(255,255,255,.06)!important;color:#F4EBDD!important}
+html body #app .rch{text-shadow:0 2px 8px rgba(0,0,0,.85);color:#F2E3C2!important}
+
+/* 5 · validation : ce qui manque reste visible */
+.vmissmsg{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(229,83,75,.12);border:1px solid rgba(229,83,75,.55);color:#FFD4CF;font-size:13px;font-weight:700;line-height:1.35}
+html body .btn.vmiss{background:linear-gradient(180deg,#4A3A2A,#3A2C1F)!important;color:#F3D9C4!important;border:1.5px dashed rgba(229,83,75,.75)!important;box-shadow:none!important;opacity:1!important}
+html body #app .qcard.miss,html body #app .mhero ~ * .qcard.miss,html body #app .item.mb.miss{border:2px solid #E5534B!important;box-shadow:0 0 0 3px rgba(229,83,75,.18)!important}
+
+/* 6 · heure de début / fermeture */
+.kon{display:inline-block;margin-left:2px;font-weight:800;white-space:nowrap}
+.kon.kdel{color:#FFB547}
+.kon.kcl{color:#F2D28A}
+@media (max-width:360px){.kon{white-space:normal}}
+
 </style>
 </body>
 </html>
