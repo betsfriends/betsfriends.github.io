@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v129";
+const APP_VER="v130";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4588,24 +4588,24 @@ function hmTopRender(){const el=document.getElementById("hmtop");if(!el)return;c
    <span class="hmtp" aria-hidden="true"></span>
    <span class="hmtpr"><small>Ta partie ${pr?"":"dès"}</small><b>${pr?eur(pr):"1,99 €"}</b></span><button type="button" class="hmtx" data-act="partyCancel">Annuler</button></div>`;}
 /* retour d'une étape dans le parcours : on retire la dernière précision choisie */
-function hmStep(){const b=[...document.querySelectorAll("#flwrap .flbx .flpill [data-act=flBack]")].pop();if(b){b.click();return;}const H=hmS();if(H.flowOn){H.flowOn=false;H.fl={};S.sel={comp:null,full:false,items:{}};render();}}
+function hmStep(){const b=[...document.querySelectorAll("#flwrap .flbx .flpill [data-act=flBack]")].pop();if(b){b.click();return;}const H=hmS();if(H.flowOn){H.flowOn=false;H.sport=null;H.fl={};S.sel={comp:null,full:false,items:{}};render();}}
 function hmReset(){const H=hmS();Object.assign(H,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},sport:null,flip:null,flowOn:false,fl:{}});S._flPK=undefined;S._flPV=undefined;S.sel={comp:null,full:false,items:{}};render();window.scrollTo(0,0);toast("On repart de zéro");}
 function hmTaken(){const H=hmS();return H.multi.flatMap(x=>x.k==="g"?gMem(x):[x.name]);}
 const HM_MAILRX=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 function hmMailName(e){return String(e).split("@")[0].split(/[._\-+]+/).filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ")||e;}
 function hmMailRow(ctx,q){return`<button type="button" class="hmrow inv" data-act="hmInvite" data-ctx="${ctx}" data-name="${esc(hmMailName(q))}" data-email="${esc(q)}"><span class="hmgi">✉️</span><span><b>Inviter ${esc(q)}</b><small>Par e-mail, avec le lien de la partie.</small></span><i>+</i></button>`;}
-function hmResults(ctx){const H=hmS(),q=(H.q[ctx]||"").trim(),nq=normS(q).replace(/^@/,"");if(!q)return"";
-  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em)return`<button type="button" class="hmrow" data-act="hmPick" data-ctx="${ctx}" data-k="m" data-name="${esc(em.short)}" data-email="${esc(normEmail(q))}">${avatar(em,34)}<span><b>${esc(em.short)}</b><small>Inscrit · ${esc(em.name)} · @${esc(em.pseudo)}</small></span><i>+</i></button>`;return hmMailRow(ctx,q);}
+function hmResults(ctx){const H=hmS(),q=(H.q[ctx]||"").trim(),nq=normS(q).replace(/^@/,"");/* v130 : sans recherche, on montre tes potes et tes groupes */
+  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em)return`<button type="button" class="hmrow" data-act="hmPick" data-ctx="${ctx}" data-k="m" data-name="${esc(em.short)}" data-email="${esc(normEmail(q))}">${avatar(em,34)}<span><b>${esc(em.short)}</b><small>Inscrit · ${esc(em.name)}</small></span><i>+</i></button>`;return hmMailRow(ctx,q);}
   if(q.includes("@")&&!q.startsWith("@"))return`<p class="hmnone">Termine l'adresse e-mail pour l'inviter.</p>`;
   if(ctx==="duel"){
-    const ps=hmPeople(q,H.duel?[H.duel.name]:[]);let h=ps.map(m=>`<button type="button" class="hmrow" data-act="hmPick" data-ctx="duel" data-k="m" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.short)}</b><small>${m.fr?"Ami · ":""}${esc(m.name)} · @${esc(m.pseudo)}</small></span><i>+</i></button>`).join("");
+    const ps=hmPeople(q,H.duel?[H.duel.name]:[]);let h=ps.map(m=>`<button type="button" class="hmrow" data-act="hmPick" data-ctx="duel" data-k="m" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.short)}</b><small>${m.fr?"Ami":"Membre"}${m.name!==m.short?" · "+esc(m.name):""}</small></span><i>+</i></button>`).join("");
     if(q&&!ps.some(m=>normS(m.short)===nq||normS(m.name)===nq))h+=`<button type="button" class="hmrow inv" data-act="hmInvite" data-ctx="duel" data-name="${esc(q.replace(/^@/,""))}"><span class="hmgi">✉️</span><span><b>Inviter « ${esc(q)} »</b><small>Pas encore sur Bet's Friends : lien à partager, ou tape son e-mail.</small></span><i>+</i></button>`;
     if(!q&&!ps.length)h=`<p class="hmnone">Tape le prénom d'un ami pour le défier.</p>`;
     return h;}
   const gs=allGroups().filter(g=>!H.multi.some(x=>x.k==="g"&&x.id===g.id)).filter(g=>!nq||normS(g.name).includes(nq)).slice(0,4);
   const ps=hmPeople(q,hmTaken());
   let h=gs.map(g=>`<button type="button" class="hmrow" data-act="hmPick" data-ctx="multi" data-k="g" data-id="${esc(g.id)}"><span class="hmgi">👥</span><span><b>${esc(g.name)}</b><small>Groupe · ${(g.members||[]).length} membre${(g.members||[]).length>1?"s":""}</small></span><i>+</i></button>`).join("");
-  h+=ps.map(m=>`<button type="button" class="hmrow" data-act="hmPick" data-ctx="multi" data-k="m" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.short)}</b><small>${m.fr?"Ami · ":""}${esc(m.name)} · @${esc(m.pseudo)}</small></span><i>+</i></button>`).join("");
+  h+=ps.map(m=>`<button type="button" class="hmrow" data-act="hmPick" data-ctx="multi" data-k="m" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.short)}</b><small>${m.fr?"Ami":"Membre"}${m.name!==m.short?" · "+esc(m.name):""}</small></span><i>+</i></button>`).join("");
   if(q&&!ps.some(m=>normS(m.short)===nq||normS(m.name)===nq)&&!gs.some(g=>normS(g.name)===nq))h+=`<button type="button" class="hmrow inv" data-act="hmInvite" data-ctx="multi" data-name="${esc(q.replace(/^@/,""))}"><span class="hmgi">✉️</span><span><b>Inviter « ${esc(q)} »</b><small>Pas encore inscrit : lien à partager, ou tape son e-mail.</small></span><i>+</i></button>`;
   if(!h)h=`<p class="hmnone">Ajoute un groupe, des amis ou des invités.</p>`;
   return h;}
@@ -4664,6 +4664,10 @@ function evAlive(cid,sid){try{const c=FIND[cid];if(!c)return false;const sus=sub
 function spOn(id){const h=me().hs;return!(Array.isArray(h)&&h.includes(id));}
 function goldSp(sid,sz=26,cls=""){/* v59 : or plein (le dégradé SVG partagé ne s'affiche pas sur iPhone) */const svg=String(H3_ICO[sid]||H3_ICO.free||"").replace(/url\(#h3gold\)/g,"#D9B66A");return`<span class="gsp ${cls}" style="width:${sz}px;height:${sz}px" aria-hidden="true">${svg}</span>`;}
 function goldDefs(){if(document.getElementById("gdefs"))return;const d=document.createElement("div");d.id="gdefs";d.style.cssText="position:absolute;width:0;height:0;overflow:hidden";d.innerHTML=`<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="h3gold" gradientUnits="userSpaceOnUse" x1="4" y1="4" x2="44" y2="44"><stop offset="0" stop-color="#E6C680"/><stop offset=".5" stop-color="#C9A04E"/><stop offset="1" stop-color="#9A7535"/></linearGradient></defs></svg>`;document.body.prepend(d);}
+/* v130 : un tap sur un sport lance directement le choix du tournoi */
+function h3GoNow(){const H=hmS();if(!h3Ready())return;H._afl=false;if(!H.keepWho){Object.assign(H,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null});}H.keepWho=false;if(H.sport&&H.sport!=="free"){H.flowOn=true;H.fl={};S._flPK=undefined;S._flPV=undefined;S.sel={comp:null,full:false,items:{}};render();flShowStage();return;}if(H.sport==="free"){go("free");toast("Partie prête : invente ton pari");return;}go("sport",{sport:H.sport});toast(H.mode==="duel"?"Duel prêt : choisis ton match":"Partie prête : choisis tes matchs");}
+/* v130 : pluriel unique — nb(2,"match") → "2 matchs", nb(0,"partie") → "0 partie" */
+function nb(n,w,ws){n=+n||0;return n+" "+(n>1?(ws||(/[sxz]$/.test(w)?w:w+"s")):w);}
 function h3Ready(){return !!hmS().sport;}
 function h3Who(){const H=hmS();return H.mode==="duel"?!!H.duel:H.mode==="multi"?H.multi.length>0:false;}
 function h3Need(){const H=hmS(),L=[];if(!H.mode)L.push("tes potes");else if(H.mode==="duel"?!H.duel:!H.multi.length)L.push(H.mode==="duel"?"ton adversaire":"tes joueurs");if(!H.sport)L.push("ton sport");return L;}
@@ -4689,7 +4693,7 @@ function h3Back(){const H=hmS(),ctx=H.flip;if(!ctx)return`<div class="hfb" aria-
   return`<div class="hfb"><div class="hfbh"><p class="hfsub" style="margin:0">Un pote, plusieurs, ou un groupe</p><button type="button" class="hfret" data-act="h3Unflip" aria-label="Revenir">↺ Retour</button></div>
    <div class="hms">${HM_ICO.search}<input class="inp" type="search" id="h3q-${ctx}" data-hq="${ctx}" value="${esc(H.q[ctx]||"")}" placeholder="${duel?"Prénom ou e-mail…":"Groupe, ami, e-mail…"}" autocomplete="off" enterkeyhint="search" aria-label="${duel?"Chercher ton adversaire ou taper son e-mail":"Chercher un groupe, un ami ou taper un e-mail"}"><button type="button" class="flclr" data-act="flClr" aria-label="Effacer la recherche"${H.q[ctx]?"":" hidden"}>✕</button></div>
    <div class="hfscroll"><div class="hmr" id="hmr-${ctx}">${hmResults(ctx)}</div>
-    ${sel.length?`<div class="hmsel">${sel.map((x,i)=>hmChip(x,ctx,i)).join("")}</div>`:(H.q[ctx]?"":`<p class="hmnone">${duel?"Tape le prénom d'un ami, ou l'adresse e-mail de quelqu'un à inviter.":"Ajoute des amis, un groupe, ou invite par e-mail."}</p>`)}
+    ${sel.length?`<div class="hmsel">${sel.map((x,i)=>hmChip(x,ctx,i)).join("")}</div>`:(H.q[ctx]?"":`<p class="hmnone">${duel?"Ou tape un prénom ou un e-mail pour inviter.":"Ou tape un prénom, un groupe ou un e-mail pour inviter."}</p>`)}
     ${hmInvBox(ctx)}${!duel&&H.multi.length>1?`<button type="button" class="hfgrp" data-act="hmGrpOpen">👥 En faire un groupe</button>`:""}</div>
    ${sel.length?`<button type="button" class="hfok" data-act="h3Unflip">C'est bon</button>`:""}</div>`;}
 function h3Create(){const H=hmS(),rd=h3Ready(),A=S._cwAnim,was=A&&performance.now()-A.t0<H3CW_D?true:!!S._cwOn;H.goSeen=rd;S._cwOn=rd;
@@ -4929,7 +4933,7 @@ function flMatchesHTML(){const f=flS(),c=flComp(),co=flCountry();let lab="",h=""
       return`<div class="flm${o?" on":""}"><span class="flmt"><b>${i.tbd?esc(su.name):matchHTML(i)}</b><small>${i.tbd?esc((su.end&&+new Date(su.end)!==+new Date(su.start)?"Du "+fmtD(new Date(su.start))+" au "+fmtD(new Date(su.end)):fmtD(new Date(i.date)))+" · affiches au tirage"):esc(su.name)+" · "+esc(fmtD(new Date(i.date))+" · "+fmtT(new Date(i.date)))}</small></span>${full?"":can?`<button type="button" class="flck" data-act="flTick" data-key="${esc(k)}" aria-pressed="${o}" aria-label="Ajouter ${esc(i.label)} à ma partie">${o?"✓":""}</button>`:`<span class="flck lock" aria-label="Fermé">🔒</span>`}</div>`;}).join("");
     if(full&&its.length>8)rows+=`<p class="flmore">+ ${its.length-8} autres matchs, toute la saison</p>`;
     h=`<div class="flcad flmatch sp-${hmS().sport}"><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span>
-      <div class="flmh"><span>${full?"Toute la compétition · "+(its.length&&its.every(([su,i])=>i.tbd)?its.length+" tours à venir":its.length+" matchs à venir"):its.length+" "+(({velo:"étape",golf:"pari",f1:"séance"})[hmS().sport]||"match")+(its.length>1?"s":"")+" à venir"}</span>${!full&&open.length>1?`<button type="button" class="flall" data-act="flAll">${allOn?"Tout décocher":"Tout cocher"}</button>`:""}</div>
+      <div class="flmh"><span>${full?"Toute la compétition · "+(its.length&&its.every(([su,i])=>i.tbd)?nb(its.length,"tour")+" à venir":nb(its.length,"match")+" à venir"):its.length+" "+(({velo:"étape",golf:"pari",f1:"séance"})[hmS().sport]||"match")+(its.length>1?"s":"")+" à venir"}</span>${!full&&open.length>1?`<button type="button" class="flall" data-act="flAll">${allOn?"Tout décocher":"Tout cocher"}</button>`:""}</div>
       <div class="flml">${rows||`<p class="flmore">Aucun match à venir pour ce choix.</p>`}</div></div>`;
     if(its.length)h+=`<button type="button" class="h3create fadein" data-act="toCreate"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>${esc(mpLabel())}</button>`;
   return[lab,h];}
@@ -5100,9 +5104,9 @@ function flView(){const na=S._flKeep;let st="";if(!flComp())st=flStage();if(flCo
 /* accueil : l'événement est choisi, le bouton or ouvre sa page (formule, façon de jouer, matchs) */
 function flEvtPick(){const c=flComp(),f=flS(),co=flCountry(),sp=hmS().sport,nm=f.intl?"Coupes d'Europe · clubs "+(co?co.name:""):c.name;
   const n=subsOf(c).reduce((a,su)=>a+su.items.filter(i=>selOpen(i)).length,0),u=({velo:"étape",golf:"pari",f1:"séance"})[sp]||"match";
-  return`<h2 class="fllab flok"><span class="flokc" aria-hidden="true">✓</span><span class="flokt">Ton choix est <em>fait</em></span></h2><div class="flcad flevt sp-${sp}"><span class="flevck">✓ Choisi</span><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span>
-   <div class="flevi">${compBadge(c,64)}<span><b>${esc(nm)}</b><small>${esc(c.desc||c.flag||"")}</small><small class="flevn">${n} ${u}${n>1?"s":""} à venir</small></span></div></div>
-   <button type="button" class="h3create fadein" data-act="toCreate"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Continuer</button>`;}
+  return`<h2 class="fllab flok"><span class="flokc" aria-hidden="true">✓</span><span class="flokt">Ton choix est <em>fait</em></span></h2><div class="flcad flevt sp-${sp}${n?"":" flzero"}"><span class="flevck">✓ Choisi</span><span class="flcc" aria-hidden="true"></span><span class="flpb l" aria-hidden="true"></span><span class="flpb r" aria-hidden="true"></span>
+   <div class="flevi">${compBadge(c,64)}<span><b>${esc(nm)}</b><small>${esc(c.desc||c.flag||"")}</small><small class="flevn">${n?n+" "+u+(n>1?"s":"")+" à venir":"Pas de "+u+" à venir pour l'instant"}</small></span></div></div>
+   <button type="button" class="h3create fadein" data-act="toCreate"${n?"":" disabled aria-disabled=\"true\""}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Continuer</button>`;}
 
 function vHome(){
   const flood=side=>`<div class="flood ${side}" aria-hidden="true"><div class="beam"></div><div class="beam b2"></div><div class="mast"></div><div class="panel">${"<i></i>".repeat(16)}</div><div class="halo"></div></div>`;
@@ -5491,19 +5495,19 @@ function gIdent(g){const al={};groupParties(g).forEach(p=>{if(p.free)return;rawP
   const nm=(k,n)=>k==="u:"+(S.uid||"me")?"Toi":(isMeName(n)?(k==="u:"+g.owner?(ownerNm(g.owner)||n):n):n);
   return{mk,pk,nm};}
 function generalBoard(g){const SPF=S.gbSp&&S.gbSp!=="all"?S.gbSp:null;const tot={},nameOf={},I=gIdent(g);const add=(k,n)=>{if(!tot[k])tot[k]={k,name:I.nm(k,n),pts:0,ev:0,live:0,wins:0,exact:0,cr:0,pod:0};else if(isMeName(tot[k].name)&&!isMeName(n)&&k!=="u:"+(S.uid||"me"))tot[k].name=n;return tot[k];};
-  (g.members||[]).forEach(n=>add(I.mk(n),n));let nP=0,nLive=0;
-  groupParties(g).forEach(p=>{if(p.free)return;if(SPF&&sportOfParty(p)!==SPF)return;let sc;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(e){return;}if(!sc.done)return;nP++;const fin=isClosed(p)||sc.done===sc.total;if(!fin)nLive++;
+  (g.members||[]).forEach(n=>add(I.mk(n),n));let nP=0,nLive=0,nAll=0,nRun0=0;
+  groupParties(g).forEach(p=>{if(p.free)return;if(SPF&&sportOfParty(p)!==SPF)return;nAll++;let sc;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(e){return;}if(!sc.done){try{const st=partyStatus(p)[0];if(st==="En direct"||st==="En cours")nRun0++;}catch(_){}return;}nP++;const fin=isClosed(p)||sc.done===sc.total;if(!fin)nLive++;
     const pl=rawPlayers(p);sc.rows.forEach((r,i)=>{const x=pl.find(y=>y.id===r.id)||{id:r.id,name:r.name};const k=I.pk(p,x);const t=add(k,r.name);if(k==="u:"+(S.uid||"me"))t.name="Toi";t.pts+=r.pts;t.exact+=r.exact||0;fin?t.ev++:t.live++;if(fin&&tieRank(sc.rows,i)===1&&r.pts>0)t.wins++;if(fin&&tieRank(sc.rows,i)<=3&&r.pts>0)t.pod++;if(fin&&+p.amount>0&&(p.split||[]).length){t.cr+=tieGain(sc.rows,i,p.split,p.amount*effPeople(p));t.mise=(t.mise||0)+(+p.amount);}});});
   Object.values(tot).forEach(t=>{t.net=t.cr-(t.mise||0);});
   const by=S.gbSort||"pts",K={pts:x=>x.pts,wins:x=>x.wins,cr:x=>x.net,pod:x=>x.pod};const f=K[by]||K.pts;
-  return{nP,nLive,by,rows:Object.values(tot).sort((a,b)=>f(b)-f(a)||b.pts-a.pts||b.wins-a.wins||a.name.localeCompare(b.name))};}
+  return{nP,nLive,nAll,nRun0,by,rows:Object.values(tot).sort((a,b)=>f(b)-f(a)||b.pts-a.pts||b.wins-a.wins||a.name.localeCompare(b.name))};}
 function generalBoardHTML(g){const B=generalBoard(g),meK="u:"+(S.uid||"me"),f=v=>v.toLocaleString("fr-BE");
   const sids=[...new Set(groupParties(g).filter(p=>!p.free).map(sportOfParty))].filter(x=>x&&x!=="free"),spf=S.gbSp&&sids.includes(S.gbSp)?S.gbSp:"all";
   const val=r=>B.by==="cr"?(r.net>0?"+":"")+f(r.net):B.by==="wins"?String(r.wins):B.by==="pod"?String(r.pod):f(r.pts);
   const KEY={pts:r=>r.pts,wins:r=>r.wins,cr:r=>r.net,pod:r=>r.pod}[B.by]||(r=>r.pts);let place=0;const ranks=B.rows.map((r,i)=>{if(!i||KEY(r)!==KEY(B.rows[i-1]))place=i+1;return place;});
   const spName=spf==="all"?"":((SPORTS.find(x=>x.id===spf)||{}).name||spf);
   const nmOf=r=>isMeName(r.name)?((me()||{}).name||myLabel()||r.name):r.name;
-  return`<div class="pad" style="margin-top:12px"><div class="card board gboardall"><div class="bh"><b class="sbh"><i>${spf==="all"?"🏆":(SP_ICON[spf]||"🏆")}</i>Classement ${spf==="all"?"général":esc(spName)}</b><span class="muted">${B.nP} partie${B.nP>1?"s":""}${B.nLive?" · "+B.nLive+" en cours":""}</span></div>
+  return`<div class="pad" style="margin-top:12px"><div class="card board gboardall"><div class="bh"><b class="sbh"><i>${spf==="all"?"🏆":(SP_ICON[spf]||"🏆")}</i>Classement ${spf==="all"?"général":esc(spName)}</b><span class="muted">${(()=>{const nF=B.nP-B.nLive,nR=B.nLive+B.nRun0,nW=B.nAll-B.nP-B.nRun0;return [nF?nb(nF,"terminée"):"",nR?nR+" en cours":"",nW?nb(nW,"à venir","à venir"):""].filter(Boolean).join(" · ")||nb(B.nAll,"partie");})()}</span></div>
    <div class="gbsort gbs4" role="group" aria-label="Classer par">${[["pts","🎯 Points"],["cr","💰 Crédits"],["wins","🏆 Victoires"],["pod","🥇 Podiums"]].map(([k,l])=>`<button type="button" class="pick${B.by===k?" on":""}" data-act="gbSort" data-v="${k}" aria-pressed="${B.by===k}">${l}</button>`).join("")}</div>
    ${sids.length>1?`<div class="gbsp" role="group" aria-label="Sport">${[["all","Tous"]].concat(sids.map(x=>[x,SP_ICON[x]||x])).map(([k,l])=>`<button type="button" class="${spf===k?"on":""}" data-act="gbSp" data-v="${k}" aria-pressed="${spf===k}"${k!=="all"?` aria-label="${esc((SPORTS.find(x=>x.id===k)||{}).name||k)}"`:""}>${l}</button>`).join("")}</div>`:""}
    ${B.nP?B.rows.map((r,i)=>`<div class="br${r.k===meK?" me":""}">${rkTile(ranks[i],0,false,0,false)}${(()=>{const uid=r.k&&r.k.startsWith("u:")?r.k.slice(2):null;let pr=(uid===(S.uid||"me")?me():null)||(uid?personByUid(uid,r.name):null)||memberByName(r.name);if(!pr||!okPhoto(pr.photo)){try{const fr=myFriends().find(x=>normS(x.name)===normS(r.name)||(uid&&x.uid===uid));if(fr&&okPhoto(fr.photo))pr=fr;}catch(_){}}return avatar(pr||{short:r.name},36);})()}<span class="nm">${esc(nmOf(r))}</span><span class="gbv r${Math.min(ranks[i],4)}${KEY(r)?"":" zero"}"><i>${{wins:"🏆",cr:"💰",pts:"🎯",pod:"🥇"}[B.by]||"🏆"}</i><b>${val(r)}</b></span></div>`).join("")
@@ -5520,13 +5524,13 @@ function ngSheet(){const sel=S.frSel||[],q=(S.ngQ||"").trim(),F=ngFriends(),have
    <label class="nglab">2 · Les membres <span>${sel.length}</span></label>
    <div class="frchips">${sel.length?sel.map(n=>`<span class="chip2">${esc(n)}<button type="button" data-act="ngDel" data-n="${esc(n)}" aria-label="Retirer ${esc(n)}">✕</button></span>`).join(""):'<span class="muted" style="font-size:13px">Coche au moins un ami.</span>'}</div>
    ${F.length?`<div class="nglist">${F.map(f=>{const on=have.has(normS(f.name));return`<button type="button" class="ngrow${on?" on":""}" data-act="frSel" data-n="${esc(f.name)}" aria-pressed="${on}"><span class="frchk">${on?"✓":""}</span>${frAv(f,32)}<b>${esc(f.full)}</b></button>`;}).join("")}</div>`:""}
-   <input class="inp ngq" data-ngq="1" value="${esc(q)}" placeholder="Ajouter quelqu'un : prénom, @pseudo ou e-mail" autocomplete="off">
+   <input class="inp ngq" data-ngq="1" value="${esc(q)}" placeholder="Ajouter quelqu'un : prénom ou e-mail" autocomplete="off">
    <div class="ngres" id="ngres">${ngResults()}</div>
    <button type="button" class="btn block" data-act="frNewGo"${sel.length&&(S.ngName||"").trim()?"":" disabled"}>Créer le groupe${sel.length?" ("+(sel.length+1)+" membres)":""}</button><button type="button" class="btn ghost block" style="margin-top:8px" data-act="frNewClose">Annuler</button></div>`;}
 function ngResults(){const q=(S.ngQ||"").trim();if(!q)return"";const sel=S.frSel||[];
   if(HM_MAILRX.test(q)){const em=emailMember(q);if(em)return`<button type="button" class="hmrow" data-act="ngAdd" data-n="${esc(em.short)}">${avatar(em,30)}<span><b>${esc(em.name)}</b><small>Inscrit</small></span><i>+</i></button>`;return`<button type="button" class="hmrow inv" data-act="ngAdd" data-n="${esc(hmMailName(q))}" data-e="${esc(q)}"><span class="hmgi">✉️</span><span><b>Ajouter ${esc(q)}</b><small>Pas encore inscrit</small></span><i>+</i></button>`;}
   const res=findMembers(q,["Toi"].concat(sel)).filter(m=>!isMeName(m.short)).slice(0,5);
-  return res.map(m=>`<button type="button" class="hmrow" data-act="ngAdd" data-n="${esc(m.short)}">${avatar(m,30)}<span><b>${esc(m.name)}</b><small>@${esc(m.pseudo)}</small></span><i>+</i></button>`).join("")+(res.some(m=>normS(m.short)===normS(q))?"":`<button type="button" class="hmrow inv" data-act="ngAdd" data-n="${esc(q.replace(/^@/,""))}"><span class="hmgi">✉️</span><span><b>Ajouter « ${esc(q.replace(/^@/,""))} »</b><small>Pas encore inscrit</small></span><i>+</i></button>`);}
+  return res.map(m=>`<button type="button" class="hmrow" data-act="ngAdd" data-n="${esc(m.short)}">${avatar(m,30)}<span><b>${esc(m.name)}</b><small>${esc(m.city||"Membre")}</small></span><i>+</i></button>`).join("")+(res.some(m=>normS(m.short)===normS(q))?"":`<button type="button" class="hmrow inv" data-act="ngAdd" data-n="${esc(q.replace(/^@/,""))}"><span class="hmgi">✉️</span><span><b>Ajouter « ${esc(q.replace(/^@/,""))} »</b><small>Pas encore inscrit</small></span><i>+</i></button>`);}
 
 function groupParties(g){const ids=new Set(g.parties||[]);return allParties().filter(p=>ids.has(p.id)||p.group===g.id||gSameCrew(g,p));}
 /* classement d'un sport dans le groupe : points de ce sport seulement (on n'additionne jamais des sports différents) */
@@ -5853,8 +5857,8 @@ const avatar=(m,sz=36)=>{if(m&&isMeName(m.short||"")&&!m.photo)m=me();return`<sp
 /* pastille d'un joueur dans une partie : ma photo si c'est moi */
 const plAv=(p,pl)=>{if(p&&pl&&pl.id===myId(p)&&okPhoto(me().photo))return avatar(me(),36);let pr=null;try{pr=personOf(p,pl);}catch(_){}return pr&&okPhoto(pr.photo)?avatar(pr,36):`<span class="av">${esc(String(pl.name||"?").slice(0,1).toUpperCase())}</span>`;};
 function memberPicker(ctx,selected){const q=S["mq_"+ctx]||"";const res=q.trim()?findMembers(q,selected).slice(0,8):[];
-  return`<div class="mpick"><input class="inp" data-mq="${ctx}" value="${esc(q)}" placeholder="Chercher un membre : nom ou @pseudo" autocomplete="off">
-   <div class="mres">${res.map(m=>`<button type="button" class="mrow2" data-act="mAdd" data-ctx="${ctx}" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.name)}</b><small>@${esc(m.pseudo)} · ${esc(m.city)}</small></span><i>+</i></button>`).join("")||`<p class="muted" style="font-size:13px;margin:6px 0">${q?"Aucun membre trouvé avec « "+esc(q)+" ».":""}</p>`}</div>
+  return`<div class="mpick"><input class="inp" data-mq="${ctx}" value="${esc(q)}" placeholder="Chercher un membre : prénom ou nom" autocomplete="off">
+   <div class="mres">${res.map(m=>`<button type="button" class="mrow2" data-act="mAdd" data-ctx="${ctx}" data-name="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.name)}</b><small>${esc(m.city||"Membre")}</small></span><i>+</i></button>`).join("")||`<p class="muted" style="font-size:13px;margin:6px 0">${q?"Aucun membre trouvé avec « "+esc(q)+" ».":""}</p>`}</div>
    ${q&&!res.some(m=>normS(m.short)===normS(q))?`<button type="button" class="mini" style="margin-top:6px" data-act="mAdd" data-ctx="${ctx}" data-name="${esc(q.replace(/^@/,""))}">+ Ajouter « ${esc(q)} » (pas encore inscrit)</button>`:""}</div>`;}
 
 /* ===================================================================== MON PROFIL (nouveau) */
@@ -5904,11 +5908,11 @@ function vFriends(){
   let h=pageHead("MES <b>AMIS</b>","Invite tes potes, défie-les, crée tes groupes.");
   h+=`<div class="frwrap">
    <div class="frinv"><div><b>Invite tes potes</b><small>Ils rejoignent Bet's Friends avec ton lien</small></div><button type="button" class="pfpl" data-act="frShare">Partager</button></div>
-   <div class="frsearch">${HM_ICO.search}<input class="inp" type="search" data-frq="1" value="${esc(q)}" placeholder="Ajouter un ami : prénom, @pseudo ou e-mail" autocomplete="off" enterkeyhint="search" aria-label="Ajouter un ami"></div>
+   <div class="frsearch">${HM_ICO.search}<input class="inp" type="search" data-frq="1" value="${esc(q)}" placeholder="Ajouter un ami : prénom ou e-mail" autocomplete="off" enterkeyhint="search" aria-label="Ajouter un ami"></div>
    <div id="frres">${frResults()}</div>
    <div class="frhd"><h2>Tes amis <span>${F.length}</span></h2>${F.length>1?`<button type="button" class="link" data-act="frSelAll">${sel.size===F.length?"Tout désélectionner":"Tout sélectionner"}</button>`:""}</div>
    ${F.length?`<div class="frlist">${F.map(f=>{const on=sel.has(f.name);return`<div class="frrow${on?" on":""}"><button type="button" class="frchk" data-act="frSel" data-n="${esc(f.name)}" aria-pressed="${on}" aria-label="Sélectionner ${esc(f.name)}">${on?"✓":""}</button>
-     <button type="button" class="frmain" ${f.m?`data-act="member" data-id="${esc(f.m.id)}"`:`data-act="frSel" data-n="${esc(f.name)}"`}>${frAv(f,44)}<span><b>${esc(f.full)}</b><small>${f.m?"@"+esc(f.m.pseudo)+" · ":""}${f.parties?f.parties+" partie"+(f.parties>1?"s":"")+" ensemble":f.m?"Pas encore joué ensemble":"Invité · pas encore inscrit"}</small></span></button>
+     <button type="button" class="frmain" ${f.m?`data-act="member" data-id="${esc(f.m.id)}"`:`data-act="frSel" data-n="${esc(f.name)}"`}>${frAv(f,44)}<span><b>${esc(f.full)}</b><small>${f.parties?f.parties+" partie"+(f.parties>1?"s":"")+" ensemble":f.m?"Pas encore joué ensemble":"Invité · pas encore inscrit"}</small></span></button>
      <button type="button" class="frduel" data-act="frDuel" data-n="${esc(f.name)}" aria-label="Défier ${esc(f.name)}">⚔️ Défier</button></div>`;}).join("")}</div>`
     :`<div class="frempty"><b>Pas encore d'amis ici</b><small>Ajoute-les avec la recherche ou partage ton lien.</small></div>`}
    <div class="frhd"><h2>Mes groupes <span>${gs.length}</span></h2></div>
@@ -5920,11 +5924,11 @@ function vFriends(){
   return h;
 }
 function frResults(){const q=(S.frQ||"").trim();if(!q)return"";const nq=normS(q).replace(/^@/,""),have=new Set(myFriends().map(f=>normS(f.name)));
-  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em){const on=have.has(normS(em.short));return`<div class="frres"><button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(em.id)}" data-n="${esc(em.short)}" data-e="${esc(normEmail(q))}">${avatar(em,34)}<span><b>${esc(em.name)}</b><small>Inscrit sur Bet's Friends · @${esc(em.pseudo)}</small></span><i>${on?"✓":"+"}</i></button></div>`;}}
+  if(HM_MAILRX.test(q)){const em=emailMember(q);if(em){const on=have.has(normS(em.short));return`<div class="frres"><button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(em.id)}" data-n="${esc(em.short)}" data-e="${esc(normEmail(q))}">${avatar(em,34)}<span><b>${esc(em.name)}</b><small>Inscrit sur Bet's Friends</small></span><i>${on?"✓":"+"}</i></button></div>`;}}
   if(HM_MAILRX.test(q))return`<div class="frres"><button type="button" class="hmrow inv" data-act="frAddMail" data-e="${esc(q)}"><span class="hmgi">✉️</span><span><b>Inviter ${esc(q)}</b><small>Un e-mail avec ton lien d'invitation, et on l'ajoute à tes amis</small></span><i>+</i></button></div>`;
   const ps=findMembers(q,[]).filter(m=>!isMeName(m.short)).slice(0,6);
   const frs=myFriends().filter(f=>(normS(f.name).includes(nq)||normS(f.full||"").includes(nq))&&!ps.some(m=>(f.m&&m.uid===f.m.uid)||normS(m.short)===normS(f.name))).slice(0,6);
-  let h=frs.map(f=>`<button type="button" class="hmrow" ${f.m?`data-act="member" data-id="${esc(f.m.id)}"`:`data-act="frSel" data-n="${esc(f.name)}"`}>${frAv(f,34)}<span><b>${esc(f.full||f.name)}</b><small>Déjà dans tes amis${f.m?" · @"+esc(f.m.pseudo):" · pas encore inscrit"}</small></span><i>✓</i></button>`).join("")+ps.map(m=>{const on=have.has(normS(m.short));return`<button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(m.id)}" data-n="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.name)}</b><small>@${esc(m.pseudo)} · ${esc(m.city)}</small></span><i>${on?"✓":"+"}</i></button>`;}).join("");
+  let h=frs.map(f=>`<button type="button" class="hmrow" ${f.m?`data-act="member" data-id="${esc(f.m.id)}"`:`data-act="frSel" data-n="${esc(f.name)}"`}>${frAv(f,34)}<span><b>${esc(f.full||f.name)}</b><small>Déjà dans tes amis${f.m?" · @"+esc(f.m.pseudo):" · pas encore inscrit"}</small></span><i>✓</i></button>`).join("")+ps.map(m=>{const on=have.has(normS(m.short));return`<button type="button" class="hmrow" data-act="${on?"member":"frAdd"}" data-id="${esc(m.id)}" data-n="${esc(m.short)}">${avatar(m,34)}<span><b>${esc(m.name)}</b><small>${esc(m.city||"Membre")}</small></span><i>${on?"✓":"+"}</i></button>`;}).join("");
   if(!ps.some(m=>normS(m.short)===nq||normS(m.name)===nq)&&!frs.some(f=>normS(f.name)===nq))h+=`<button type="button" class="hmrow inv" data-act="frAdd" data-n="${esc(q.replace(/^@/,""))}"><span class="hmgi">✉️</span><span><b>Ajouter « ${esc(q.replace(/^@/,""))} »</b><small>Pas encore inscrit : partage-lui ton lien</small></span><i>+</i></button>`;
   if(!ps.length&&!frs.length)h+=`<p class="muted" style="font-size:12px;margin:8px 4px 0">Pas trouvé ? Tape son <b>e-mail</b> ou son <b>@pseudo</b> exact : ça marche même si son profil n'est pas public.</p>`;
   return`<div class="frres">${h}</div>`;}
@@ -5949,9 +5953,9 @@ function vSearch(){
   h+=sec("Compétitions",comps.length,comps.slice(0,6).map(x=>`<button type="button" class="item" data-act="comp" data-comp="${x.c.id}"><span class="main"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span>${arrow}</button>`).join(""));
   h+=sec("Matchs à venir",matches.length,matches.slice(0,8).map(x=>`<button type="button" class="item" data-act="sMatch" data-comp="${x.c.id}" data-sub="${x.su.id}" data-item="${x.it.id}"><span class="main"><b style="display:flex;flex-wrap:wrap;align-items:center">${matchHTML(x.it)}</b><span>${esc(x.s)}</span></span>${arrow}</button>`).join(""));
   h+=sec("Joueurs et pilotes",people.length,people.map(n=>{const p=PERSON[n];const sp=p.team?"f1":GOLF_PGA.concat(GOLF_LIV,GOLF_EU,GOLF_ABU,GOLF_WWT,GOLF_DPW).some(x=>x[0]===n)?"golf":"tennis";return`<button type="button" class="item" data-act="sport" data-id="${sp}"><span class="main"><b class="tm" style="display:inline-flex">${mark(n)} ${esc(n)}</b><span>${p.team?"F1 · "+esc(p.team):sp==="golf"?"Golf":"Tennis"}</span></span>${arrow}</button>`;}).join(""));
-  h+=sec("Mes groupes",groups.length,groups.map(g=>`<button type="button" class="item" data-act="group" data-id="${esc(g.id)}"><span class="main"><b>${esc(g.name)}</b><span>${g.members.length} membres</span></span>${arrow}</button>`).join(""));
+  h+=sec("Mes groupes",groups.length,groups.map(g=>`<button type="button" class="item" data-act="group" data-id="${esc(g.id)}"><span class="main"><b>${esc(g.name)}</b><span>${nb(g.members.length,"membre")}</span></span>${arrow}</button>`).join(""));
   h+=sec("Mes parties",parties.length,parties.map(p=>`<button type="button" class="item" data-act="party" data-id="${esc(p.id)}"><span class="main"><b>${esc(p.name)}</b><span>${esc(p.free?"Pari libre":FIND[p.comp].name)}</span></span>${arrow}</button>`).join(""));
-  h+=sec("Membres",mems.length,mems.map(m=>{const n=commonWith(m).length;return`<button type="button" class="item" data-act="member" data-id="${esc(m.id)}">${avatar(m,36)}<span class="main"><b>${esc(m.name)}</b><span>@${esc(m.pseudo)} · ${esc(m.city)}${n?` · <b style="display:inline;color:var(--lime)">${n} partie${n>1?"s":""} en commun</b>`:""}</span></span>${arrow}</button>`;}).join(""));
+  h+=sec("Membres",mems.length,mems.map(m=>{const n=commonWith(m).length;return`<button type="button" class="item" data-act="member" data-id="${esc(m.id)}">${avatar(m,36)}<span class="main"><b>${esc(m.name)}</b><span>${esc(m.city)}${n?` · <b style="display:inline;color:var(--lime)">${n} partie${n>1?"s":""} en commun</b>`:""}</span></span>${arrow}</button>`;}).join(""));
   if(!comps.length&&!matches.length&&!people.length&&!groups.length&&!parties.length&&!mems.length)h+=`<p class="empty">Rien trouvé pour « ${esc(S.sq)} ».</p>`;
   return h;
 }
@@ -6226,7 +6230,7 @@ function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done"
   const meI=R.findIndex(x=>x.id===me||x.name==="Toi"),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
   let PL=[];try{PL=playersOf(p);}catch(_){}
   const face=x=>{const pl=PL.find(y=>y.id===x.id)||{id:x.id,name:x.name};let im="";try{im=bubImg(personOf(p,pl));}catch(_){}return`<span class="rtfc" style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(nm(x)||"?").charAt(0).toUpperCase())}</span>`;};
-  const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i>${face(x)}<b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?(fin?"up":"up pv"):""}">${cr>0?(fin?"+":"≈ +")+cr:"0"} cr.</u>`:""}</span>`;};
+  const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot&&(fin||R.some(y=>y.pts>0))?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i>${face(x)}<b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?(fin?"up":"up pv"):""}">${cr>0?(fin?"+":"≈ +")+cr:"0"} cr.</u>`:""}</span>`;};
   let list=(meI>2?[0,1,meI]:[0,1,2]).filter(i=>i<R.length).map(line).join("");
   const att=rows.filter(r=>{try{return!isDone(r.it)&&+r.it.date+3*3600e3<+NOW;}catch(_){return false;}}).length;
   const started=(sc&&sc.done>0)||rows.some(r=>+r.it.date<=+NOW),onAir=!fin&&rows.some(r=>{try{return inPlay(r.it);}catch(_){return false;}});
@@ -6335,14 +6339,14 @@ function vParties(){
     return`<button type="button" class="pcard pc2 ph-${ph} pcsu pcsp sp-${sid}${S.justNew&&S.justNew.id===p.id?" pcnew":""}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span><b class="pct">${!n&&urgIc(p)?urgIc(p):""}${esc(p.name)}</b><span class="pcb">${c?compBadge(c,44):`<span class="prfree">🥂</span>`}</span><span class="pcm"><small>${phaseLine(p,n?urgTag(vibeT(p)):"",1)}</small>${fin&&gainOf(p)>0?`<em class="pcgain">+${gainOf(p).toLocaleString("fr-BE")} cr.</em>`:playedTxt(p)}</span>${right}</button>`;};
   const grid=list=>list.length?rtGrid(list,D):`<p class="empty">${f&&f.k==="pending"?"Tout est fait, chapeau 👌":"Rien ici pour l'instant."}</p>`;
   if(f){
-    if(f.k==="groups"){const gs=allGroups();return head("PAR <b>GROUPE</b>","Une bande d'amis, ses parties")+`<div class="ptg">${gs.map(g=>{const ps=groupParties(g),t=ps.reduce((a,p)=>a+D.todoN(p),0);return`<button type="button" class="pcat" data-act="pf" data-k="group" data-v="${esc(g.id)}">${scene("sport",1)}<span class="ptsh"></span><span class="pcic">${esc(g.name.split(" ").filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join("").toUpperCase())}</span><span class="pttx"><b>${esc(g.name)}</b><small>${g.members.length} membres · ${ps.length} partie${ps.length>1?"s":""}</small>${t?`<em>✏️ ${t} prono${t>1?"s":""} à faire</em>`:""}</span></button>`;}).join("")}</div>`;}
+    if(f.k==="groups"){const gs=allGroups();return head("PAR <b>GROUPE</b>","Une bande d'amis, ses parties")+`<div class="ptg">${gs.map(g=>{const ps=groupParties(g),t=ps.reduce((a,p)=>a+D.todoN(p),0);return`<button type="button" class="pcat" data-act="pf" data-k="group" data-v="${esc(g.id)}">${scene("sport",1)}<span class="ptsh"></span><span class="pcic">${esc(g.name.split(" ").filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join("").toUpperCase())}</span><span class="pttx"><b>${esc(g.name)}</b><small>${nb(g.members.length,"membre")} · ${ps.length} partie${ps.length>1?"s":""}</small>${t?`<em>✏️ ${t} prono${t>1?"s":""} à faire</em>`:""}</span></button>`;}).join("")}</div>`;}
     if(f.k==="group"){const g=groupById(f.v);return head(esc(g?g.name:"Groupe"),g?g.members.join(" · "):"")+grid(g?groupParties(g):[]);}
     if(f.k==="sport"){const sp=SPORTS.find(x=>x.id===f.v);return head(sp?esc(sp.name).toUpperCase():"<b>PARI LIBRE</b>","")+grid(cur.concat(todoL,rdy,doneL).filter(p=>sportOfParty(p)===f.v));}
     const T={pending:["PRONOS <b>EN ATTENTE</b>","Tous tes pronos à faire, la fermeture la plus proche d'abord"],ready:["PARIS <b>PRIS</b>","…mais tu peux changer d'avis avant le départ"],todo:["À <b>VENIR</b>","Tes pronos à faire, la fermeture la plus proche d'abord"],live:["EN <b>COURS</b>","En direct et à venir · ta place au classement"],soon:["À <b>VENIR</b>","Pas encore commencé"],done:["<b>TERMINÉES</b>","Les plus récentes en haut"],ready:["PARIS <b>PRIS</b>","…mais tu peux changer d'avis avant le départ"]}[f.k]||["MES <b>PARTIES</b>",""];
     return head(T[0],T[1])+grid(f.k==="pending"?D.all.filter(p=>D.todoN(p)).sort(byKo):f.k==="ready"?taken:f.k==="todo"?todoL:f.k==="live"?cur:f.k==="done"?doneL:f.k==="all"?D.sec.todo.concat(D.sec.live,D.sec.soon,D.sec.done):D.sec[f.k]||[]);}
   const nTodo=D.sec.todo.reduce((a,p)=>a+D.todoN(p),0);
   const cat=(k,t,n,sub,bg,cls="")=>`<button type="button" class="pcat${cls}" data-act="pf" data-k="${k}">${bg}<span class="ptsh"></span><span class="pttx"><b>${t}</b><small>${sub}</small></span><span class="pcn">${n}</span></button>`;
-  let h=head("MES <b>PARTIES</b>","Range tes parties comme tu veux");
+  let h=head("MES <b>PARTIES</b>",(()=>{const n=D.all.filter(p=>D.todoN(p)).length;return n?"✏️ "+nb(n,"partie")+" attend"+(n>1?"ent":"")+" tes pronos":D.all.length?"Tous tes pronos sont faits 👌":"Lance ta première partie depuis l'accueil";})());
   const CATS=[["pending","Pronos en attente",pend,"hc2","Tout est fait, chapeau 👌"],["ready","Prono fait… tu changes d’avis ?",taken,"hc3","Pronos encore modifiables"],["done","Résultats",doneL,"hdn","Tes matchs joués"]];
   const rk=r=>`${r.rank}${r.rank>1?"e":"er"}`;
   const prow=(p,sk)=>{const c=p.free?null:FIND[p.comp],g=partyGroup(p),[st,col]=partyStatus(p),r=D.RK.get(p.id),n=D.todoN(p);
@@ -6352,7 +6356,7 @@ function vParties(){
   /* 3 lignes : cadre de catégorie (1/3) + rectangle avec ses parties (2/3) */
   /* moitié droite = carte à retourner : face pleine (chiffre + action), dos = la liste des parties */
   /* ticket : clic → il se déchire, le talon tombe, la partie droite prend toute la largeur et montre les parties en grand (plus de page à part) */
-  const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir les ${n} parties"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
+  const flip=(k,cls,n,sub,inner,ttl)=>`<div class="pflip" data-k="${k}"><button type="button" class="pfront ${cls}" data-act="pflip" aria-label="Ouvrir : ${nb(n,"partie")}"><span class="pfrow pfbar"></span><span class="pfl pfl2"><span class="pfn">${n}</span> partie${n>1?"s":""}</span></button><div class="tkl"><div class="tkh"><b>${ttl||""}</b>${k==="pending"?"":`<small>${n} partie${n>1?"s":""} · ${sub}</small>`}</div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>`;
   const SP_ORD=["foot","tennis","f1","golf","rugby","velo","basket","free"],SP_NM={foot:"Football",tennis:"Tennis",f1:"Formule 1",golf:"Golf",rugby:"Rugby",velo:"Cyclisme",basket:"Basket",free:"Pari libre"};
   const tkList=(list,empty,k)=>{if(!list.length)return`<p class="tkempty">${empty}</p>`;if(k==="done")return rtGrid(list,D);const T=p=>(k==="done"||k==="pending"||k==="ready")?rtile(p,D):pcard(p);
     if(k==="pending"&&tkSortOf(k).by==="cat"){let h="",cur=null;list.forEach(p=>{const sd=sportOfParty(p);if(sd!==cur){cur=sd;h+=`<div class="ntcat">${esc(SP_NM[sd]||sd)}</div>`;}h+=T(p);});return`<div class="pclist rtlist2">${h}</div>`;}
@@ -6989,7 +6993,7 @@ function myBetsTab(p,sc){
     const lv2=r.it.live?liveSt(r.it):"",stTxt=st==="open"?(testOpen(r.it)&&+r.it.date<=+NOW?"Ouvert (test)":"Paris ouverts"):st==="closed"?(+r.it.date>+NOW?"Paris fermés":"En cours"):(res&&!res.pending?"Terminé":"Terminé · résultat en attente");
     const stCol=st==="open"?"var(--lime)":st==="closed"?(lv2==="LIVE"?"#E5534B":"#FFB547"):"var(--muted)";
     const pl=myPronoLine(p,r),can=st==="open"&&!isLater(r.it);
-    const orgL=own?`<span class="orgline" style="color:${cs?"#FFB547":"var(--pink)"}">⚙️ ${cs?`${ownC?"Réglage de ce match":"Réglage commun"} · ${cs.f} · ${cs.n} paris`:"Paris à régler (réglage par défaut)"}</span>`:"";
+    const orgL=own?`<span class="orgline" style="color:${cs?"#FFB547":"var(--pink)"}">⚙️ ${cs?`${ownC?"Réglage de ce match":"Réglage commun"} · ${cs.f} · ${nb(cs.n,"pari")}`:"Paris à régler (réglage par défaut)"}</span>`:"";
     const acts=[];if(can)acts.push(`<button type="button" class="bigact ${pl?"green":"orange"}" data-act="betOne" data-key="${esc(r.key)}">${pl?"Modifier mon prono":"Faire mon prono"}</button>`);
     if(own&&st==="open")acts.push(`<button type="button" class="mini" data-act="cfg" data-key="${esc(r.key)}">⚙️ Régler les paris</button>`);
     /* v46 : bouton très visible pour l'organisateur — rouvrir / refermer les paris de ce match */
@@ -7125,7 +7129,7 @@ function betsAdmin(p,c,started){let h="";const rws=rowsOfParty(p).filter(r=>r.it
   const opn=cat=>rws.filter(x=>x.cat===cat&&itemState(p,x)==="open").length,stt=rws.some(x=>itemState(p,x)!=="open");
   const cr=commonRows(p).filter(r=>opn(r.cat));
   h+=`<div class="group" style="margin-top:14px">Réglage commun</div>`;
-  h+=cr.length?`<div class="list">`+cr.map(r=>{const cs=cfgSummary(p.cfg&&p.cfg[r.key],r.cat),no=opn(r.cat);return`<button type="button" class="item common" data-act="cfg" data-key="${esc(r.key)}"><span class="main"><b>${esc(stt?(no+" "+(r.cat.startsWith("f1")?"session"+(no>1?"s":""):r.cat.startsWith("velo")?"étape"+(no>1?"s":""):"match"+(no>1?"s":""))+" à venir"):r.title)}</b><span>${esc(stt?"Seuls les matchs pas encore commencés changent":r.sub+" · mêmes paris partout")}</span><span style="margin-top:4px;color:${cs?"var(--lime)":"var(--muted)"};font-weight:700">${cs?cs.f+" · "+cs.n+" paris · "+cs.pts+" pts":"Réglage par défaut"}</span></span><span class="cfgtag">Régler les paris</span></button>`;}).join("")+`</div>`
+  h+=cr.length?`<div class="list">`+cr.map(r=>{const cs=cfgSummary(p.cfg&&p.cfg[r.key],r.cat),no=opn(r.cat);return`<button type="button" class="item common" data-act="cfg" data-key="${esc(r.key)}"><span class="main"><b>${esc(stt?(no+" "+(r.cat.startsWith("f1")?"session"+(no>1?"s":""):r.cat.startsWith("velo")?"étape"+(no>1?"s":""):"match"+(no>1?"s":""))+" à venir"):r.title)}</b><span>${esc(stt?"Seuls les matchs pas encore commencés changent":r.sub+" · mêmes paris partout")}</span><span style="margin-top:4px;color:${cs?"var(--lime)":"var(--muted)"};font-weight:700">${cs?cs.f+" · "+nb(cs.n,"pari")+" · "+cs.pts+" pts":"Réglage par défaut"}</span></span><span class="cfgtag">Régler les paris</span></button>`;}).join("")+`</div>`
     :`<p class="muted" style="font-size:13px;margin:0 2px">${rws.some(r=>itemState(p,r)==="open")?"Un seul match par type : règle-le directement ci-dessous.":"Plus aucun match à venir."}</p>`;
   const G=[["open","À venir · paris ouverts"],["closed","En cours · paris fermés"],["done","Terminés"]];
   G.forEach(([g,t])=>{let l=rws.filter(r=>itemState(p,r)===g);if(!l.length)return;l=l.slice().sort((a,b)=>g==="done"?(+b.it.date-+a.it.date):(+a.it.date-+b.it.date));
@@ -7143,7 +7147,7 @@ function adminRow(p,c,subs,r,g){const it=r.it,su=subs.find(x=>x.id===r.key.split
     if(!it.res)acts.push(`<button type="button" class="mini warn" data-act="cuDelGame" data-key="${esc(r.key)}">${S.delArmG===r.key?"Confirmer la suppression":"Supprimer le match"}</button>`);}
   else if(it.live&&past&&!(S.resEdit===r.key))acts.push(`<button type="button" class="mini go" data-act="resEdit" data-key="${esc(r.key)}">${lv==="FT"?"✏️ Corriger le résultat":"🏁 Encoder le résultat"}</button>`);
   const ed=S.resEdit===r.key?resEditor(it,L):"";
-  return`<div class="item gm adm">${g==="open"?`<button type="button" class="cfgtag" data-act="cfg" data-key="${esc(r.key)}">Régler ce pari</button>`:""}<div class="gmain" style="flex-direction:column;align-items:stretch;gap:3px"><b style="display:flex;flex-wrap:wrap;align-items:center">${score}</b><span class="muted" style="font-size:12px">${esc(r.sub)}${res&&res.line&&!(res.sa!=null&&/^Score final/.test(res.line))?" · "+esc(res.line):""}</span><span style="font-size:12px;font-weight:800;color:${stCol}">● ${esc(stTxt)}</span>${g==="open"?`<span style="font-size:12px;font-weight:700;color:${cs?"var(--lime)":"var(--muted)"}">${cs?"⚙️ "+cs.f+" · "+cs.n+" paris · "+cs.pts+" pts":"⚙️ Réglage par défaut"}</span>`:""}</div>${ed}${acts.length?`<div class="gctl" style="flex-wrap:wrap">${acts.join("")}</div>`:""}</div>`;}
+  return`<div class="item gm adm">${g==="open"?`<button type="button" class="cfgtag" data-act="cfg" data-key="${esc(r.key)}">Régler ce pari</button>`:""}<div class="gmain" style="flex-direction:column;align-items:stretch;gap:3px"><b style="display:flex;flex-wrap:wrap;align-items:center">${score}</b><span class="muted" style="font-size:12px">${esc(r.sub)}${res&&res.line&&!(res.sa!=null&&/^Score final/.test(res.line))?" · "+esc(res.line):""}</span><span style="font-size:12px;font-weight:800;color:${stCol}">● ${esc(stTxt)}</span>${g==="open"?`<span style="font-size:12px;font-weight:700;color:${cs?"var(--lime)":"var(--muted)"}">${cs?"⚙️ "+cs.f+" · "+nb(cs.n,"pari")+" · "+cs.pts+" pts":"⚙️ Réglage par défaut"}</span>`:""}</div>${ed}${acts.length?`<div class="gctl" style="flex-wrap:wrap">${acts.join("")}</div>`:""}</div>`;}
 /* encodage manuel d'un résultat (matchs suivis automatiquement mais sans résultat fiable) : il est enregistré pour l'évent, donc pour toutes les parties */
 function resEditor(it,L){const sd=sides(it);
   return`<div class="pad resed" style="padding:0 16px 10px"><div class="lab" style="margin-top:4px">Résultat final</div>${sd?`<div class="mps"><span>${esc(sd[0])}</span><input class="inp" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" data-res="sa" value="${L.sa!=null?L.sa:""}" aria-label="Score ${esc(sd[0])}"><b>–</b><input class="inp" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="done" data-res="sb" value="${L.sb!=null?L.sb:""}" aria-label="Score ${esc(sd[1])}"><span>${esc(sd[1])}</span></div>
@@ -7257,7 +7261,7 @@ function vMember(){const m=MEMBERS.find(x=>x.id===S.memberView);if(!m)return vSe
   const st=d=>{const[t,col]=partyStatus(d.p);return`<span class="pbadge" style="color:${col};border-color:${col}">${t==="En direct"?"● ":""}${t}</span>`;};
   const ordS={"En direct":0,"En cours":1,"Paris ouverts":2,"Résultats complets":3,"Terminée":4};ds.sort((a,b)=>(ordS[partyStatus(a.p)[0]]-ordS[partyStatus(b.p)[0]])||String(b.p.createdAt).localeCompare(String(a.p.createdAt)));
   let h=`<div class="night" style="padding-bottom:6px"><div class="hero" style="background:transparent;min-height:0;padding-bottom:6px"><div class="bar">${backBtn}<span class="chip">Membre</span></div>
-    <div class="mbhead">${avatar(m,76)}<div><h1 class="disp" style="font-size:38px;margin:0">${esc(m.name)}</h1><p class="muted" style="margin:4px 0 0">@${esc(m.pseudo)} · ${esc(m.city)}</p></div></div></div></div>`;
+    <div class="mbhead">${avatar(m,76)}<div><h1 class="disp" style="font-size:38px;margin:0">${esc(m.name)}</h1><p class="muted" style="margin:4px 0 0">${esc(m.city)}</p></div></div></div></div>`;
   h+=`<div class="pad"><div class="card duel"><div class="dh"><span>${avatar(me(),40)}<b>Toi</b></span><span class="dvs">${W}<i>–</i>${L}</span><span>${avatar(m,40)}<b>${esc(m.short)}</b></span></div>
     <p class="dsub">${played.length?`Face-à-face sur ${played.length} partie${played.length>1?"s":""} commencée${played.length>1?"s":""}${E?` · ${E} égalité${E>1?"s":""}`:""}`:"Pas encore de face-à-face : aucune partie commune n'a commencé."}</p>
     ${played.length?`<div class="dbar"><i style="width:${Math.round(100*pMe/Math.max(1,pMe+pHe))}%"></i></div><div class="dpts"><span>${pMe} pts</span><span>${pHe} pts</span></div>`:""}
@@ -7544,17 +7548,17 @@ function vParty(){
   /* la partie = des tickets (même ouverture que « Mes parties ») : Matchs ouvert d'office, puis Classement, Joueurs, Chat et — pour l'organisateur seulement — Réglages */
   const sec=tab=>{let h="";
   if(tab==="board"){
-      const medal=["#FFD24A","#D0D5DD","#E39B5B"];
-      try{const pv=scoreProv(Object.assign({},p,{players:playersOf(p)}));if(pv.done>sc.done){const defR=id=>sc.rows.findIndex(x=>x.id===id),defP=id=>(sc.rows.find(x=>x.id===id)||{pts:0}).pts;
-        h+=`<div class="pad" style="margin-top:12px"><div class="card board prov"><div class="bh"><b>Classement provisoire</b><span class="provtag">● si ça s'arrêtait maintenant</span></div>
-         ${pv.rows.map((r,i)=>{const d=defR(r.id),mv=sc.done?d-i:0,acq=defP(r.id),pr=r.pts-acq;return`<div class="br${r.name==="Toi"?" me":""}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}<small>${acq} acquis${pr?` · <i class="pvp">+${pr} provisoire${pr>1?"s":""}</i>`:""}</small></span>${mv?`<span class="mv ${mv>0?"up":"dn"}">${mv>0?"▲":"▼"} ${Math.abs(mv)}</span>`:""}<span class="pt">${r.pts}<small>pts</small></span></div>`;}).join("")}
-         <p class="muted" style="font-size:12px;margin:10px 0 0">Calculé sur l'état en direct${LIVE_UPD?" (mise à jour : "+esc(LIVE_UPD)+")":""}. Devient définitif à la fin. ▲▼ = places gagnées ou perdues par rapport au classement définitif actuel.</p></div></div>`;}}catch(e){}
-      {const cl=isClosed(p),pr=!cl&&sc.done>0,hasPot=+p.amount>0&&(p.split||[]).length;
-      h+=`<div class="pad" style="margin-top:12px"><div class="mbest pboard${pr?" isprov":""}"><div class="mbtop"><div><b>${cl?"Classement final":pr?"Classement provisoire":"Classement"}</b><small>${sc.done}/${sc.total} terminé${sc.done>1?"s":""}${!sc.done?" · pas encore commencé":""}</small></div></div>
-       ${pr?`<div class="provban"><span>⏳</span><p><b>Provisoire</b>Il reste ${sc.total-sc.done} match${sc.total-sc.done>1?"s":""} : places et crédits peuvent encore bouger.</p></div>`:""}
-       <div class="mbl">${sc.rows.map((r,i)=>{const gain=hasPot&&sc.done?tieGain(sc.rows,i,p.split,pot):null,rk=tieRank(sc.rows,i);const me=r.id===myId(p)||r.name==="Toi";const nm0=r.name==="Toi"?((rawPlayers(p).find(y=>y.id===r.id)||{}).name||myLabel()||r.name):r.name,nm=/^toi$/i.test(nm0)?(myLabel()||nm0):nm0;
-         const fcr=v=>v.toLocaleString("fr-BE"),crTxt=!hasPot?"":!sc.done?"—":gain>0?(pr?"≈ +":"+")+fcr(gain)+" cr.":"0 cr.";
-         return`<div class="mbc r${sc.done?Math.min(rk,4):4}${me?" me":""}">${sc.done?rkBadge(rk,0,pr,tieEq(sc.rows,i)):`<span class="rkb r4"><b>–</b></span>`}<span class="mbav">${(()=>{try{return plAv(p,rawPlayers(p).find(y=>y.id===r.id)||{id:r.id,name:nm});}catch(_){return"";}})()}</span><span class="mbnm"><b>${esc(nm)}</b></span><span class="mbpt2">${r.pts}<i> pt${r.pts>1?"s":""}</i></span>${hasPot?`<span class="mbcr2${gain>0&&sc.done?(pr?" prov":" won"):""}">${crTxt}</span>`:""}</div>`;}).join("")}</div>
+      /* v130 : un seul tableau ; pendant un live, interrupteur « Actuel / ● En direct » */
+      let pv=null;try{const v=scoreProv(Object.assign({},p,{players:playersOf(p)}));if(v.done>sc.done)pv=v;}catch(e){}
+      const lv=!!pv&&S.pbV!=="cur",R=lv?pv.rows:sc.rows,dn=lv?pv.done:sc.done;
+      {const cl=isClosed(p),pr=!cl&&dn>0,hasPot=+p.amount>0&&(p.split||[]).length,zero=R.every(x=>!x.pts);
+      const sw=pv?`<div class="pbsw" role="group" aria-label="Classement affiché"><button type="button" data-act="pbV" data-v="cur" aria-pressed="${!lv}">Actuel</button><button type="button" data-act="pbV" data-v="live" aria-pressed="${lv}"><i class="pbdot" aria-hidden="true"></i>En direct</button></div>`:"";
+      h+=`<div class="pad" style="margin-top:12px"><div class="mbest pboard${pr?" isprov":""}${lv?" islive":""}"><div class="mbtop"><div><b>${cl?"Classement final":lv?"Classement en direct":pr?"Classement provisoire":"Classement"}</b><small>${sc.done}/${sc.total} terminé${sc.done>1?"s":""}${!sc.done&&!lv?" · pas encore commencé":""}</small></div>${sw}</div>
+       ${lv?`<div class="provban live"><span>●</span><p><b>En direct</b>Calculé sur le score en cours${LIVE_UPD?" (mise à jour : "+esc(LIVE_UPD)+")":""} : devient définitif à la fin.</p></div>`:pr?`<div class="provban"><span>⏳</span><p><b>Provisoire</b>Il reste ${sc.total-sc.done} match${sc.total-sc.done>1?"s":""} : places et crédits peuvent encore bouger.</p></div>`:""}
+       <div class="mbl">${R.map((r,i)=>{const gain=hasPot&&dn?tieGain(R,i,p.split,pot):null,rk=tieRank(R,i);const me=r.id===myId(p)||r.name==="Toi";const nm0=r.name==="Toi"?((rawPlayers(p).find(y=>y.id===r.id)||{}).name||myLabel()||r.name):r.name,nm=/^toi$/i.test(nm0)?(myLabel()||nm0):nm0;
+         const d0=lv&&sc.done?sc.rows.findIndex(x=>x.id===r.id):-1,mv=d0>=0?d0-i:0;
+         const fcr=v=>v.toLocaleString("fr-BE"),crTxt=!hasPot?"":!dn||(pr&&zero)?"—":gain>0?(pr?"≈ +":"+")+fcr(gain)+" cr.":"0 cr.";
+         return`<div class="mbc r${dn?Math.min(rk,4):4}${me?" me":""}">${dn?rkBadge(rk,0,pr,tieEq(R,i)):`<span class="rkb r4"><b>–</b></span>`}<span class="mbav">${(()=>{try{return plAv(p,rawPlayers(p).find(y=>y.id===r.id)||{id:r.id,name:nm});}catch(_){return"";}})()}</span><span class="mbnm"><b>${esc(nm)}</b>${mv?`<small class="mv ${mv>0?"up":"dn"}">${mv>0?"▲":"▼"} ${Math.abs(mv)}</small>`:""}</span><span class="mbpt2">${r.pts}<i> pt${r.pts>1?"s":""}</i></span>${hasPot?`<span class="mbcr2${gain>0&&dn&&!(pr&&zero)?(pr?" prov":" won"):""}">${crTxt}</span>`:""}</div>`;}).join("")}</div>
        ${hasPot?`<div class="mbsum pot"><span><small>Cagnotte · ${p.amount} cr. × ${p.people} joueurs</small><em>${p.split.map((x,i)=>(i+1)+(i?"e":"er")+" "+x+" %").join(" · ")}</em></span><b>${pot.toLocaleString("fr-BE")}<i>cr.</i></b></div>`:""}</div></div>`;}
     }
     if(tab==="chat")h+=chatTab(p,S.ptOpen==="pt-chat");
@@ -7730,7 +7734,7 @@ function mpWho(){const H=hmS(),ok=h3Who(),open=!!S.mpWhoOpen,ctx=H.wctx||H.mode|
   if(open)h+=`<div class="mpwed"><div class="mpseg" role="group" aria-label="Formule"><button type="button" data-act="mpWhoMode" data-ctx="duel" aria-pressed="${duel}">⚔️ En duel</button><button type="button" data-act="mpWhoMode" data-ctx="multi" aria-pressed="${!duel}">👥 À plusieurs</button></div>
    <div class="hms">${HM_ICO.search}<input class="inp" type="search" data-hq="${ctx}" value="${esc(H.q[ctx]||"")}" placeholder="${duel?"Prénom ou e-mail…":"Groupe, ami, e-mail…"}" autocomplete="off" enterkeyhint="search" aria-label="${duel?"Chercher ton adversaire ou taper son e-mail":"Chercher un groupe, un ami ou taper un e-mail"}"><button type="button" class="flclr" data-act="flClr" aria-label="Effacer la recherche"${H.q[ctx]?"":" hidden"}>✕</button></div>
    <div class="hmr" id="hmr-${ctx}">${hmResults(ctx)}</div>
-   ${sel.length?`<div class="hmsel">${sel.map((x,i)=>hmChip(x,ctx,i)).join("")}</div>`:`<p class="hmnone">${duel?"Tape le prénom d'un ami, ou l'adresse e-mail de quelqu'un à inviter.":"Ajoute des amis, un groupe, ou invite par e-mail."}</p>`}
+   ${sel.length?`<div class="hmsel">${sel.map((x,i)=>hmChip(x,ctx,i)).join("")}</div>`:`<p class="hmnone">${duel?"Ou tape un prénom ou un e-mail pour inviter.":"Ou tape un prénom, un groupe ou un e-mail pour inviter."}</p>`}
    ${hmInvBox(ctx)}${ok?`<button type="button" class="mpwok" data-act="mpWho">C'est bon</button>`:""}</div>`;
   return h;}
 /* Toute la compétition / Par journée : les journées empilées, dépliables ; tout coché d'office ou rien coché */
@@ -7767,7 +7771,7 @@ function vMpick(){const c=FIND[S.sel.comp];if(!c)return vHome();const sp=c.sport
    <section class="suhd mpev ev-${sp.id}" style="--evb:${evGrad(sp.id)}" aria-label="Événement : ${esc(nm)}">
     <div class="mpevt"><small class="mpevk">${SP_ICON[sp.id]||""} ${esc(sp.name)}${c.flag?" · "+esc(c.flag):""}</small>
     <h1 class="mpevn">${esc(nm)}</h1><div class="mpevrow"><span class="mpevl">${compBadge(c,40)}</span>${c.desc?`<p class="mpevd">${esc(c.desc)}</p>`:""}</div></div><button type="button" class="sret" data-act="mpEvt" aria-label="Changer d'évent">Changer</button></section>
-   <section class="susec mpform">${(()=>{const H=hmS(),fl=H.flip&&!H.flipAnim;return`<div class="h3grid solo${fl?" wide":""}" id="h3grid"><section aria-labelledby="h3l1"><h2 class="h3lab" id="h3l1">Tu défies <em>qui ?</em></h2><div class="hfc${fl?" flipped":""}" id="h3card"><div class="hfin">${h3Front()}${h3Back()}</div></div></section></div>`;})()}</section>
+   <section class="susec mpform">${(()=>{const H=hmS();/* v130 : la liste des potes est ouverte d'office */if(!H.flip&&!H._afl&&!h3Who()){H._afl=true;H.mode="multi";H.flip="multi";H.flipAnim=false;}const fl=H.flip&&!H.flipAnim;return`<div class="h3grid solo${fl?" wide":""}" id="h3grid"><section aria-labelledby="h3l1"><h2 class="h3lab" id="h3l1">Tu défies <em>qui ?</em></h2><div class="hfc${fl?" flipped":""}" id="h3card"><div class="hfin">${h3Front()}${h3Back()}</div></div></section></div>`;})()}</section>
    <section class="susec"><h2>Comment tu joues</h2>
     <div class="mpmodes" role="group" aria-label="Façon de jouer">${M.map(([k,l,d])=>{const on=f.mode===k;return`<button type="button" class="mpmode${on?" on":""}" data-act="mpMode" data-v="${k}" aria-pressed="${on}"><b>${esc(l)}</b>${d&&k!=="all"?`<small>${esc(d)}</small>`:k==="all"?`<small>${F?"Tout est inclus":"Le pack complet"}</small>`:""}</button>`;}).join("")}</div>
     ${f.mode==="team"||f.mode==="h2h"?mpTeamGrid(c):f.mode&&!PH?mpPicker(c):""}${f.mode&&(F||n>0)?`<div class="mpnonew"><button type="button" class="mpnone" data-act="mpNone">✕ Tout décocher (${F?L.length:n})</button></div>`:""}</section>
@@ -7849,7 +7853,8 @@ const SU_CAT_T={f1_course:"Course",f1_qualifs:"Qualifications",f1_sprint:"Sprint
 const SU_ALL_T={f1_course:"Toutes les courses",f1_qualifs:"Toutes les qualifs",f1_sprint:"Tous les sprints",f1_sq:"Toutes les qualifs sprint",golf_round:"Tous les jours",golf_win:"Le dernier jour",velo_stage:"Toutes les étapes",tennis_round:"Tous les tours",tennis_title:"Vainqueur du tournoi",foot_ko:"Matchs à élimination"};
 function vSetup(){
   const c=FIND[S.sel.comp];if(!c)return vHome();const sp=c.sport,cr=S.create,s=suS(),H=hmS(),f=flS();
-  const rows=suRows(),on=rows.filter(r=>r.on),cats=[...new Set(on.map(r=>r.cat))].filter(k=>BETS[k]);
+  const rows=suRows(),on=rows.filter(r=>r.on),cats=[...new Set(on.map(r=>r.cat))].filter(k=>BETS[k]&&BETS[k].length);
+  /* v130 : pas d'achat sans au moins un pari actif */const nBets=cats.reduce((a,k)=>a+((cfgSummary(suGen(k))||{}).n||0),0)+Object.values(s.own||{}).reduce((a,d)=>a+((d&&cfgSummary(d)||{}).n||0),0),noBet=!nBets;
   const nCat={};on.forEach(r=>nCat[r.cat]=(nCat[r.cat]||0)+1);
   const g=S.groupCtx&&groupById(S.groupCtx);
   const who=H.mode==="duel"&&H.duel?"En duel avec "+esc((memberByName(H.duel.name)||{}).short||H.duel.name):g?"Groupe "+esc(g.name):cr.people+" joueurs";
@@ -7872,7 +7877,7 @@ function vSetup(){
    <p class="suhelp">Chaque ${word[0]} suit le réglage des paris. Touche « Personnaliser » pour donner à un ${word[0]} ses propres paris.</p>
    <div class="sucard">${shown.map(r=>{const i=r.it,k=esc(r.key),own=s.own[r.key],cf=own||(BETS[r.cat]?suGen(r.cat):null),sm=cf&&cfgSummary(cf),op=s.open===r.key;
      const when=i.tbd?esc(r.su.name):esc((r.su.name&&r.su.name!==i.label?r.su.name+" · ":"")+fmtD(new Date(i.date))+" · "+fmtT(new Date(i.date)));
-     const st=!r.can?"🔒 Fermé":!r.on?"<b>Pas joué</b>":own?`<b>Réglage à part</b> · ${esc(sm.f)} · ${sm.n} paris`:sm?`Réglage général · ${esc(sm.f)} · ${sm.n} paris`:"";
+     const st=!r.can?"🔒 Fermé":!r.on?"<b>Pas joué</b>":own?`<b>Réglage à part</b> · ${esc(sm.f)} · ${nb(sm.n,"pari")}`:sm?`Réglage général · ${esc(sm.f)} · ${nb(sm.n,"pari")}`:"";
      return`<div class="sum${r.on?"":" off"}"><span class="sumt"><b>${suMatch(i)}</b><small>${when}</small></span>
       ${r.can?(own?`<button type="button" class="subtn" data-act="suOpen" data-key="${k}" aria-expanded="${op}">${op?"Fermer":"Voir mes paris"}</button>`:`<button type="button" class="subtn" data-act="suCustom" data-key="${k}" data-cat="${esc(r.cat)}">Personnaliser le pari pour ce ${word[0]}</button>`):""}
       ${st?`<div class="sureg">${st}</div>`:""}
@@ -7894,7 +7899,7 @@ function vSetup(){
   /* 4. prix et création */
   h+=`<div class="sufoot suin1"${D(3+cats.length)}><div class="pl"><span>${esc(lbl)}</span><b>${eur(sz)}</b></div><div class="pl"><span>${cr.people} joueurs</span><b>${ex?"+ "+eur(ex):"inclus"}</b></div><div class="pl tot"><span>Total, payé une fois par toi</span><b>${eur(tot)}</b></div>
    ${cr.err?`<p class="suerr">${esc(cr.err)}</p>`:""}
-   <div class="mpfix sufix"><button type="button" class="sugo" data-act="suCreate" ${sum!==100||!on.length?"disabled":""}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>J’achète ma partie pour ${eur(tot)}</button></div>
+   ${noBet?`<p class="suerr sunob" role="status">${cats.length?"Choisis au moins un pari pour lancer ta partie.":"Les joueurs de ces matchs ne sont pas encore connus : ajoute un match déjà programmé."}</p>`:""}<div class="mpfix sufix"><button type="button" class="sugo" data-act="suCreate" ${sum!==100||!on.length||noBet?"disabled":""}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>J’achète ma partie pour ${eur(tot)}</button></div>
    <p>Tes potes jouent gratuitement. Tu pourras inviter, fermer ou rouvrir les pronos depuis ta partie.</p></div></div>`;
   return h;}
 
@@ -8041,7 +8046,7 @@ document.addEventListener("click",e=>{
       if(!p.demo&&!isOwner(p)){toast("Seul l'organisateur règle les paris.");break;}
       const doc=Object.assign({},p,{cfg});delete doc.id;p.cfg=cfg;
       const rws_=rowsOfParty(p),isAllK=S.cfgKey.startsWith("all:"),catK=isAllK?S.cfgKey.slice(4):null,started_=rws_.some(x=>x.it&&itemState(p,x)!=="open"),nOpen=isAllK?rws_.filter(x=>x.cat===catK&&x.it&&itemState(p,x)==="open").length:0;
-      const notify=()=>{if(!(isAllK&&started_&&nOpen&&a!=="cfgReset"))return;const sm=cfgSummary(cfg[S.cfgKey],catK);const txt="⚙️ L'organisateur a modifié les paris des "+nOpen+" "+(catK.startsWith("f1")?"sessions":"matchs")+" à venir : "+sm.f+" · "+sm.n+" paris. Les matchs déjà commencés ne changent pas, et les pronos sur les paris retirés ne comptent plus.";
+      const notify=()=>{if(!(isAllK&&started_&&nOpen&&a!=="cfgReset"))return;const sm=cfgSummary(cfg[S.cfgKey],catK);const txt="⚙️ L'organisateur a modifié les paris des "+nOpen+" "+(catK.startsWith("f1")?"sessions":"matchs")+" à venir : "+sm.f+" · "+nb(sm.n,"pari")+". Les matchs déjà commencés ne changent pas, et les pronos sur les paris retirés ne comptent plus.";
         const msg={uid:"sys",name:"Bet's Friends",text:txt.slice(0,400),at:Date.now(),sys:true};if(db&&!p.demo){const id="m"+Date.now().toString(36)+"sys";db.doc("chats/"+p.id+"/msgs/"+id).set(msg).catch(()=>{});CHAT[p.id]=(CHAT[p.id]||[]).concat([Object.assign({id},msg)]);}else CHAT_LOCAL[p.id]=(CHAT_LOCAL[p.id]||[]).concat([msg]);};
       const done=()=>{notify();toast(a==="cfgReset"?"Réglage effacé":isAllK&&started_?"Paris à venir mis à jour · joueurs prévenus":"Paris enregistrés");S.cfgDraft=null;S.ptv=S.ptv||{};if(S.ptv[p.id]==="settings"){S.ptv[p.id]="games";S.orgMode=null;S.rtab=null;}back();};
       if(db&&!p.demo)db.doc("parties/"+p.id).set(doc).then(done,()=>toast("Enregistrement impossible, réessaie."));else done();break;}
@@ -8100,7 +8105,7 @@ document.addEventListener("click",e=>{
     case "cuNext":{const C=S.cu;C.err="";if(C.step===1&&!C.title.trim()){C.err="Donne un nom à ton championnat.";render();break;}if(C.step===2&&C.teams.length<2){C.err="Il faut au moins 2 participants.";render();break;}C.step++;if(C.step===3&&C.genFor!==C.teams.join("|")+"#"+C.sport+"#"+(C.start||""))cuAuto(C);render();window.scrollTo(0,0);break;}
     case "cuTeam":{const C=S.cu,n=(C.teamDraft||"").trim();if(n&&!C.teams.some(x=>normS(x)===normS(n)))C.teams.push(n.slice(0,40));C.teamDraft="";render();const el=document.querySelector('[data-cu="team"]');if(el)el.focus();break;}
     case "cuTeamDel":{const C=S.cu,n=C.teams[+t.dataset.i];C.teams.splice(+t.dataset.i,1);C.games=C.games.filter(g=>g.a!==n&&g.b!==n);render();break;}
-    case "cuGen":{const C=S.cu;C.games=cuRoundRobin(C.teams,cuNextSat(),cuKind(C.sport));toast(C.games.length+" matchs générés");render();break;}
+    case "cuGen":{const C=S.cu;C.games=cuRoundRobin(C.teams,cuNextSat(),cuKind(C.sport));toast(nb(C.games.length,"match")+" généré"+(C.games.length>1?"s":""));render();break;}
     case "cuGame":{const C=S.cu,k=cuKind(C.sport),d0=(document.getElementById("cuDate")||{}).value,d=d0?d0+"T00:00":"";C.err="";if(!d){C.err="Choisis une date.";render();break;}C.lastDate=d;
       if(cuDuel(k)){const a=document.getElementById("cuA").value,b=document.getElementById("cuB").value;if(!a||!b||a===b){C.err="Choisis deux participants différents.";render();break;}C.games.push({a,b,date:d,round:Math.max(0,...C.games.map(g=>g.round||1))+1});}
       else{const l=(document.getElementById("cuL").value||"").trim()||((k==="race"?"Course ":"Journée ")+(C.games.length+1));C.games.push({label:l,date:d,round:Math.max(0,...C.games.map(g=>g.round||1))+1});}
@@ -8204,7 +8209,7 @@ case "pfGo":{S.stack=[];S.screen="parties";S.pfStack=[];S.pf=null;S.pfOpen=t.dat
     case "groupFromParty":{const p=partyById(S.partyView);if(!p||!canGroupParty(p))return toast("Le groupe existe déjà.");const i=document.querySelector("[data-pg]");const nm=String((i&&i.value)||p.name||"").trim();if(!nm)return toast("Donne un nom au groupe.");
       const emails={};rawPlayers(p).forEach(x=>{if(x.email&&x.id!==p.owner)emails[x.name]=normEmail(x.email);});const g={id:"g"+Date.now().toString(36),name:nm.slice(0,40),members:partyNames(p).slice(0,50),emails,parties:[p.id],owner:S.uid||null,createdAt:new Date().toISOString()};
       S.groups=(S.groups||[]).concat([g]);S.pgName=null;if(db){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>toast("Enregistrement impossible."));}
-      S.pgOpen=null;S.groupView=g.id;go("group");toast("Groupe créé avec "+(g.members.length-1)+" amis");break;}
+      S.pgOpen=null;S.groupView=g.id;go("group");toast("Groupe créé avec "+nb(g.members.length-1,"ami"));break;}
     case "newGroup":{const nm=(S.ngName||"").trim(),mem=(S.ngSel||[]).slice();if(!nm)return toast("Donne un nom au groupe.");if(mem.length<1)return toast("Ajoute au moins un membre.");
       const g={id:"g"+Date.now().toString(36),name:nm.slice(0,40),members:["Toi"].concat(mem.filter(x=>x.toLowerCase()!=="toi")).slice(0,50),parties:[],owner:S.uid||null,createdAt:new Date().toISOString()};
       S.groups=(S.groups||[]).concat([g]);g.members.forEach(n=>{const mm=memberByName(n);if(mm&&mm.uid)notify(mm.uid,"group",(me().name||"Ton pote")+" t'a ajouté au groupe « "+g.name+" »",{gid:g.id});});S.ngName="";S.ngSel=[];S.mq_ng="";if(db){const d=Object.assign({},g);delete d.id;db.doc("groups/"+g.id).set(d).catch(()=>toast("Enregistrement impossible."));}
@@ -8299,8 +8304,9 @@ case "mpTyp":{const f=flS(),v=t.dataset.v;if(f.typ===v)delete f.typ;else f.typ=v
   H.validated=ok||(!!H.validated&&has);if(!has)H.mode=null;
   if(H.validated&&el){const f=el.querySelector(".hff");if(f)f.outerHTML=h3Front();}
   if(g){g.classList.remove("wide");if(H.validated&&!H.sport)g.classList.add("await");const r=g.querySelector("section:last-child");if(r)r.inert=false;}if(el)el.classList.remove("flipped");setTimeout(()=>{H.flip=null;if(S.screen==="home"||S.screen==="mpick")render();},matchMedia("(prefers-reduced-motion:reduce)").matches?0:600);break;}
-    case "h3Sport":{const H=hmS(),id=t.dataset.id,old=H.sport;H.sport=old===id?null:id;H.anim={in:H.sport,out:old};const y=scrollY,keep=!!(old&&H.sport);if(keep)S._cbHold=true;render();H.anim=null;if(keep){scrollTo(0,y);requestAnimationFrame(()=>{scrollTo(0,y);});}break;}
-    case "h3Go":{const H=hmS();if(!h3Ready())break;if(!H.keepWho){Object.assign(H,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null});}H.keepWho=false;if(H.sport&&H.sport!=="free"){H.flowOn=true;H.fl={};S._flPK=undefined;S._flPV=undefined;S.sel={comp:null,full:false,items:{}};render();flShowStage();break;}if(H.sport==="free"){go("free");toast("Partie prête : invente ton pari");break;}go("sport",{sport:H.sport});toast(H.mode==="duel"?"Duel prêt : choisis ton match":"Partie prête : choisis tes matchs");break;}
+    case "h3Sport":{const H=hmS();H.sport=t.dataset.id;H.anim=null;h3GoNow();break;}
+    case "h3Go":h3GoNow();break;
+    case "pbV":S.pbV=t.dataset.v==="cur"?"cur":"live";render();break;
     case "hmGrpOpen":{const H=hmS();H.grpPop=true;H.grpName=H.grpName||"";render();setTimeout(()=>{const e=document.getElementById("hmgname");if(e)e.focus();},60);break;}
     case "hmGrpClose":hmS().grpPop=false;render();break;
     case "hmGrpSave":{const H=hmS(),nm=String(H.grpName||"").trim();if(!nm){toast("Donne un nom au groupe.");const e=document.getElementById("hmgname");if(e)e.focus();break;}
@@ -8323,7 +8329,7 @@ case "mpTyp":{const f=flS(),v=t.dataset.v;if(f.typ===v)delete f.typ;else f.typ=v
       if(ctx==="duel")H.duel={k:"inv",name:n,email:em||undefined};else if(!H.multi.some(x=>x.k!=="g"&&normS(x.name)===normS(n)))H.multi.push({k:"inv",name:n,email:em||undefined});
       H.inv[ctx]=n;H.q[ctx]="";H.mode=ctx;render();break;}
     case "hmCopy":{const n=hmS().inv[t.dataset.ctx];if(n)copyText(`${n}, je te défie sur Bet's Friends ! Rejoins-moi ici : ${hmInvLink(n)}\nConnecte-toi à Claude pour ouvrir l'appli.`,"Lien d'invitation copié");break;}
-    case "flQuit":{const H=hmS();H.flowOn=false;S._flPK=undefined;S._flPV=undefined;H.fl={};S.sel={comp:null,full:false,items:{}};render();break;}
+    case "flQuit":{const H=hmS();H.flowOn=false;H.sport=null;S._flPK=undefined;S._flPV=undefined;H.fl={};S.sel={comp:null,full:false,items:{}};render();break;}
 case "flBack":{const f=flS(),_co1=FL_C.find(x=>x.id===f.c),to=(t.dataset.to==="comp"&&hmS().sport==="foot"&&_co1&&_co1.comps.length===1)?"c":t.dataset.to,order=["g","c","comp","mode","sub","team","typ"];if(to==="g"||to==="comp")delete f.autoC;const i=order.indexOf(to);order.slice(i).forEach(k=>{delete f[k];});if(i<=order.indexOf("sub")){delete f.subs;delete f.phOk;}if(i<=order.indexOf("team")){delete f.teams;delete f.tmOk;delete f.h2h;}if(i<=2)delete f.intl;S.sel={comp:null,full:false,items:{}};render();flShowStage();break;}
 case "flPick":{const f=flS(),k=t.dataset.k,v=t.dataset.v;
   if(k==="c"){f.c=v;const _co=FL_C.find(x=>x.id===v);if(_co&&_co.comps.length===1&&FIND[_co.comps[0]]){f.comp=_co.comps[0];f.intl=false;}}else if(k==="comp"){f.comp=v;f.intl=false;}else if(k==="intl"){f.comp="ucl";f.intl=true;}
@@ -8594,6 +8600,45 @@ html body[data-sp] .fc .ba{background:linear-gradient(160deg,var(--sa2),#120D07)
 
 /* pages « Paramétrer ma partie » : fond sombre teinté du sport (au lieu du cuivre uni) */
 html body.susc[data-sp] #app>.subg{background:radial-gradient(90% 38% at 50% -6%,rgba(var(--sar),.26),transparent 70%),radial-gradient(70% 50% at 100% 100%,rgba(var(--sar),.10),transparent 70%),linear-gradient(180deg,#1C140B 0%,#120D07 45%,#0C0805 100%)!important}
+
+/* ===== v130 : lot 1 de l'analyse ===== */
+/* cibles tactiles >= 44 px : zone cliquable agrandie, dessin inchangé */
+.tkx::after,.frchk::after,.gedit::after,.frduel::after,.link[data-act=frSelAll]::after{content:"";position:absolute;inset:-7px -2px}
+.tkx,.frchk,.gedit,.frduel,.link[data-act=frSelAll]{position:relative}
+.frchk::after{inset:-9px}.gedit::after{inset:-12px -10px}.tkx::after{inset:-6px}.frduel::after,.link[data-act=frSelAll]::after{inset:-5px -2px}
+/* puces : bord transparent de 5 px (zone de tap 44 px), trait dessiné à l'intérieur — même aspect */
+.pick[data-act=evF],.pick[data-act=gbSort]{border-top:6px solid transparent!important;border-bottom:6px solid transparent!important;border-left-color:transparent!important;border-right-color:transparent!important;background-clip:padding-box!important;box-shadow:inset 0 0 0 1px var(--line);margin-top:-5px!important;margin-bottom:-5px!important}
+.pick[data-act=evF].on,.pick[data-act=gbSort].on,.pick[data-act=evF][aria-pressed=true],.pick[data-act=gbSort][aria-pressed=true]{box-shadow:inset 0 0 0 1px var(--lime)}
+.evchips{padding-top:5px!important;padding-bottom:7px!important;margin-top:-5px;margin-bottom:-5px}
+.gbsort{row-gap:12px!important;margin-top:7px!important;margin-bottom:15px!important}
+/* bandeau live : un peu plus haut (zone de tap) */
+.hbn{height:38px!important}
+.chatq{padding:3px 12px!important}.chatq button{min-height:44px}
+/* en-tête à 320 px : le bouton profil reste dans l'écran */
+.phbrand{min-width:0}.phbrand .logo{min-width:0;flex-shrink:1}
+.phbrand>span{flex:none}
+@media (max-width:359px){.phbrand .logo .wm{font-size:18px!important}.phbrand .logo{gap:6px}.phbrand .logo .mark{width:30px;height:30px}.phbrand .iconbtn{width:36px!important;height:36px!important}.top .logo .wm{font-size:19px!important}}
+/* classement de partie : un seul tableau, interrupteur Actuel / En direct */
+.pboard .mbtop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pbsw{display:inline-flex;border:1px solid rgba(238,217,170,.35);border-radius:999px;padding:3px;background:rgba(0,0,0,.25)}
+.pbsw button{position:relative;min-height:34px;padding:0 12px;border:0;border-radius:999px;background:none;color:#EED9AA;font:inherit;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.pbsw button::after{content:"";position:absolute;inset:-5px 0}
+.pbsw button[aria-pressed=true]{background:linear-gradient(135deg,#EED9AA 0%,#C7A04A 48%,#9C7432 100%);color:#2A0705}
+.pbdot{width:7px;height:7px;border-radius:50%;background:#E5534B;box-shadow:0 0 0 0 rgba(229,83,75,.6);animation:urgp 1.6s infinite}
+.pbsw button[aria-pressed=true] .pbdot{background:#B3261E}
+.provban.live span{color:#E5534B}
+.pboard .mbnm{min-width:0}
+.pboard .mbc .mbnm{min-width:0!important;flex:1 1 0!important}
+.pboard .mbnm b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto;line-height:1.1;display:block!important;max-width:none!important;font-size:clamp(12.5px,3.8vw,15px)!important}
+@media (max-width:400px){.pboard .mbc{gap:6px!important;padding-left:8px!important;padding-right:8px!important}.pboard .mbcr2{width:66px!important;font-size:13.5px!important}.pboard .mbpt2{width:40px!important;font-size:15px!important}}
+@media (max-width:359px){.pboard .mbc>.tile.rk,.pboard .mbc>.rkb{width:38px!important;height:38px!important;min-width:38px!important}.pboard .mbcr2{width:56px!important;font-size:12.5px!important;padding:6px 2px!important}.pboard .mbpt2 i{display:none}.pboard .mbpt2{width:26px!important}}
+.pboard .mbnm .mv{display:block;font-size:11px;font-weight:800;margin-top:2px}
+.pboard .mbnm .mv.up{color:#8FE3B0}.pboard .mbnm .mv.dn{color:#F2B3A8}
+/* création : compétition sans match à venir, achat sans pari */
+.flcad.flzero{filter:grayscale(.85);opacity:.7}
+.h3create[disabled]{opacity:.45;filter:grayscale(.6);cursor:not-allowed}
+.sunob{margin:0 0 10px;text-align:center}
+@media (max-width:359px){.phead h1{font-size:36px!important;overflow-wrap:break-word}}
 </style>
 </body>
 </html>
