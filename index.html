@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v140";
+const APP_VER="v141";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4011,9 +4011,13 @@ function lvEndOk(k,v){if(!v||v.manual||!(v.status==="FT"||v.status==="END"))retu
 let LV_RAW=false;
 /* v139 TEST — à retirer : Pays de Galles – Portugal (Ligue des nations, 17 nov.) reste « en direct » pour les tests de Thomas (rouvrir / modifier / refermer). Supprimer TEST_LIVE + tlIs + la ligne tlIs dans liveWrap. */
 const TEST_LIVE={cid:"unl",a:"Pays de Galles",b:"Portugal",day:"2026-11-17",until:"2026-11-30T23:00:00Z"};
-function tlIs(k){try{if(Date.now()>+new Date(TEST_LIVE.until))return false;const m=String(k).match(/^E([^~]+)~(.+)$/);if(!m||m[1]!==TEST_LIVE.cid)return false;const n=x=>String(x||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
-  const K=LCAL[m[1]],e=K&&(K.ev||[]).find(x=>String(x.i)===m[2]);if(!e)return false;return n(e.a)===n(TEST_LIVE.a)&&n(e.b)===n(TEST_LIVE.b)&&String(e.d||"").slice(0,10)===TEST_LIVE.day;}catch(_){return false;}}
-function liveWrap(o){return new Proxy(o,{set(t,k,v){if(v&&typeof v==="object"&&!v.manual&&tlIs(k)){v=Object.assign({},v,{status:"LIVE",minute:v.status==="LIVE"&&v.minute?v.minute:"90'",line:v.status==="LIVE"?(v.line||""):"",winner:undefined});delete v.ftAt;if(FTAT[k]){delete FTAT[k];ftatSave();}t[k]=v;return true;}if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+function tlIs(k){try{if(Date.now()>+new Date(TEST_LIVE.until))return false;const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+  const m=String(k).match(/^E([^~]+)~(.+)$/);if(m&&m[1]==="unl"){const K=LCAL[m[1]],e=K&&(K.ev||[]).find(x=>String(x.i)===m[2]);if(!e||String(e.d||"").slice(0,10)!=="2026-11-17")return false;return TEST_PAIRS.some(([a,b])=>n(e.a)===n(a)&&n(e.b)===n(b));}
+  if(/^atpf~/.test(String(k))){const c=FIND.atpf;if(!c)return false;const it=lvItems(c).map(x=>x[1]).find(i=>i.lid===k);if(!it)return false;let sd=[];try{sd=sides(it)||[];}catch(_){}const L=n((it.label||"")+" "+sd.join(" "));return /zverev/.test(L)&&/shelton/.test(L)&&String(new Date(it.date).toISOString()).slice(0,10)==="2026-11-17";}
+  return false;}catch(_){return false;}}
+/* v141 TEST : les 3 matchs du 17 nov. restent en direct (Galles–Portugal, Danemark–Norvège, Zverev–Shelton) */
+const TEST_PAIRS=[["Pays de Galles","Portugal"],["Danemark","Norvège"]];
+function liveWrap(o){return new Proxy(o,{set(t,k,v){if(v&&typeof v==="object"&&!v.manual&&tlIs(k)){v=Object.assign({},v,{status:"LIVE",minute:v.status==="LIVE"&&v.minute?v.minute:(/^atpf~/.test(String(k))?"":"90'"),line:v.status==="LIVE"?(v.line||""):(/^atpf~/.test(String(k))?String(v.line||"").replace(/\s*·.*$/,""):""),winner:undefined});delete v.ftAt;if(FTAT[k]){delete FTAT[k];ftatSave();}t[k]=v;return true;}if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
   /* v101 : LIVE → NS/PST (source qui « perd » le match) : on garde le direct */
   if(v&&typeof v==="object"&&!v.manual&&old&&old.status==="LIVE"&&(v.status==="NS"||v.status==="PST"||!v.status))return true;
   if(v&&typeof v==="object"&&v.status==="LIVE"&&!isEnd(old)&&FTAT[k]){delete FTAT[k];ftatSave();}
@@ -5649,7 +5653,7 @@ function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it
   let h=`<div class="lrc lrc-${sp}${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
     <span class="lrtop"><span class="spic">${goldSp(sp,20)}</span><span><b>${esc(c.name)}</b><small>${esc(it.label||"")}</small></span></span>
     <span class="lrbody mh-${sp}">${duoBg(sd,sp,"lr")}${body}</span>
-    </button><div class="lrfoot lrfoot2 v140f">${m.rows.length>1?`<span class="lrwhere">Ce match est dans ${m.rows.length} parties :</span><div class="lrpsel" role="group" aria-label="Partie">${m.rows.map(x=>`<button type="button" class="lrpb${x===sel?" on":""}" aria-pressed="${x===sel}" data-act="lrPick" data-k="${esc(k)}" data-p="${esc(x.p.id)}">${esc(partyLabel(x.p))}</button>`).join("")}</div>`:`<span class="lrwhere">${where}</span>`}${(()=>{const b=reoMid(p,r,"",m.rows.length>1?partyLabel(p):"");return b?`<span class="lrfr">${b}</span>`:"";})()}</div>`;
+    </button><div class="lrfoot lrfoot2 v140f${m.rows.length>1?" multi":" solo"}">${m.rows.length>1?`<span class="lrwhere">Ce match est dans ${m.rows.length} parties :</span><div class="lrpsel" role="group" aria-label="Partie">${m.rows.map(x=>`<button type="button" class="lrpb${x===sel?" on":""}" aria-pressed="${x===sel}" data-act="lrPick" data-k="${esc(k)}" data-p="${esc(x.p.id)}">${esc(partyLabel(x.p))}</button>`).join("")}</div>`:""}${(()=>{const b=reoMid(p,r,"",m.rows.length>1?partyLabel(p):"");return b?`<span class="lrfr">${b}</span>`:"";})()}</div>`;
   if(open){const mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
     h+=`<div class="lrx"><div class="lrone">${esc(partyLabel(p))}</div>
       ${mine?`<div class="lrmine">Ton prono : <em>${nwrap(mine)}</em></div>`:""}${rawPlayers(p).length>1?`<div class="card ptacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}${projLine(p,r).replace('<div class="pad" style="margin-top:12px">','<div>')}${liveBetsHTML(p,r,c)}<button type="button" class="btn block lropen" data-act="party" data-id="${esc(p.id)}">Ouvrir la partie « ${esc(partyLabel(p))} » →</button></div>`;}
@@ -9396,5 +9400,15 @@ html body #app .mpselw{margin-top:12px}html body #app .mpselt{font-size:12px;fon
 /* libellé long « Rouvrir les paris · nom de la partie » : passe à la ligne au lieu de déborder */
 html body #app .reomid{max-width:100%;white-space:normal;text-align:left;line-height:1.2;padding-top:8px;padding-bottom:8px;height:auto}
 html body #app .lrfoot2.v140f .lrfr,html body #app .lrfoot2.v140f .reomidw{max-width:100%}
+</style><style id="v141">
+html body #app .lrc>.lrfoot2.v140f{border-top:0;padding:12px 28px 4px;gap:10px}
+html body #app .lrc>.lrfoot2.v140f.solo:not(:has(.lrfr)){display:none}
+html body #app .lrfoot2.v140f .lrwhere{flex:0 0 auto}
+html body #app .lrfoot2.v140f .lrfr{width:100%;display:block}
+html body #app .lrfoot2.v140f .lrfr .reomidw{display:block;width:100%}
+html body #app .lrfoot2.v140f .lrfr .reomidw>*:not(small){width:100%;justify-content:center;min-height:52px;font-size:17px}
+html body #app .lrfoot2.v140f .lrfr button,html body #app .lrfoot2.v140f .lrfr .reomid{width:100%;justify-content:center;min-height:52px}
+html body #app .lrc.open .lrx{padding-top:8px}
+
 </style></body>
 </html>
