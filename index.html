@@ -3734,7 +3734,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v113";
+const APP_VER="v114";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4021,10 +4021,12 @@ function provResult(it){const L=LIVE[it.lid];if(!L||["FT","END"].includes(L.stat
   /* v38 tennis : « si ça finit comme ça » = celui qui mène dans le set en cours gagne ce set (et le match si c'était décisif) */
   try{if(L.sa!=null&&L.sb!=null&&sides(it)&&/en cours/.test(String(L.line||""))){const cur=tnSets(String(L.line).replace(/·.*$/,""),null,null),last=cur[cur.length-1];const fin=([a,b])=>(Math.max(a,b)>=6&&Math.abs(a-b)>=2)||(Math.max(a,b)===7&&Math.min(a,b)>=5);
     if(last&&!fin(last)&&last[0]!==last[1]){fx.sa=L.sa+(last[0]>last[1]?1:0);fx.sb=L.sb+(last[1]>last[0]?1:0);fx.line=cur.slice(0,-1).map(x=>x.join("-")).join(" ");}
-    else if(L.sa===L.sb){return null;}}}catch(_){}
+    else if(L.sa===L.sb){fx=null;}}}catch(_){}
+  if(!fx){let D={};try{D=tnDecided(it);}catch(_){}return Object.keys(D).length?{prov:true,line:"",ans:D}:null;}
   LV_RAW=true;try{LIVE[it.lid]=Object.assign({},save,fx);try{r=liveResult(it);}catch(e){r=null;}}finally{LIVE[it.lid]=save;LV_RAW=false;}if(r)r.prov=true;
   /* v38 : les sets déjà terminés comptent déjà (score du 1er / 2e set, vainqueur du 1er set) */
   try{const sd=sides(it);if(r&&r.ans&&sd&&L.sa!=null){const ds=tnDoneSets(it);if(ds[0]&&r.ans.set1==null){r.ans.set1=ds[0].join("-");r.ans.first=ds[0][0]>ds[0][1]?sd[0]:sd[1];}if(ds[1]&&r.ans.set2==null)r.ans.set2=ds[1].join("-");}}catch(_){}
+  try{if(r&&r.ans&&sides(it)&&L.sa!=null){const D=tnDecided(it);Object.keys(D).forEach(k=>{if(r.ans[k]==null)r.ans[k]=D[k];});}}catch(_){}
   return r;}
 function scoreProv(p){PROV=true;try{return scoreParty(p);}finally{PROV=false;}}
 function liveResult(it){const L=LIVE[it.lid]||{},st=L.status||"NS";if(L.ans&&st==="FT")return{sa:L.sa,sb:L.sb,line:L.line||"Terminé",ans:L.ans};const sd=it.a&&it.b?[it.a,it.b]:(()=>{try{return sides(it);}catch(_){return null;}})();
@@ -6196,7 +6198,7 @@ function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?li
 const GRACE=15*60e3;
 function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;if(!lvEndOk(it.lid,LIVE[it.lid]))return false;if(+NOW>+new Date(it.date)+6*3600e3)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
 function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it)||inGrace(it));}
-function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{const cl=isClosed(p);rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it)&&!(cl&&inGrace(r.it)));}catch(_){}rows.forEach(r=>out.push({p,r}));});
+function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{const cl=isClosed(p);rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it));rows.forEach(r=>out.push({p,r,cl:cl&&inGrace(r.it)}));}catch(_){}});
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
 /* noms courts, comme sur l'affiche du match (« Tirante – Munar ») */
 function shortSides(it){const sd=sides(it);if(!sd)return null;const l=String(it.label||""),sep=l.includes(" @ ")?" @ ":" – ",pr=l.split(sep);return pr.length===2?pr:sd;}
@@ -6219,7 +6221,9 @@ function liveMatches(){const out=liveMatches0(),by={},now=+NOW;out.forEach(m=>{b
   return out;}
 function liveMatches0(){const by={},out=[];const st=it=>{const L=LIVE[it.lid]||{};return L.status==="LIVE"&&lvEndOk(it.lid,L)?2:(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)?1:0;};
   liveRowsAll().forEach(x=>{const it=x.r.it;let k=it.lid||x.r.key;try{const sd=sides(it);if(sd&&sd.length===2)k="m:"+sd.map(normS).sort().join("|")+":"+new Date(it.date).toDateString();}catch(_){}
-    if(!by[k]){by[k]={k,it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}else if(st(it)>st(by[k].it)){by[k].it=it;by[k].c=FIND[x.p.comp];}by[k].rows.push(x);});return out;}
+    if(!by[k]){by[k]={k,it,c:FIND[x.p.comp],rows:[]};out.push(by[k]);}else if(st(it)>st(by[k].it)){by[k].it=it;by[k].c=FIND[x.p.comp];}by[k].rows.push(x);});
+  /* v114 : un match terminé reste dans le Salon avec TOUTES ses parties ; seulement si au moins une partie n'est pas close (règle d'avant) */
+  return out.filter(m=>m.rows.some(x=>!x.cl));}
 /* nom lisible d'une partie : son groupe, sinon « avec Alexandre, Maxime », sinon son nom */
 const SPLIT_ALL=[["100","Tout au 1er"],["70-30","70 / 30"],["50-30-20","50 / 30 / 20"],["40-30-20-10","40 / 30 / 20 / 10"],["perso","Personnalisée"]];
 function splitOk(k,n){n=+n||2;if(k==="perso")return n>=3;return String(k).split("-").length<n;}
@@ -6236,6 +6240,7 @@ function partyBase(p){const g=partyGroupLike(p);if(g)return g.name;const me=myId
 function partyLabel(p){const b=partyBase(p);let same=[];try{same=(S.parties||[]).filter(q=>q&&q.id!==p.id&&!q.demo&&partyBase(q)===b);}catch(_){}if(!same.length)return b;
   const cn=q=>((FIND[q.comp]||{}).name)||"";if(cn(p)&&same.every(q=>cn(q)!==cn(p)))return b+" · "+cn(p);
   const d=q=>q.made?new Date(q.made).toLocaleDateString("fr-BE",{day:"numeric",month:"short"}):"",dh=q=>q.made?new Date(q.made).toLocaleString("fr-BE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+  {const n=q=>{try{return rowsOfParty(q).filter(r=>r.it).length;}catch(_){return 0;}},np=n(p);if(np&&same.every(q=>n(q)!==np))return b+" · "+(np===1?"ce match seul":np+" matchs");}
   if(d(p)&&same.every(q=>d(q)!==d(p)))return b+" · "+d(p);return dh(p)?b+" · "+dh(p):b;}
 function lvProg(it){const L=LIVE[it.lid]||{};if(inGrace(it))return"Terminé";const cl=v=>String(v||"").replace(/\s*·\s*en cours$/i,"");
   if(L.minute)return cl(L.minute);if(L.line&&!/^Score final/i.test(L.line))return cl(L.line);return"En cours";}
@@ -7296,6 +7301,18 @@ function stageWinner(p,r,sc){const per=sc.per[r.key];if(!per)return null;const p
 /* ===================================================================== v38 : PRONOS EN DIRECT — déjà gagné / déjà perdu / encore en jeu
    Tennis : on essaie toutes les fins de match encore possibles (en sets) ; un prono juste dans toutes = gagné, dans aucune = perdu.
    Foot : règles sûres (score exact dépassé, les deux équipes ont marqué, nombre de buts dépassé). Sinon : en jeu. */
+/* v114 : réponses tennis déjà acquises pendant le match (quel que soit le vainqueur) */
+function tnDecided(it,bo){const L=LIVE[it.lid]||{},o={};if(L.sa==null||L.sb==null)return o;const sa=+L.sa,sb=+L.sb,sd=sides(it);
+  if(!bo){const fc=FIND[it._c]||FIND[it.cid]||FIND[String(it.lid||"").split(/[-~]/)[0]];bo=fc&&["ao","rg","wim","uso"].includes(fc.id)?5:3;}const N=Math.ceil(bo/2);
+  if(sa>=1&&sb>=1)o.loserset="Oui";else if(sa>=N||sb>=N)o.loserset="Non";
+  if(sa===N-1&&sb===N-1)o.sets=bo+" sets";
+  const ds=tnDoneSets(it);
+  if(ds.some(([a,b])=>(a===7&&b===6)||(a===6&&b===7)))o.tb="Oui";
+  if(ds.some(([a,b])=>(a===7&&b===5)||(a===5&&b===7)))o.set75="Oui";
+  if(ds.some(([a,b])=>Math.max(a,b)===6&&Math.min(a,b)<=1))o.bagel="Oui";
+  if(ds[0]){o.set1=ds[0].join("-");if(sd)o.first=ds[0][0]>ds[0][1]?sd[0]:sd[1];}if(ds[1])o.set2=ds[1].join("-");if(ds[2])o.set3=ds[2].join("-");
+  if(bo===3&&ds.length===2&&(sa>=2||sb>=2))o.set3="Pas de 3e set";
+  return o;}
 function tnFinals(c,it){const L=LIVE[it.lid]||{};if(L.sa==null||L.sb==null)return null;const bo=["ao","rg","wim","uso"].includes(c.id)?5:3,N=Math.ceil(bo/2),out=[];
   for(let y=L.sb;y<N;y++)if(L.sa<=N)out.push([N,y]);for(let x=L.sa;x<N;x++)if(L.sb<=N)out.push([x,N]);
   return out.map(([x,y])=>{const save=LIVE[it.lid];let r=null;LV_RAW=true;try{LIVE[it.lid]={status:"FT",sa:x,sb:y,line:""};try{r=liveResult(it);}catch(_){}}finally{LIVE[it.lid]=save;LV_RAW=false;}return r&&r.ans||{};});}
@@ -7303,7 +7320,8 @@ function tnDoneSets(it){const L=LIVE[it.lid]||{};const sets=tnSets(String(L.line
 function liveVerdict(c,r,b,t,v){if(v==null||v===""||!c||!r.it||!r.it.live||liveSt(r.it)!=="LIVE")return null;const sp=c.sport.id,L=LIVE[r.it.lid]||{},sd=sides(r.it);
   try{if(sp==="tennis"&&sd){
       /* manches déjà jouées : 1er set, 2e set, vainqueur du 1er set */
-      const ds=tnDoneSets(r.it);if(["set1","set2","first"].includes(b.id)){const k=b.id==="set2"?1:0;if(ds.length>k){const tr=b.id==="first"?(ds[0][0]>ds[0][1]?sd[0]:sd[1]):ds[k][0]+"-"+ds[k][1];return betGood(t,tr,v)?"win":"lose";}return"open";}
+      {const bo=["ao","rg","wim","uso"].includes(c.id)?5:3,Dc=tnDecided(r.it,bo);if(Dc[b.id]!=null&&!["set1","set2","set3","first"].includes(b.id))return betGood(t,Dc[b.id],v)?"win":"lose";}
+      const ds=tnDoneSets(r.it);if(["set1","set2","set3","first"].includes(b.id)){const k=b.id==="set2"?1:b.id==="set3"?2:0;if(ds.length>k){const tr=b.id==="first"?(ds[0][0]>ds[0][1]?sd[0]:sd[1]):ds[k][0]+"-"+ds[k][1];return betGood(t,tr,v)?"win":"lose";}return"open";}
       const F=tnFinals(c,r.it);if(!F||!F.length)return"open";const T=F.map(a=>a[b.id]);if(T.some(x=>x==null))return"open";const ok=T.map(x=>betGood(t,x,v));return ok.every(Boolean)?"win":ok.some(Boolean)?"open":"lose";}
     if(sp==="foot"&&sd&&L.sa!=null){const a=+L.sa,bb=+L.sb;
       if(b.id==="score"){const m=String(v).match(/(\d+)\s*-\s*(\d+)/);if(m&&(a>+m[1]||bb>+m[2]))return"lose";return"open";}
@@ -7337,7 +7355,7 @@ function lvvTag(k){const x=LVV[k];return x?`<span class="lvv ${x[1]}">${x[0]}</s
 /* v76 : avec un match (r), on ne compte QUE les points de ce match */
 function projLine(p,r){let sc=null;try{sc=scoreProv(Object.assign({},p,{players:playersOf(p)}));}catch(_){return"";}if(!sc||!sc.rows||!sc.rows.length)return"";const me=myId(p),pm=r?((sc.per||{})[r.key]||{}):null,R=sc.rows.map(x=>pm?Object.assign({},x,{pts:pm[x.id]||0}):x).sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name)));
   const rk=id=>1+R.filter(x=>x.pts>(R.find(y=>y.id===id)||{pts:0}).pts).length,mine=R.find(x=>x.id===me);
-  const nm=x=>x.id===me||x.name==="Toi"?"Toi":esc(x.name||"?");
+  const nm=x=>{let n=x.name;if(!n||/^toi$/i.test(n)){const pl=rawPlayers(p).find(y=>y.id===x.id);n=pl&&pl.name&&!/^toi$/i.test(pl.name)?pl.name:(x.id===me?(myLabel()||"?"):"?");}return esc(n);};
   return`<div class="pad" style="margin-top:12px"><div class="card projc"><div class="projh">🔮 Si ça finit comme ça${r?" · sur ce match":""}</div>${mine?`<div class="projme">Tu serais <b>${rk(me)}${rk(me)>1?"e":"er"}</b> avec <b>${mine.pts} pts</b></div>`:""}<div class="projl">${R.slice(0,5).map(x=>`<span class="${x.id===me?"me":""}"><i>${rk(x.id)}</i>${nm(x)}<b>${x.pts}</b></span>`).join("")}</div></div></div>`;}
 function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div><button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button></div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
   const mine=R.board.find(x=>x.pl.id===me);let place=1;const ranks=R.board.map((x,i)=>{if(i&&x.pts<R.board[i-1].pts)place=i+1;return place;});const myPlace=ranks[R.board.indexOf(mine)];
