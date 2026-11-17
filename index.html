@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v139";
+const APP_VER="v140";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -5649,9 +5649,9 @@ function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it
   let h=`<div class="lrc lrc-${sp}${open?" open":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
     <span class="lrtop"><span class="spic">${goldSp(sp,20)}</span><span><b>${esc(c.name)}</b><small>${esc(it.label||"")}</small></span></span>
     <span class="lrbody mh-${sp}">${duoBg(sd,sp,"lr")}${body}</span>
-    </button><div class="lrfoot lrfoot2"><span class="lrwhere">${where}</span><span class="lrfr">${reoMid(p,r)}<button type="button" class="lrcta" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">${open?"Masquer":"Voir les paris"}</button></span></div>`;
+    </button><div class="lrfoot lrfoot2 v140f">${m.rows.length>1?`<span class="lrwhere">Ce match est dans ${m.rows.length} parties :</span><div class="lrpsel" role="group" aria-label="Partie">${m.rows.map(x=>`<button type="button" class="lrpb${x===sel?" on":""}" aria-pressed="${x===sel}" data-act="lrPick" data-k="${esc(k)}" data-p="${esc(x.p.id)}">${esc(partyLabel(x.p))}</button>`).join("")}</div>`:`<span class="lrwhere">${where}</span>`}${(()=>{const b=reoMid(p,r,"",m.rows.length>1?partyLabel(p):"");return b?`<span class="lrfr">${b}</span>`:"";})()}</div>`;
   if(open){const mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
-    h+=`<div class="lrx">${m.rows.length>1?`<div class="lrtabs" role="tablist">${m.rows.map(x=>`<button type="button" role="tab" class="lrtab${x===sel?" on":""}" aria-selected="${x===sel}" data-act="lrPick" data-k="${esc(k)}" data-p="${esc(x.p.id)}">${esc(partyLabel(x.p))}</button>`).join("")}</div>`:`<div class="lrone">${esc(partyLabel(p))}</div>`}
+    h+=`<div class="lrx"><div class="lrone">${esc(partyLabel(p))}</div>
       ${mine?`<div class="lrmine">Ton prono : <em>${nwrap(mine)}</em></div>`:""}${rawPlayers(p).length>1?`<div class="card ptacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}${projLine(p,r).replace('<div class="pad" style="margin-top:12px">','<div>')}${liveBetsHTML(p,r,c)}<button type="button" class="btn block lropen" data-act="party" data-id="${esc(p.id)}">Ouvrir la partie « ${esc(partyLabel(p))} » →</button></div>`;}
   return h+`</div>`;}
 function vLiveRoom(){const M=liveMatches();let h=pageHead("LE SALON <b>DES LIVES</b>",M.length?M.length+" match"+(M.length>1?"s":"")+" en direct dans tes parties":"Rien en direct pour l'instant",`<button type="button" class="back phback" data-act="lrBack" aria-label="Retour à Mes parties"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>`);
@@ -6978,10 +6978,10 @@ function orgLink(p,r){try{if(!p||!r||!r.it||p.free||!isOwner(p)||isClosed(p)||is
 function reoBtnFor(p,r){if(!isOwner(p)||p.free)return"";try{if(itemState(p,r)==="closed")return reopenBtn(p,r);if(reoOpenNow(p,r))return closeBtn(p,r);}catch(_){}return"";}
 function reopenBtn(p,r){const paid=false;return`<button type="button" class="reobtn" data-act="reopenQuick" data-id="${esc(p.id)}" data-key="${esc(r.key)}"><span class="reoi">🔓</span><span><b>Rouvrir les paris</b><small>Un pote a oublié ? Tout le monde verra la réouverture${paid?" · "+eur(LATE.reopen):""}</small></span></button>`;}
 /* v139 : Rouvrir / Refermer directement sur le match (organisateur seulement) — carte du match, fiche du match, Salon des lives */
-function reoMid(p,r,cls){try{if(!p||p.free||p.demo||!r||!r.it||!isOwner(p)||isClosed(p)||isDone(r.it))return"";const st=itemState(p,r),k=esc(r.key),id=esc(p.id);
-  if(st==="closed")return`<button type="button" class="reomid${cls?" "+cls:""}" data-act="reopenQuick" data-id="${id}" data-key="${k}">🔓 Rouvrir les paris</button>`;
+function reoMid(p,r,cls,nm){try{if(!p||p.free||p.demo||!r||!r.it||!isOwner(p)||isClosed(p)||isDone(r.it))return"";const st=itemState(p,r),k=esc(r.key),id=esc(p.id);
+  if(st==="closed")return`<button type="button" class="reomid${cls?" "+cls:""}" data-act="reopenQuick" data-id="${id}" data-key="${k}">🔓 Rouvrir les paris${nm?` · ${esc(nm)}`:""}</button>`;
   if(reoOpenNow(p,r)){const L=(p.rlog||[]).filter(e=>e.k===r.key&&e.act==="open"),e=L[L.length-1];let since="";try{if(e)since=new Date(e.at).toLocaleTimeString("fr-BE",{hour:"2-digit",minute:"2-digit"});}catch(_){}
-    return`<span class="reomidw${cls?" "+cls:""}">${since?`<small class="reosince">Rouverts depuis ${since}</small>`:""}<button type="button" class="reomid on" data-act="lockQuick" data-id="${id}" data-key="${k}">🔒 Refermer les paris</button></span>`;}}catch(_){}return"";}
+    return`<span class="reomidw${cls?" "+cls:""}">${since?`<small class="reosince">Rouverts depuis ${since}</small>`:""}<button type="button" class="reomid on" data-act="lockQuick" data-id="${id}" data-key="${k}">🔒 Refermer les paris${nm?` · ${esc(nm)}`:""}</button></span>`;}}catch(_){}return"";}
 function nwrap(h){return String(h).split(" · ").map(x=>`<span class="nw">${x}</span>`).join(" · ");}
 function reoCloseNtf(p,r){try{const sc=r&&r.it?lvSnap(r.it):"",tx=`${myLabel()||""} a refermé les paris de ${r?r.title:"un match"}${sc?" ("+sc+")":""} · « ${p.name} »`;[...new Set(rawPlayers(p).map(x=>x.uid).filter(Boolean))].forEach(u=>notify(u,"reo",tx,{pid:p.id}));}catch(_){}}
 function rlogAdd(p,k,r,act){const it=r&&r.it,L=it&&it.live?(LIVE[it.lid]||{}):{},sd=it?sides(it):null;
@@ -7177,7 +7177,7 @@ function chatTab(p,mark=true){const m=chatMsgs(p),me=myId(p),pl=playersOf(p);con
   if(mark)chatSeen(p.id,Math.max(+NOW,...m.map(x=>x.at)));let last=null;
   const body=m.length?m.map(x=>{if(x.sys)return`<div class="cmsys">${esc(x.text)}</div>`;const mine=x.uid===me,n=mine?"Toi":(x.name||nm(x.uid)),showN=!mine&&last!==x.uid;last=x.uid;
     const cph=mine?"":bubImg(personOf(p,pl.find(y=>y.id===x.uid)||{name:n}));
-    const rx=rxHTML(p,x,me);return`<div class="cm${mine?" me":""}${rx?" hasrx":""}"${x.id?` data-mid="${esc(x.id)}" data-pid="${esc(p.id)}"`:""}>${mine?"":`<span class="cav" style="background:hsl(${hs(n)%360} 45% 32%)">${cph||esc(n.slice(0,1))}</span>`}<div class="cbw"><div class="cb">${showN?`<b>${esc(n)}</b>`:""}<p>${esc(x.text)}</p><small>${fmtChatT(x.at)}</small></div>${rx}</div></div>`;}).join(""):`<div class="cmempty">💬 Lance la conversation : une vanne, un pronostic, un défi…</div>`;
+    const rx=rxHTML(p,x,me);return`<div class="cm${mine?" me":""}${rx?" hasrx":""}"${x.id?` data-mid="${esc(x.id)}" data-pid="${esc(p.id)}"`:""}>${mine?"":`<span class="cav" style="background:hsl(${hs(n)%360} 45% 32%)">${cph||esc(n.slice(0,1))}</span>`}<div class="cbw"><div class="cb">${showN?`<b>${esc(n)}</b>`:""}${x.ctx&&x.ctx.label?`<em class="hcctx">${esc(x.ctx.label)}</em>`:""}<p>${esc(x.text)}</p><small>${fmtChatT(x.at)}</small></div>${rx}</div></div>`;}).join(""):`<div class="cmempty">💬 Lance la conversation : une vanne, un pronostic, un défi…</div>`;
   return`<div class="pad" style="margin-top:12px"><div class="chat card"><div class="chath"><b>Le chat de la partie</b><span>${pl.length} joueurs</span></div><div class="chatlist">${body}</div>
    <div class="chatq">${["🔥","😂","🤡","👏","GG","On verra dimanche 😏"].map(e=>`<button type="button" data-act="chatQuick" data-v="${esc(e)}">${esc(e)}</button>`).join("")}</div>
    <div class="chatin"><input class="inp" data-chat="1" maxlength="400" placeholder="Écris à tes potes…" value="${esc(S.chatDraft||"")}" enterkeyhint="send"><button type="button" class="btn" data-act="chatSend" aria-label="Envoyer">➤</button></div></div></div>`;}
@@ -7218,13 +7218,18 @@ function chatBar0(p,title){if(!p)return"";try{chatSubscribe(p);}catch(_){}const 
   if(!op){const tt=p.isGroupChat?"Chat du groupe":"Chat de la partie";return`<div class="pad cbwrap"><button type="button" class="chatbar cbcard${p.isGroupChat?" cbgrp":""}${n?" hot":""}" data-act="chatTog" data-id="${esc(p.id)}" aria-expanded="false" aria-label="Ouvrir le ${tt.toLowerCase()}"><span class="cbic" aria-hidden="true">💬</span><span class="cbtx"><b>${tt}</b><small>${esc(chatPrev(p))}</small></span>${n?`<i class="cbdot" aria-label="${n} message${n>1?"s":""} non lu${n>1?"s":""}">${n>9?"9+":n}</i>`:""}<span class="cbch" aria-hidden="true">›</span></button></div>`;}
   return chatTab(p,true).replace('<div class="chat card">','<div class="chat card chatopen">').replace("<b>Le chat de la partie</b>",`<b>💬 ${esc(title||"Le chat")}</b>`).replace(/(<span>\d+) joueurs<\/span>/,p.isGroupChat?"$1 membres</span>":"$1 joueurs</span>").replace(/<\/div><\/div>$/,`<button type="button" class="chatclose" data-act="chatTog" data-id="${esc(p.id)}">✕ Fermer le chat</button></div></div>`);}
 /* v139 : chat DANS l'encart — onglet vertical C/H/A/T sur toute la hauteur du bord droit ; ouvert = panneau qui glisse et couvre ~84 % de l'encart */
-function heroChat(p){try{chatSubscribe(p);}catch(_){}const op=S.chatOpen===p.id,n=op?0:chatUnread(p),tt=p.isGroupChat?"Chat du groupe":"Chat de la partie",id=esc(p.id);
-  if(!op)return`<button type="button" class="hctab${n?" hot":""}" data-act="chatTog" data-id="${id}" aria-expanded="false" aria-label="Ouvrir le ${tt.toLowerCase()}${n?" · "+n+" non lu"+(n>1?"s":""):""}"><span class="hcbub" aria-hidden="true">💬${n?`<i class="hcdot">${n>9?"9+":n}</i>`:""}</span><span class="hclet" aria-hidden="true"><b>C</b><b>H</b><b>A</b><b>T</b></span></button>`;
+/* v140 : un contexte (match) peut ouvrir le chat de la partie ; l'ouverture ne concerne que l'encart d'où on l'a ouvert */
+function mpParties(p,r){try{return(S.parties||[]).filter(q=>q&&!q.free&&!q.demo&&q.comp===p.comp&&rowsOfParty(q).some(x=>x.key===r.key));}catch(_){return[];}}
+function mpSelHTML(p,r){const L=mpParties(p,r);if(L.length<2)return"";return`<div class="pad mpselw"><p class="mpselt">Ce match est dans ${L.length} parties :</p><div class="lrpsel" role="group" aria-label="Partie">${L.map(q=>`<button type="button" class="lrpb${q.id===p.id?" on":""}" aria-pressed="${q.id===p.id}" data-act="mpSel" data-id="${esc(q.id)}" data-key="${esc(r.key)}">${esc(partyLabel(q))}</button>`).join("")}</div></div>`;}
+function ctxLabel(sp,it,title){try{const sd=sides(it),sh=n=>{n=String(n||"").replace(/^(Pays de|République de|République|Îles?)\s+/i,"").trim();const w=n.split(/\s+/);return sp==="tennis"?w[w.length-1]:n;};return(SPEM[sp]||"")+" "+(sd?sh(sd[0])+"–"+sh(sd[1]):(title||it.label||""));}catch(_){return title||"";}}
+function heroChat(p,ctx){try{chatSubscribe(p);}catch(_){}const ck=ctx?ctx.k:"",op=S.chatOpen===p.id&&(S.chatCtx||"")===ck,n=op?0:chatUnread(p),tt=p.isGroupChat?"Chat du groupe":"Chat de la partie",id=esc(p.id),cx=ctx?` data-ctx="${esc(ctx.k)}" data-lbl="${esc(ctx.label)}"`:"";
+  if(!op)return`<button type="button" class="hctab${n?" hot":""}${S.hcAnimC&&Date.now()-S.hcAnimC<500&&S.hcAnimK===p.id+"|"+ck?" back":""}" data-act="chatTog" data-id="${id}"${cx} aria-expanded="false" aria-label="Ouvrir le ${tt.toLowerCase()}${n?" · "+n+" non lu"+(n>1?"s":""):""}"><span class="hcbub" aria-hidden="true">💬${n?`<i class="hcdot">${n>9?"9+":n}</i>`:""}</span><span class="hclet" aria-hidden="true"><b>C</b><b>H</b><b>A</b><b>T</b></span></button>`;
   const m=chatMsgs(p).slice(-40),me=myId(p),pl=playersOf(p);try{chatSeen(p.id,Math.max(+NOW,...m.map(x=>chT(x)||0)));}catch(_){}
   const myN=myLabel()||((pl.find(x=>x.id===me)||{}).name)||"Moi",nmOf=x=>x.uid===me?myN:(x.name&&normS(x.name)!=="toi"?x.name:((pl.find(y=>y.id===x.uid)||{}).name||"Un pote"));
-  const body=m.length?m.map(x=>x.sys?`<div class="hcsys">${esc(x.text)}</div>`:`<div class="hcm${x.uid===me?" me":""}"><small>${esc(nmOf(x))}</small><span>${esc(x.text)}</span></div>`).join(""):`<div class="hcempty">Lance la discussion 👋</div>`;
-  return`<button type="button" class="hcpeek" data-act="chatTog" data-id="${id}" aria-label="Fermer le chat et revenir à l'encart"><span>‹ ENCART</span></button><div class="hcpanel${S.hcAnim&&Date.now()-S.hcAnim<600?" anim":""}" role="dialog" aria-label="${tt}"><div class="hch"><span aria-hidden="true">💬</span><b>${tt}</b><button type="button" class="hcx" data-act="chatTog" data-id="${id}" aria-label="Fermer le chat">✕</button></div><div class="hclist chatlist">${body}</div><div class="hcin"><input class="inp" data-chat="1" maxlength="400" placeholder="Écris un message…" value="${esc(S.chatDraft||"")}" enterkeyhint="send" aria-label="Écris un message"><button type="button" class="hcsend" data-act="chatSend" aria-label="Envoyer">➤</button></div></div>`;}
-function heroChatIn(h,p,marker){try{const i=h.indexOf(marker);if(i<0)return h+chatBar(p,p.isGroupChat?"Le chat du groupe":"Le chat de la partie");const j=h.indexOf(">",i);let open=h.slice(i,j+1);open=open.replace('class="','class="hcon'+(S.chatOpen===p.id?" hcopen":"")+' ');return h.slice(0,i)+open+heroChat(p)+h.slice(j+1);}catch(_){return h;}}
+  const body=m.length?m.map(x=>x.sys?`<div class="hcsys">${esc(x.text)}</div>`:`<div class="hcm${x.uid===me?" me":""}"><small>${esc(nmOf(x))}</small>${x.ctx&&x.ctx.label?`<em class="hcctx">${esc(x.ctx.label)}</em>`:""}<span>${esc(x.text)}</span></div>`).join(""):`<div class="hcempty">Lance la discussion 👋</div>`;
+  const el=S.hcAnim?Date.now()-S.hcAnim:9999,an=el<450?` style="animation-delay:-${el}ms"`:"";
+  return`<span class="hcveil${el<450?" anim":""}"${an} aria-hidden="true"></span><button type="button" class="hcpeek${el<450?" anim":""}"${an} data-act="chatTog" data-id="${id}"${cx} aria-label="Fermer le chat et revenir à l'encart"><span>‹ ENCART</span></button><div class="hcpanel${el<450?" anim":""}"${an} role="dialog" aria-label="${tt}"><div class="hch"><span aria-hidden="true">💬</span><b>${ctx?`Chat · ${esc(partyLabel(p))}`:tt}${ctx?`<small class="hcctxh">${esc(ctx.label)}</small>`:""}</b><button type="button" class="hcx" data-act="chatTog" data-id="${id}"${cx} aria-label="Fermer le chat">✕</button></div><div class="hclist chatlist">${body}</div><div class="hcin"><input class="inp" data-chat="1" maxlength="400" placeholder="Écris un message…" value="${esc(S.chatDraft||"")}" enterkeyhint="send" aria-label="Écris un message"><button type="button" class="hcsend" data-act="chatSend" aria-label="Envoyer">➤</button></div></div>`;}
+function heroChatIn(h,p,marker,ctx){try{const i=h.indexOf(marker);if(i<0)return ctx?h:h+chatBar(p,p.isGroupChat?"Le chat du groupe":"Le chat de la partie");const j=h.indexOf(">",i);let open=h.slice(i,j+1);const op=S.chatOpen===p.id&&(S.chatCtx||"")===(ctx?ctx.k:"");open=open.replace('class="','class="hcon'+(op?" hcopen":"")+' ');return h.slice(0,i)+open+heroChat(p,ctx)+h.slice(j+1);}catch(_){return h;}}
 if(!window._hcFocus){window._hcFocus=1;document.addEventListener("focusin",e=>{const t=e.target;if(t&&t.closest&&t.closest(".hcpanel")&&t.matches("[data-chat]"))setTimeout(()=>{try{t.scrollIntoView({block:"center",behavior:"smooth"});}catch(_){}},320);});try{window.visualViewport&&window.visualViewport.addEventListener("resize",()=>{const a=document.activeElement;if(a&&a.closest&&a.closest(".hcpanel"))try{a.scrollIntoView({block:"center"});}catch(_){}});}catch(_){}}
 function chatSend(text){const p=chatP(S.chatPid||S.partyView);text=(text||"").trim();if(!p||!text)return;const me=myId(p),meN=(playersOf(p).find(x=>x.id===me)||{}).name||"Toi";
   const msg={uid:me,name:meN==="Toi"?(S.myName||"Toi"):meN,text:text.slice(0,400),at:Date.now()};
@@ -7544,7 +7549,7 @@ function projLine(p,r){let sc=null;try{sc=scoreProv(Object.assign({},p,{players:
 function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div><button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button></div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
   const mine=R.board.find(x=>x.pl.id===me);let place=1;const ranks=R.board.map((x,i)=>{if(i&&x.pts<R.board[i-1].pts)place=i+1;return place;});const myPlace=ranks[R.board.indexOf(mine)];
   const arrow=m=>m>0?`<span class="mvup">▲${m}</span>`:m<0?`<span class="mvdn">▼${-m}</span>`:`<span class="mveq">=</span>`;
-  let h=matchHero(c,r.it,res,"🏁 Récap des points",r.title);
+  let h=matchHero(c,r.it,res,"🏁 Récap des points",r.title);h+=mpSelHTML(p,r);
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
   {const L=r.it.live?(LIVE[r.it.lid]||{}):{};let body="";
    if(sd&&res.sa!=null)body=res.line&&!/^Score final/.test(res.line)?`<p class="rsl big">${esc(res.line)}</p>`:`<p class="rsl big">Score final ${res.sa}–${res.sb}</p>`;else if(false)body=`<div class="rsc"><span class="rst">${mark(sd[0])}<b>${esc(sd[0])}</b></span><span class="rsn">${res.sa}<i>–</i>${res.sb}</span><span class="rst r">${mark(sd[1])}<b>${esc(sd[1])}</b></span></div>${res.line&&!/^Score final/.test(res.line)?`<p class="rsl">${esc(res.line)}</p>`:""}`;
@@ -7552,7 +7557,7 @@ function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Mat
    if(L.board&&L.board.length)body+=`<div class="rsb">${L.board.slice(0,8).map(x=>`<div><span>${esc(x[0])}</span>${mark(x[1])}<b>${esc(x[1])}</b><em>${esc(x[2])}</em></div>`).join("")}</div>`;
    }
   h+=fixBlock(p,r)+rlogFold(p,r.key);if(mine)h+=`<div class="pad" style="margin-top:12px"><p class="rcone">Tu marques <b>+${mine.pts} pt${mine.pts>1?"s":""}</b> sur ce match</p></div>`;
-  h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Les points de l'étape</h3><div class="card" style="padding:4px 14px">${R.board.map((x,i)=>`<div class="br simple${x.pl.id===me?" me":""}"><span class="rk">${x.pts?ranks[i]:"–"}</span><span class="nm">${esc(x.pl.name&&!/^toi$/i.test(x.pl.name)?x.pl.name:(x.pl.id===me?(myLabel()||x.pl.name):x.pl.name))}</span><span class="pt" style="color:${x.pts?"var(--lime)":"var(--muted)"}">+${x.pts}<small>pts</small></span></div>`).join("")}</div></div>`;
+  h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">${(x=>x==="velo"?"Les points de l'étape":x==="f1"?"Les points de la session":x==="golf"?"Les points du tour":"Les points du match")(c.sport.id)}</h3><div class="card" style="padding:4px 14px">${R.board.map((x,i)=>`<div class="br simple${x.pl.id===me?" me":""}"><span class="rk">${x.pts?ranks[i]:"–"}</span><span class="nm">${esc(x.pl.name&&!/^toi$/i.test(x.pl.name)?x.pl.name:(x.pl.id===me?(myLabel()||x.pl.name):x.pl.name))}</span><span class="pt" style="color:${x.pts?"var(--lime)":"var(--muted)"}">+${x.pts}<small>pts</small></span></div>`).join("")}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Question par question</h3>${R.qs.map(q=>`<div class="card rcq"><div class="rcqh"><b>${esc(q.label)}</b><span>${q.w?q.pts+" pts × cote":q.pts+" pts"}</span></div><div class="rcqa">${q.truth==null?"Pas encore relevé":`Bonne réponse : <b>${esc(Array.isArray(q.truth)?q.truth.join(", "):tnL(q.row,q.bid,q.truth))}</b>`}</div>
     ${q.picks.map(x=>{const has=x.v!=null&&x.v!=="";return`<div class="rcp${x.won?" ok":""}${x.pl.id===me?" me":""}"><span class="rcn">${esc(x.pl.id===me?"Toi":x.pl.name)}</span><span class="rcv">${has?(q.t==="choice"?mark(x.v):"")+esc(tnL(q.row,q.bid,x.v))+chgMark(p,x.pl.id,q.row.key+"|"+q.bid):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${x.odd&&has?`<small class="rco">@${x.odd.toFixed(2)}</small> `:""}${q.truth==null||!has?"":x.won?`✓ +${x.won}${x.near?(q.t==="near"?' <small>(à ±2)</small>':' <small>(le + proche)</small>'):""}`:"✗ 0"}</span></div>`;}).join("")}</div>`).join("")}
         <div style="margin-top:10px"><button type="button" class="btn block" data-act="back">Retour</button></div></div>`;
@@ -7568,7 +7573,7 @@ function vBet(){
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
   /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
-  {const b=reoMid(p,r);if(b)h+=`<div class="pad reorow rmatch">${b}</div>`;}h+=rlogFold(p,r.key);
+  h+=mpSelHTML(p,r);{const b=reoMid(p,r,"",mpParties(p,r).length>1?partyLabel(p):"");if(b)h+=`<div class="pad reorow rmatch">${b}</div>`;}h+=rlogFold(p,r.key);
   try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.id===me?"Toi":x.name,st:done?"in":"wait"};});
     h+=`<div class="pad" style="margin-top:12px"><div class="card ptacc whop">${bubRow(L,"ont joué ce match")}</div></div>`;}}catch(_){}
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
@@ -8206,11 +8211,15 @@ document.addEventListener("click",e=>{
     case "ptab":S.ptab=t.dataset.t;if(S.ptab==="chat")chatSubscribe(partyById(S.partyView));render();if(S.ptab==="chat")chatScroll();break;
     case "liveRoom":S.lrOpen={};go("lives");break;
     case "lockQuick":{const p=partyById(t.dataset.id);if(!p)break;S.partyView=p.id;p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});{const r=rowsOfParty(p).find(x=>x.key===t.dataset.key);rlogAdd(p,t.dataset.key,r,"close");reoCloseNtf(p,r);}savePartyDoc(p,"Paris refermés");break;}
-    case "lrPick":{S.lrSel=S.lrSel||{};S.lrSel[t.dataset.k]=t.dataset.p;render();break;}
+    case "mpSel":{const id=t.dataset.id;if(!partyById(id))break;if(S.chatOpen&&S.chatCtx==="m:"+t.dataset.key){S.chatOpen=id;S.chatPid=id;S.hcAnim=0;}S.partyView=id;S.editKey=null;S.myDraft={};S.missHi=null;render();break;}
+    case "lrPick":{S.lrSel=S.lrSel||{};S.lrSel[t.dataset.k]=t.dataset.p;if(S.chatOpen&&S.chatCtx==="lr:"+t.dataset.k){S.chatOpen=t.dataset.p;S.chatPid=t.dataset.p;S.hcAnim=0;chatSeen(t.dataset.p,Date.now());}render();break;}
     case "lrTog":{const k=t.dataset.k,A=liveMatches();S.lrOpen=S.lrOpen||{};S.lrOpen[k]=!lrIsOpen(A.length,k);render();if(S.lrOpen[k]){const el=document.getElementById("lr-"+k.replace(/[^\w-]/g,"_"));if(el)setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),60);}break;}
     case "chatOpen":{const p=partyById(t.dataset.id);if(!p)break;S.chatParty=p.id;S.partyView=p.id;chatSubscribe(p);go("chatroom");setTimeout(()=>{try{chatScroll();}catch(_){}},250);break;}
     case "gAcc":{const g=groupById(S.groupView);if(g)gAnswer(g,t.dataset.v);break;}
-    case "chatTog":{const id=t.dataset.id;S.chatOpen=S.chatOpen===id?null:id;S.hcAnim=S.chatOpen?Date.now():0;S.chatPid=id;if(S.chatOpen){chatSeen(id,Date.now());}render();if(S.chatOpen){chatScroll();const b=document.querySelector(".chatbar.on");if(b)b.scrollIntoView({block:"start",behavior:"smooth"});}else{try{navChatBadge();}catch(_){}}break;}
+    case "chatTog":{const id=t.dataset.id,ck=t.dataset.ctx||"";const isOpen=S.chatOpen===id&&(S.chatCtx||"")===ck;
+      if(isOpen){if(S._hcClosing)break;const host=t.closest(".hcon"),pan=host&&host.querySelector(".hcpanel");const fin=()=>{S._hcClosing=0;S.chatOpen=null;S.chatCtx="";S.chatCtxLbl="";S.hcAnim=0;S.hcAnimC=Date.now();S.hcAnimK=id+"|"+ck;render();try{navChatBadge();}catch(_){}};
+        if(pan&&!matchMedia("(prefers-reduced-motion: reduce)").matches){S._hcClosing=1;host.classList.add("hcclosing");let done=0;const go=()=>{if(done)return;done=1;fin();};pan.addEventListener("animationend",go,{once:true});setTimeout(go,520);}else fin();break;}
+      S.chatOpen=id;S.chatCtx=ck;S.chatCtxLbl=t.dataset.lbl||"";S.hcAnim=Date.now();S.chatPid=id;if(S.chatOpen){chatSeen(id,Date.now());}render();if(S.chatOpen){chatScroll();const b=document.querySelector(".chatbar.on");if(b)b.scrollIntoView({block:"start",behavior:"smooth"});}else{try{navChatBadge();}catch(_){}}break;}
     case "chatSend":{const i=document.querySelector("[data-chat]");chatSend(i?i.value:S.chatDraft);break;}
     case "chatQuick":chatSend(t.dataset.v);break;
     case "orgBets":{const p=partyById(t.dataset.id);if(!p)break;const k=t.dataset.key;S.ptv=S.ptv||{};S.ptv[p.id]="settings";S.orgMode=p.id;S.rtab="bets";if(S.screen!=="party"||S.partyView!==p.id){S.partyView=p.id;go("party");}else render();if(k)orgFocus(k,true);else setTimeout(()=>{try{const el=document.querySelector("#app .ptnav")||document.querySelector("#app [data-act=ptv]");if(el)window.scrollTo({top:window.scrollY+el.getBoundingClientRect().top-12,behavior:"smooth"});}catch(_){}},180);break;}
@@ -9349,5 +9358,43 @@ html body #app .sum .subtn.flip{animation:suFlip .42s cubic-bezier(.3,.7,.3,1)}
 html body #app .supan .sumok{margin:14px 0 6px}
 @media (max-width:359px){html body #app .sum .subtn.sumod,html body #app .sum .subtn.supers{font-size:12px;padding:0 10px}}
 html body #app :is(.v137t,.ptabs.gtabs,.tksort,.rtsort,.ptnav)>button{flex:1 1 0!important;min-width:0!important;min-height:44px!important}
+</style><style id="v140">/* ===== v140 : chat qui glisse vraiment · chat sur les matchs · Salon live épuré ===== */
+html body #app .hcon .hcpanel.anim{animation:hcIn140 .45s cubic-bezier(.22,.8,.2,1) both!important}
+html body #app .hcon .hcpeek.anim,html body #app .hcon .hcveil.anim{animation:hcFade140 .45s cubic-bezier(.22,.8,.2,1) both}
+html body #app .hcon .hcveil{position:absolute;inset:0;z-index:27;background:rgba(8,5,2,.35);pointer-events:none}
+html body #app .hcon.hcclosing .hcpanel{animation:hcOut140 .45s cubic-bezier(.22,.8,.2,1) both!important}
+html body #app .hcon.hcclosing .hcveil,html body #app .hcon.hcclosing .hcpeek{animation:hcFadeOut140 .45s cubic-bezier(.22,.8,.2,1) both!important}
+html body #app .hcon .hctab.back{animation:hcTabIn140 .35s cubic-bezier(.22,.8,.2,1) both}
+@keyframes hcIn140{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes hcOut140{from{transform:translateX(0)}to{transform:translateX(100%)}}
+@keyframes hcFade140{from{opacity:0}to{opacity:1}}
+@keyframes hcFadeOut140{from{opacity:1}to{opacity:0}}
+@keyframes hcTabIn140{from{transform:translateX(60%);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){html body #app .hcon .hcpanel.anim,html body #app .hcon.hcclosing .hcpanel,html body #app .hcon .hctab.back,html body #app .hcon .hcveil.anim,html body #app .hcon .hcpeek.anim{animation-duration:.12s!important}}
+/* étiquette de contexte d'un message envoyé depuis un match */
+html body #app .hcctx{display:inline-block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.02em;padding:1px 7px;margin:1px 0 3px;border-radius:999px;background:rgba(242,210,138,.16);color:#F2D28A;border:1px solid rgba(242,210,138,.35)}
+html body #app .hcm.me .hcctx{background:rgba(26,18,8,.14);color:#3A2A10;border-color:rgba(26,18,8,.25)}
+html body #app .hcctxh{display:block;font-size:11px;font-weight:700;color:#E9C77A;opacity:.85;margin-top:1px}
+/* Salon des lives : onglet chat sur la carte du match */
+html body #app .lrc .lrhcw{position:relative;overflow:hidden;padding-right:58px!important;border-radius:inherit}
+html body #app .lrc .lrhcw>.hctab{border-radius:0}
+html body #app .lrc .lrhcw>.lrhd{width:100%}
+html body #app .lrc .lrhcw .hcpanel{width:86%}
+html body #app .lrc .lrhcw.hcopen{min-height:300px}
+/* pied de la carte : plus de « Voir les paris » ; Rouvrir aligné à gauche */
+html body #app .lrfoot2.v140f{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px}
+html body #app .lrfoot2.v140f .lrfr{margin-left:0;justify-content:flex-start}
+html body #app .lrfoot2.v140f .reomidw{justify-content:flex-start}
+/* fiche du match : la barre du haut ne passe pas sous l'onglet */
+html body #app .mhero.hcon{padding-right:62px!important}
+html body #app .mhero.hcon .bar{padding-right:0}
+/* match dans plusieurs parties : sélecteur en vrais boutons dorés */
+html body #app .lrpsel{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+html body #app .lrpb{min-height:44px;padding:0 16px;border-radius:14px;border:1.5px solid rgba(233,199,122,.7);background:transparent;color:#E9C77A;font:inherit;font-size:13px;font-weight:900;letter-spacing:.02em;cursor:pointer}
+html body #app .lrpb.on{background:linear-gradient(180deg,#F2D28A,#C79A45);color:#1A1208;border-color:transparent;box-shadow:0 6px 16px rgba(199,154,69,.3)}
+html body #app .mpselw{margin-top:12px}html body #app .mpselt{font-size:12px;font-weight:800;color:#E9C77A;margin:0 0 8px}
+/* libellé long « Rouvrir les paris · nom de la partie » : passe à la ligne au lieu de déborder */
+html body #app .reomid{max-width:100%;white-space:normal;text-align:left;line-height:1.2;padding-top:8px;padding-bottom:8px;height:auto}
+html body #app .lrfoot2.v140f .lrfr,html body #app .lrfoot2.v140f .reomidw{max-width:100%}
 </style></body>
 </html>
