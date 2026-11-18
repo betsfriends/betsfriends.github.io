@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v142";
+const APP_VER="v144";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4017,6 +4017,32 @@ function tlIs(k){try{if(Date.now()>+new Date(TEST_LIVE.until))return false;const
   return false;}catch(_){return false;}}
 /* v141 TEST : les 3 matchs du 17 nov. restent en direct (Galles–Portugal, Danemark–Norvège, Zverev–Shelton) */
 const TEST_PAIRS=[["Pays de Galles","Portugal"],["Danemark","Norvège"]];
+/* v143 : le ticket EN DIRECT se déchire le long du zigzag, le talon part en haut à gauche */
+function tkRip143(box){try{if(!box||!box.parentElement)return false;
+  const W=box.offsetWidth,H=box.offsetHeight;if(!W||!H)return false;
+  /* v144 : UNE seule déchirure = l'encoche dentelée déjà dessinée (masque SVG 14px × 58%) prolongée jusqu'en bas */
+  const cx=W/3,x0=cx-7,hN=H*.58,P=(px,py)=>[x0+px/100*14,py/100*hN];
+  const LE=[[8,8],[36,16],[12,25],[38,34],[16,43],[40,52],[22,61],[46,70],[28,79],[40,88],[48,100]].map(p=>P(p[0],p[1]));
+  const RE=[[62,8],[88,15],[55,24],[80,33],[50,42],[70,51],[46,60],[62,69],[44,78],[54,87],[48,100]].map(p=>P(p[0],p[1]));
+  const tipX=x0+.48*14,low=[];let i=0;for(let y=hN+8;y<H-4;y+=8){low.push([tipX+(i%2?2.4:-2.4)*(.6+((i*37)%7)/17),y]);i++;}low.push([tipX,H]);
+  const L=[[0,0],[x0,0],...LE,...low,[0,H]],R=[[W,0],[x0+14,0],...RE,...low,[W,H]];
+  const poly=a=>"polygon("+a.map(p=>p[0].toFixed(1)+"px "+p[1].toFixed(1)+"px").join(",")+")";
+  const cl=box.cloneNode(true);cl.classList.add("tkpiece");cl.setAttribute("aria-hidden","true");
+  cl.querySelectorAll("[data-act]").forEach(e=>e.removeAttribute("data-act"));
+  Object.assign(cl.style,{position:"absolute",left:box.offsetLeft+"px",top:box.offsetTop+"px",width:W+"px",height:H+"px",margin:"0",zIndex:"30",pointerEvents:"none",clipPath:poly(L),webkitClipPath:poly(L)});
+  box.classList.add("tkrip");box.style.webkitMask="none";box.style.mask="none";cl.style.webkitMask="none";cl.style.mask="none";box.style.clipPath=poly(R);box.style.webkitClipPath=poly(R);
+  const par=box.offsetParent||box.parentElement;if(getComputedStyle(box.parentElement).position==="static"&&box.parentElement!==par){}
+  box.insertAdjacentElement("afterend",cl);
+  const o=cx+"px "+H+"px";cl.style.transformOrigin=o;
+  const r=box.getBoundingClientRect(),dx=-(r.left+cx+40),dy=-(r.top+H*.6+60);
+  cl.animate([
+    {transform:"none",filter:"drop-shadow(0 0 0 rgba(0,0,0,0))",offset:0},
+    {transform:"rotate(-2.5deg)",filter:"drop-shadow(6px 6px 8px rgba(0,0,0,.55))",offset:.22},
+    {transform:"rotate(-7deg)",filter:"drop-shadow(10px 10px 12px rgba(0,0,0,.6))",offset:.5},
+    {transform:"translate("+(dx*.35)+"px,"+(dy*.35)+"px) rotate(-16deg)",opacity:1,offset:.7},
+    {transform:"translate("+dx+"px,"+dy+"px) rotate(-38deg)",opacity:0,filter:"drop-shadow(16px 16px 18px rgba(0,0,0,.5))",offset:1}
+  ],{duration:900,easing:"cubic-bezier(.45,0,.4,1)",fill:"forwards"});
+  return true;}catch(_){return false;}}
 function liveWrap(o){return new Proxy(o,{set(t,k,v){if(v&&typeof v==="object"&&!v.manual&&tlIs(k)){v=Object.assign({},v,{status:"LIVE",minute:v.status==="LIVE"&&v.minute?v.minute:(/^atpf~/.test(String(k))?"":"90'"),line:v.status==="LIVE"?(v.line||""):(/^atpf~/.test(String(k))?String(v.line||"").replace(/\s*·.*$/,""):""),winner:undefined});delete v.ftAt;if(FTAT[k]){delete FTAT[k];ftatSave();}t[k]=v;return true;}if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
   /* v101 : LIVE → NS/PST (source qui « perd » le match) : on garde le direct */
   if(v&&typeof v==="object"&&!v.manual&&old&&old.status==="LIVE"&&(v.status==="NS"||v.status==="PST"||!v.status))return true;
@@ -8219,7 +8245,7 @@ document.addEventListener("click",e=>{
     case "optDone":S.optEdit=null;render();break;
     case "ptab":S.ptab=t.dataset.t;if(S.ptab==="chat")chatSubscribe(partyById(S.partyView));render();if(S.ptab==="chat")chatScroll();break;
     case "liveRoom":{S.lrOpen={};const tk=t.closest(".hlvb"),rm=matchMedia("(prefers-reduced-motion: reduce)").matches;S.lrIn=Date.now();
-      if(tk&&!rm&&S.screen==="parties"&&!tk.classList.contains("tear")){tk.classList.add("tear");window._tkF=1;setTimeout(()=>{window._tkF=0;S.lrIn=Date.now();go("lives");},800);}else go("lives");break;}
+      if(tk&&!rm&&S.screen==="parties"&&!tk.classList.contains("tkrip")&&tkRip143(tk)){window._tkF=1;setTimeout(()=>{window._tkF=0;S.lrIn=Date.now();go("lives");},900);}else go("lives");break;}
     case "lockQuick":{const p=partyById(t.dataset.id);if(!p)break;S.partyView=p.id;p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});{const r=rowsOfParty(p).find(x=>x.key===t.dataset.key);rlogAdd(p,t.dataset.key,r,"close");reoCloseNtf(p,r);}savePartyDoc(p,"Paris refermés");break;}
     case "mpSel":{const id=t.dataset.id;if(!partyById(id))break;if(S.chatOpen&&S.chatCtx==="m:"+t.dataset.key){S.chatOpen=id;S.chatPid=id;S.hcAnim=0;}S.partyView=id;S.editKey=null;S.myDraft={};S.missHi=null;render();break;}
     case "lrPick":{S.lrSel=S.lrSel||{};S.lrSel[t.dataset.k]=t.dataset.p;if(S.chatOpen&&S.chatCtx==="lr:"+t.dataset.k){S.chatOpen=t.dataset.p;S.chatPid=t.dataset.p;S.hcAnim=0;chatSeen(t.dataset.p,Date.now());}render();break;}
@@ -9497,5 +9523,22 @@ html body #app .lrfoot2 .lrpsel{display:flex;flex-wrap:wrap;gap:8px}
 @media (max-width:480px){html body #app .lrfoot2 .lrpb{flex:1 1 100%;min-height:44px;padding:8px 14px!important;font-size:14px!important;line-height:1.2;overflow-wrap:anywhere}}
 html body #app .lrbody .mhp{min-width:0}
 html body #app .lrbody .mhp>b{white-space:normal!important;overflow-wrap:anywhere;text-align:center;line-height:1.15;max-width:100%;display:block}
+</style><style id="v143">
+html body #app .hlvb.tkrip,html body #app .hlvb.tkpiece{transition:none!important}
+html body #app .hlvb.tkrip{pointer-events:none}
+html body #app .hlvb.tkrip .pwid{visibility:hidden}
+html body #app .hlvb.tkpiece .pwid{border-right:0!important;animation:none!important}
+html body #app .hlvb.tkpiece .lvR{visibility:hidden}
+html body #app .hlvb.tkpiece .lvpill i{animation:none!important}
+html body #app .hlvb.tear .pwid,html body #app .hlvb.tear .lvR{animation:none!important}
+body.scr-lives #app .phead.phb{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E") 0px 0px/160px 160px repeat,radial-gradient(70% 120% at 88% 0%, rgba(255, 120, 110, 0.4), rgba(0, 0, 0, 0) 70%) 0% 0%/auto repeat,linear-gradient(160deg, rgb(216, 50, 43) 0%, rgb(165, 30, 26) 40%, rgb(106, 15, 13) 75%, rgb(46, 6, 5) 100%) 0% 0%/auto repeat!important;background-color:#5a0d0b!important;border-color:rgba(243,224,166,.75)!important;box-shadow:0 0 22px rgba(255,70,60,.3)!important;isolation:isolate}
+body.scr-lives #app .phead.phb::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='14'%3E%3Cpath d='M0 7 C16 0 16 0 32 7 S48 14 64 7' fill='none' stroke='%23FFF3D6' stroke-width='.7'/%3E%3C/svg%3E") 0px 0px/64px 7px repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .3 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0% 0%/auto repeat;opacity:0.22;mix-blend-mode:overlay;z-index:-1}
+body.scr-lives #app .phead.phb>*:not(h1):not(p):not(.brand):not(button){filter:none!important}
+body.scr-lives.lrin #app .phead.phb{animation:lrRed143 .55s cubic-bezier(.2,.8,.2,1) both!important}
+@keyframes lrRed143{0%{opacity:.35;transform:translateY(-10px)}100%{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){body.scr-lives.lrin #app .phead.phb{animation:none!important}}
+</style><style id="v144">
+html body #app .hlvb.tkrip>.pwid,html body #app .hlvb.tkpiece>.pwid{border-right:0!important}
+html body #app .hlvb.tkrip::after,html body #app .hlvb.tkpiece::after{background-image:none!important}
 </style></body>
 </html>
