@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v144";
+const APP_VER="v145";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4063,7 +4063,7 @@ const LIVE=liveWrap({
  "ad26-r3":{status:"FT",winners:["Jon Rahm"],score:-18,board:[["1","Jon Rahm","-18"],["T2","Tyrrell Hatton","-17"],["T2","Francesco Laporta","-17"],["4","Rory McIlroy","-16"],["5","Adam Scott","-15"]]},
  "ad26-r4":{status:"NS"},"ww26-r1":{status:"END"},"ww26-r2":{status:"END"},"ww26-r3":{status:"FT",winners:["Ben James"],score:-21,board:[["1","Ben James","-21"],["2","Ryan Gerard","-17"],["T3","Chris Kirk","-16"],["T3","Denny McCarthy","-16"],["T5","Alvaro Ortiz","-15"],["T5","Paul Peterson","-15"],["T5","Keith Mitchell","-15"],["T5","Kensei Hirata","-15"]]},"ww26-r4":{status:"NS"}
 });
-const liveSt=it=>{const st=(LIVE[it.lid]||{}).status||"NS";if((st==="FT"||st==="END")&&tlItem(it))return"LIVE";return st;};
+const liveSt=it=>{const st=(LIVE[it.lid]||{}).status||"NS";if(st!=="LIVE"&&tlItem(it))return"LIVE";return st;};
 /* v142 TEST — à retirer : les 3 matchs du 17 nov. restent en direct (lecture par l'affiche, pas par la clé) */
 function tlItem(it){try{if(!it||Date.now()>+new Date("2026-11-30T23:00:00Z"))return false;const t=+new Date(it.date);if(!(t>=Date.UTC(2026,10,17,10)&&t<=Date.UTC(2026,10,18,4)))return false;
   const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();let sd=null;try{sd=sides(it);}catch(_){}const txt=n((sd||[]).join(" | ")+" | "+(it.a||"")+" | "+(it.b||"")+" | "+(it.label||""));
@@ -6391,7 +6391,7 @@ function lrKey(it,fb){let k=it.lid||fb;try{const sd=sides(it);if(sd&&sd.length==
 function liveMatches(){const out=liveMatches0(),by={},now=+NOW;out.forEach(m=>{by[m.k]=1;LR_SEEN[m.k]={k:m.k,it:m.it,c:m.c,rows:m.rows};});
   Object.values(LR_SEEN).forEach(s=>{if(by[s.k])return;const rows=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;try{rowsOfParty(p).forEach(r=>{if(r.it&&lrKey(r.it,r.key)===s.k)rows.push({p,r});});}catch(_){}});
     const its=rows.map(x=>x.r.it).concat([s.it]),fin=its.some(it=>{const L=LIVE[it.lid]||{};return(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)&&!inGrace(it);});
-    if(fin||now>+new Date(s.it.date)+6*3600e3){delete LR_SEEN[s.k];return;}
+    if(!its.some(i=>tlItem(i))&&(fin||now>+new Date(s.it.date)+6*3600e3)){delete LR_SEEN[s.k];return;}
     const it=its.find(i=>liveSt(i)==="LIVE")||its[0];
     try{const D=JSON.parse(localStorage.getItem("bf_lrdiag")||"[]");D.push({at:new Date().toISOString(),k:s.k,its:its.map(i=>i.lid+":"+liveSt(i)+":"+(+new Date(i.date))),rows:rows.length,v:APP_VER});localStorage.setItem("bf_lrdiag",JSON.stringify(D.slice(-30)));}catch(_){}
     out.push({k:s.k,it,c:s.c,rows:rows.length?rows:s.rows});});
@@ -8720,8 +8720,11 @@ go=(function(o){return function(screen,extra){const r=o.apply(this,arguments);if
 render=(function(o){return function(){const r=o.apply(this,arguments);try{const b=document.body;b.classList.toggle("scr-lives",S.screen==="lives");if(S.screen==="lives"&&S.lrIn&&Date.now()-S.lrIn<1500){b.classList.add("lrin");clearTimeout(window._lrinT);window._lrinT=setTimeout(()=>b.classList.remove("lrin"),1000);}requestAnimationFrame(lrFieldFit);}catch(_){}return r;};})(render);
 addEventListener("resize",()=>requestAnimationFrame(lrFieldFit));
 document.addEventListener("animationend",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("hcback"))t.classList.remove("hcback");},true);
+/* v145 TEST — score de secours si la source ne renvoie plus ces matchs */
+function tlFallback(it){const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();let sd=[];try{sd=sides(it)||[];}catch(_){}const t=n(sd.join("|")+"|"+(it.label||""));
+  if(/zverev/.test(t))return{status:"LIVE",sa:2,sb:0,line:"6-2 7-6 0-0",minute:""};return{status:"LIVE",sa:2,sb:3,minute:"90'"};}
 /* v142 TEST — à retirer : remet en direct les matchs de test que la source aurait passés « Terminé » */
-function tlSweep(){try{let ch=false;(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p);}catch(_){}rows.forEach(r=>{const it=r.it;if(!it||!it.live||!it.lid)return;const L=LIVE[it.lid];if(!L||!(L.status==="FT"||L.status==="END")||!tlItem(it))return;
+function tlSweep(){try{let ch=false;(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p);}catch(_){}rows.forEach(r=>{const it=r.it;if(!it||!it.live||!it.lid)return;let L=LIVE[it.lid];if(!tlItem(it)||(L&&L.status==="LIVE"))return;if(!L)L=tlFallback(it);
   LV_RAW=true;try{const v=Object.assign({},L,{status:"LIVE",minute:L.minute&&!/Terminé/i.test(L.minute)?L.minute:(tnIs(it)?"":"90'"),winner:undefined});if(tnIs(it))v.line=String(L.line||"").replace(/\s*·.*$/,"").replace(/^Vainqueur.*$/,"");else v.line="";delete v.ftAt;LIVE[it.lid]=v;}finally{LV_RAW=false;}if(FTAT[it.lid]){delete FTAT[it.lid];try{ftatSave();}catch(_){}}ch=true;});});if(ch)dataRender();}catch(_){}}
 setTimeout(tlSweep,1500);setInterval(tlSweep,4000);
 </script>
