@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v146";
+const APP_VER="v147";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -7164,13 +7164,14 @@ function myBetsTab(p,sc){
   const items=rows.map(r=>{const st=itemState(p,r),su=subs.find(s=>s.id===r.key.split("/")[0]),res=resultOf(c,su,r.it);
     const kind=st==="open"?(isLater(r.it)?"later":todoK.has(r.key)?"todo":"ready"):st==="done"?(res&&!res.pending?"done":"live"):+r.it.date>+NOW?"locked":"live";
     return{r,st,res,kind};});
+  const ord147=rows.slice().sort((a,b)=>+a.it.date-+b.it.date).map(x=>x.key),num147=k=>`MATCH ${ord147.indexOf(k)+1}/${ord147.length}`;
   const card=({r,st,res,kind})=>{const gain=kind==="done"&&sc.per[r.key]?sc.per[r.key][myId(p)]||0:null,w=kind==="done"?stageWinner(p,r,sc):null;
     const L=r.it.live?(LIVE[r.it.lid]||{}):{};
     const lv=r.it.live?liveSt(r.it):"";const extra=kind==="done"&&res&&res.void?`<span class="kx">Match non joué · aucun point distribué</span>`:kind==="done"?""
       :kind==="todo"?`<span class="kx">${urgTag(closeAt(r.it))}</span>`
       :kind==="later"?`<span class="kx">Pronos ouverts à partir du ${fmtD(new Date(+r.it.date-HORIZON))}${r.it.tbd?" · affiche connue après le tirage":""}</span>`
       :kind==="ready"?`<span class="kx">Tu peux encore les modifier</span>`
-      :kind==="live"&&r.it.custom?`<span class="kx">${orgOn(p)?"Touche pour encoder le résultat":"Résultat encodé par l'organisateur après le match"}</span>`:kind==="live"?`<span class="kx">${lv==="LIVE"?(/^(HT|MT)\b|mi-temps/i.test(String(L.line||L.minute||""))?"Mi-temps · ":"")+"pronos figés":KIND.live[2]}</span>`:`<span class="kx">${KIND[kind][2]}</span>`;
+      :kind==="live"&&r.it.custom?`<span class="kx">${orgOn(p)?"Touche pour encoder le résultat":"Résultat encodé par l'organisateur après le match"}</span>`:kind==="live"?"":`<span class="kx">${KIND[kind][2]}</span>`;
     const own=false,ownC=p.cfg&&p.cfg[r.key],com=p.cfg&&p.cfg["all:"+r.cat],cs=cfgSummary(ownC||com,r.cat);
     const lv2=r.it.live?liveSt(r.it):"",stTxt=st==="open"?(testOpen(r.it)&&+r.it.date<=+NOW?"Ouvert (test)":"Paris ouverts"):st==="closed"?(+r.it.date>+NOW?"Paris fermés":"En cours"):(res&&!res.pending?"Terminé":"Terminé · résultat en attente");
     const stCol=st==="open"?"var(--lime)":st==="closed"?(lv2==="LIVE"?"#E5534B":"#FFB547"):"var(--muted)";
@@ -7192,11 +7193,9 @@ function myBetsTab(p,sc){
     const ecus=pls.length>1?pls.map(x=>{const on=Object.keys(pk[x.id]||{}).some(k=>k.startsWith(pre)&&pk[x.id][k]!=null&&pk[x.id][k]!=="");if(on)nOn++;const ph=bubImg(personOf(p,x));return`<i class="ecu${on?" on":""}${ph?" ph":""}" title="${esc(x.name)}${on?" a parié":" n'a pas encore parié"}">${ph||esc(String(x.name||"?").trim().charAt(0).toUpperCase())}</i>`;}).join(""):"";
     const urg=kind==="todo"?urgTag(closeAt(r.it)):"";
     return`<div class="mc k-${kind}">${duoBg(sd,(c&&c.sport?c.sport.id:""),"mcb")}<button type="button" class="mch" data-act="betOne" data-key="${esc(r.key)}" aria-label="${esc(r.title)}">
-      <span class="mctop">${kind==="todo"||kind==="ready"?"":kind==="live"&&lv==="LIVE"?`<span class="mckind mklive">EN DIRECT</span>`:`<span class="mckind">${KIND[kind][1]} ${KIND[kind][0]}</span>`}${urg?`<span class="mcurg">${urg}</span>`:""}</span>
+      <span class="mctop"><span class="mcnum">${num147(r.key)}</span><span class="mcst">${kind==="todo"||kind==="ready"?"":kind==="live"&&lv==="LIVE"?`<span class="mckind mklive">EN DIRECT</span>`:`<span class="mckind">${KIND[kind][1]} ${KIND[kind][0]}</span>`}${urg?`<span class="mcurg">${urg}</span>`:""}${kind==="ready"?`<span class="mckind mkok">✓ Prono fait</span>`:""}</span></span>
       ${vs}
-      <span class="mcmeta"><span style="color:${stCol}">● ${esc(stTxt)}</span>${koNote(p,r,st)}${r.sub&&!sd?"":` · ${esc((r.sub||"").split(" · ")[0])}`}${res&&res.pending&&res.line?" · "+esc(res.line):""}</span>
-      <span class="mcfoot"><span class="mcmine${pl?"":" none"}">${pl?`Ton prono : <em>${nwrap(pl)}</em>`:can?"Pas encore de prono":"Pas de prono"}</span>${ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:""}</span>
-      ${kind==="todo"?"":extra}${orgL}</button>${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}${(()=>{const b=reoMid(p,r);return b?`<div class="reorow">${b}</div>`:"";})()}</div>`;};
+      ${kind==="todo"?"":extra}${orgL}</button>${(()=>{/* v147 : en bas, les potes à gauche et Rouvrir / Refermer à droite */const b=reoMid(p,r),e=ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:"";return b||e?`<div class="mcbot">${e||"<span></span>"}${b?`<span class="mcbotr">${b}</span>`:""}</div>`:"";})()}${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}</div>`;};
   /* filtres : À faire (paris ouverts) · En cours (commencés ou fermés) · Terminés · Tous */
   const FILT={edit:["todo","ready"],done:["live","wait","locked","done"]}; /* 2 filtres seulement : on parie (En attente) ou on regarde le résultat (Terminés) */ /* un prono fait quitte « À faire » : il attend son résultat dans « En cours » */
   const SECT=[["todo","Pronos en attente"],["ready","Pronos faits · encore modifiables"],["later","À venir"],["live","En cours"],["locked","Paris fermés"],["done","Terminés"]];
@@ -7661,16 +7660,17 @@ function vBet(){
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
   /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
-  h+=mpSelHTML(p,r);{const b=reoMid(p,r,"",mpParties(p,r).length>1?partyLabel(p):"");if(b)h+=`<div class="pad reorow rmatch">${b}</div>`;}h+=rlogFold(p,r.key);
-  try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.id===me?"Toi":x.name,st:done?"in":"wait"};});
+  h+=mpSelHTML(p,r);{const b=reoMid(p,r,"",mpParties(p,r).length>1?partyLabel(p):"");if(b)h+=`<div class="pad reorow rmatch">${b}</div>`;}{/* v147 : historique masqué pendant le match, visible une fois terminé */const inProg147=onAir||(st!=="done"&&+r.it.date<=+NOW&&!(res&&!res.pending));if(!inProg147)h+=rlogFold(p,r.key);}
+  try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.name,st:done?"in":"wait"};});
     h+=`<div class="pad" style="margin-top:12px"><div class="card ptacc whop">${bubRow(L,"ont joué ce match")}</div></div>`;}}catch(_){}
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
   else if(c.custom&&+r.it.date<=+NOW&&!r.it.res)h+=`<div class="pad"><div class="lockban" style="border-color:#FFB547">⏳ <span><b>En attente du résultat</b> L'organisateur doit encoder le score de ce match.</span></div></div>`;
   if(locked&&st==="done")h+=`<div class="pad"><div class="lockban" style="border-color:${st==="done"?"var(--line)":"#FFB547"}">${st==="done"?"🏁":"🔒"} <span><b>${st==="done"?"Match terminé":"Paris fermés"}</b> ${st==="done"?(res&&res.pending?"Le résultat arrive automatiquement · les points seront calculés tout seuls.":res?esc(res.line)+(gain!=null?` · tu marques <b style="color:var(--lime)">+${gain} pts</b>`:""):""):"Le match a commencé ou l'organisateur a fermé les paris. Tes pronos sont figés."}</span></div></div>`;
+  let allIn147=false;
   if(locked&&st!=="done"){const pls=playersOf(p),pk=picksOf(p);const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text");
     if(onAir)h+=projLine(p,r);
-    const others=pls.filter(pl=>pl.id!==myId(p));if(others.length)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.id===myId(p)?"Toi":pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v))+chgMark(p,pl.id,r.key+"|"+b.id):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
-  let qn=0;h+=`<div class="pad" style="margin-top:12px">${locked?`<h3 class="rch">Mes pronos</h3>`:""}<div class="qlist">${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
+    const others=pls.filter(pl=>pl.id===myId(p)).concat(pls.filter(pl=>pl.id!==myId(p)));if(others.length>1){allIn147=true;}if(others.length>1)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq"><div class="rcqh lvh"><b>${esc(d[1])}</b>${rcNow(c,r,b,d)||'<em class="rcnow none"></em>'}<span>${ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts"}</span></div>${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return`<div class="rcp${pl.id===myId(p)?" me":""}"><span class="rcn">${esc(pl.name)}</span><span class="rcv">${has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v))+chgMark(p,pl.id,r.key+"|"+b.id):'<i class="muted">pas de prono</i>'}</span><span class="rcs">${onAir&&has?lvvTag(liveVerdict(c,r,b,d[2],v)):""}${od?`<small class="rco">@${od.toFixed(2)}</small>`:""}</span></div>`;}).join("")}</div>`).join("")}</div>`;}
+  let qn=0;h+=`<div class="pad" style="margin-top:12px">${locked&&!allIn147?`<h3 class="rch">Mes pronos</h3>`:""}<div class="qlist"${allIn147?' hidden style="display:none"':""}>${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
      if(locked&&t==="text"&&!has)return"";
      qn++;return`<section class="qcard${has?" has":""}${!has&&(S.missHi||[]).includes(r.key+"|"+b.id)?" miss":""}"><header class="qh"><span class="qn">${has&&!locked?"✓":qn}</span><span class="ql"><b>${esc(label)}</b>${has?`<small class="qodd">${(()=>{if(Array.isArray(mv)){const fo=myVal(p,r.key+"|"+b.id+"@odd");const l=mv.map(x=>{const o=fixedOdd(fo,x)||oddFor(c,r.it,"top10",x);return o?esc(x.split(" ").slice(-1)[0])+" "+ptsW(c,r.it,b,x,o)+" pts":"";}).filter(Boolean);return l.length?"Si T10 : "+l.join(", "):"";}const od=fixedOdd(myVal(p,r.key+"|"+b.id+"@odd"),mv)||oddFor(c,r.it,b.id,mv);return od?`Cote ${od.toFixed(2)} → <em>${ptsW(c,r.it,b,mv,od)} pts</em> si gagné`:"";})()}</small>`:`<small class="qto">À choisir</small>`}${truth!=null?`<small>Réponse : ${esc(Array.isArray(truth)?truth.join(", "):tnL(r,b.id,truth))} ${good?"✓":"✗"}</small>`:""}</span><span class="qp">${ODD_BETS.has(b.id)&&!c.custom?`${b.pts} pt${b.pts>1?"s":""} × cote`:`${b.pts} pt${b.pts>1?"s":""}`}</span></header>${betInput(p,r,b,t,label,ro)}</section>`;}).join("")}</div>
     ${locked?"":saved&&!editing?`<div class="vstate ok">✓ <span><b>Ton prono est validé</b> Tu peux le modifier jusqu'au coup d'envoi.</span></div>`:saved?`<div class="vstate edit">✏️ <span><b>Ton prono actuel est coché</b> Change ce que tu veux : rien n'est modifié tant que tu ne confirmes pas.</span></div>`:`<div class="vstate todo">✏️ <span><b>Pas encore validé</b> Fais tes choix puis valide ton prono.</span></div>`}
@@ -9666,5 +9666,24 @@ html body #app .prowbox.open{isolation:isolate}
 html body #app .prowbox.open>.pflip{position:relative;z-index:1}
 /* hero du Salon : propre, sans le bandeau LIVE … SUIVRE */
 body.scr-lives #app .phead.phb .hbn{display:none!important}
+
+/* v147 · cartes de match : MATCH n/N à gauche, statut à droite ; potes + Rouvrir sur la même ligne en bas */
+html body #app .mc .mctop{display:flex!important;align-items:center;justify-content:space-between!important;gap:8px;min-height:26px}
+html body #app .mc .mcnum{font-size:11.5px;font-weight:900;letter-spacing:.12em;color:#F3E0A6;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(243,224,166,.45);white-space:nowrap;flex:none}
+html body #app .mc .mcst{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0;flex-wrap:wrap}
+html body #app .mc .mckind.mkok{background:rgba(0,0,0,.55);color:var(--lime);border:1px solid rgba(160,220,120,.4)}
+html body #app .mc .mcbot{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px;padding:12px 0 14px;border-top:1px solid rgba(243,224,166,.22)}
+html body #app .mc .mcbot .mcecus{min-width:0;flex-wrap:nowrap}
+html body #app .mc .mcbotr{flex:none;display:flex;justify-content:flex-end}
+html body #app .mc .mcbotr .reomidw{flex-wrap:nowrap}
+html body #app .mc .mcbot + .mbact{padding-top:0}
+html body #app .mc .mcbot{flex-wrap:wrap;row-gap:10px}html body #app .mc .mcbotr{margin-left:auto;max-width:100%}
+@media (max-width:350px){html body #app .mc .mcbot .ecu+.ecu{margin-left:-7px}html body #app .mc .mcbotr .reomid{padding:0 14px;font-size:13px}}
+/* v147 · page du match : bouton Rouvrir / Refermer pleine largeur ; ma ligne en premier, liseré doré */
+html body #app .reorow.rmatch{display:block!important}
+html body #app .reorow.rmatch .reomidw{display:flex!important;width:100%;flex-direction:column;align-items:stretch}
+html body #app .reorow.rmatch .reomid{width:100%!important;display:flex!important}
+html body #app .rcp.me{background:rgba(212,175,55,.08)!important;box-shadow:inset 3px 0 0 #D4AF37;padding-left:11px!important}
+html body #app .rcp.me .rcn{color:#F3E0A6!important}
 </style></body>
 </html>
