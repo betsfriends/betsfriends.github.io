@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v148";
+const APP_VER="v149";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6484,6 +6484,8 @@ function partyGroupLike(p){const g=partyGroup(p);if(g)return g;let gs=[];try{gs=
     /* repli par prénoms (toi = « Toi » dans le groupe) */
     const me=normS((rawPlayers(p).find(x=>x.id===myId(p))||{}).name||""),GN=M.map(m=>isMeName(m)?me:normS(m));if(PN.every(n=>GN.includes(n))&&GN.every(n=>PN.includes(n)))return G;}
   return null;}
+/* v149 : nom de la partie en tête de page — même source que le Salon et Mes parties (partyGroupLike), quel que soit le chemin d'entrée */
+function partyHeroName(p){let n="";try{n=partyBase(p);}catch(_){n="";}n=String(n||"").trim();if(!n||/^toi$/i.test(n))n=String(p.name||"Ma partie");return n;}
 function partyBase(p){const g=partyGroupLike(p);if(g)return g.name;const me=myId(p);const o=playersOf(p).filter(x=>x.id!==me&&!x.fake).map(x=>x.name);return o.length?"avec "+o.slice(0,3).join(", ")+(o.length>3?"…":""):p.name;}
 function partyLabel(p){const b=partyBase(p);let same=[];try{same=(S.parties||[]).filter(q=>q&&q.id!==p.id&&!q.demo&&partyBase(q)===b);}catch(_){}if(!same.length)return b;
   const cn=q=>((FIND[q.comp]||{}).name)||"";if(cn(p)&&same.every(q=>cn(q)!==cn(p)))return b+" · "+cn(p);
@@ -6738,7 +6740,9 @@ function golfAns(L,it){const B=(L.board||[]).map(r=>({pos:gPos(r[0]),n:r[1],par:
   return A;}
 function betTypeOf(p,k){if(!p||p.free||!FIND[p.comp])return null;const[rk,bid]=String(k).split("|");const r=rowsOfParty(p).find(x=>x.key===rk);if(!r)return null;const d=(BETS[r.cat]||[]).find(x=>x[0]===bid);return d?d[2]:null;}
 function betGood(t,truth,mv){const T=Array.isArray(truth)?truth:[truth];if(t==="near"||t==="exactnum"){const d=Math.abs(gNum(mv)-gNum(truth));return t==="near"?d<=2:d===0;}
-  if(Array.isArray(mv))return mv.some(y=>T.some(z=>norm(z)===norm(y)));return T.some(z=>norm(z)===norm(mv));}
+  /* v149 : « 2 » et « 2 sets » désignent la même réponse */
+  const nz=x=>norm(x).replace(/^(\d+)\s*sets?$/,"$1");
+  if(Array.isArray(mv))return mv.some(y=>T.some(z=>nz(z)===nz(y)));return T.some(z=>nz(z)===nz(mv));}
 const GOLF_PLAYER_BETS=["win","top10","lead","low"];
 const golfPickable=(p,b,t)=>{const c=FIND[p.comp];return!!(c&&c.sport.id==="golf"&&!c.custom&&GOLF_PLAYER_BETS.includes(b.id));};
 /* liste déroulante avec recherche : tout le champ, cote et points potentiels par joueur */
@@ -7769,9 +7773,12 @@ function vParty(){
   S.ptv=S.ptv||{};{const tabs0=["games","board"].concat(orgVisible(p)?["settings"]:[]);let v=S.ptv[p.id];if(!tabs0.includes(v)){v=S.ptab==="settings"&&isOwner(p)?"settings":S.ptab==="board"?"board":"games";S.ptv[p.id]=v;}S.orgMode=v==="settings"?p.id:null;}
   const c=p.free?null:FIND[p.comp],sp=c?c.sport:null,owner=isOwner(p),boss=orgOn(p),own=boss,started=partyStarted(p),tab=S.ptab&&S.ptab!=="bets"?S.ptab:"board";
   const nItems=p.free?0:rowsOfParty(p).filter(r=>r.it).length;
-  let h='<div>'+(sp?`<div class="hero evhero chichero ev-${sp.id}" style="background:${sp.body};--evb:${evGrad(sp.id)}">${scene(sp.id)}<div class="shade"></div><span class="chicwm">${goldSp(sp.id,230)}</span><div class="bar">${backBtn}${(()=>{const g=partyGroup(p);return`<span class="chip spball${g?" grp":""}" title="${esc(sp.name)}"><i aria-label="${esc(sp.name)}">${SPEM[sp.id]||esc(sp.name)}</i>${g?`<b>${esc(g.name)}</b>`:""}</span>`;})()}</div>
-    <div class="evid"><span class="gspc">${goldSp(sp.id,44)}</span><div><small>${c.custom?"Mon p’tit évent":esc(c.flag||sp.name)}</small><h1 class="disp" style="${c.name.length>22?"font-size:28px!important":c.name.length>14?"font-size:34px!important":""}">${esc(c.name)}</h1><p>${esc(sp.name)}${compRange(c)?" · "+esc(compRange(c)):""} · ${nItems} ${sp.id==="f1"?"session"+(nItems>1?"s":""):sp.id==="golf"?"sélection"+(nItems>1?"s":""):sp.id==="velo"?"étape"+(nItems>1?"s":""):"match"+(nItems>1?"s":"")}</p></div></div>
-    <div class="evname"><span>Ta partie</span><b>${esc(p.name)}</b>${p.demo?"<em>exemple</em>":""}</div>${rawPlayers(p).length>1?`<div class="evacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}</div>`:`<div class="night"><div class="hero chichero" style="background:transparent"><div class="bar">${backBtn}<span class="chip" style="border:1px solid var(--pink)">Pari libre</span></div><h1 class="disp">${esc(p.name)}</h1><p class="muted">${esc(p.freeTitle||"")}</p></div></div>`);
+  let h='<div>'+(sp?`<div class="hero evhero chichero ev-${sp.id}" style="background:${sp.body};--evb:${evGrad(sp.id)}">${scene(sp.id)}<div class="shade"></div><span class="chicwm">${goldSp(sp.id,230)}</span><div class="bar">${backBtn}<span class="chip spball" title="${esc(sp.name)}"><i aria-label="${esc(sp.name)}">${SPEM[sp.id]||esc(sp.name)}</i></span></div>
+    ${(()=>{const pn=partyHeroName(p),unitN=sp.id==="f1"?"session"+(nItems>1?"s":""):sp.id==="golf"?"sélection"+(nItems>1?"s":""):sp.id==="velo"?"étape"+(nItems>1?"s":""):"match"+(nItems>1?"s":"");
+      const cl=[c.custom?"Mon p’tit évent":c.name,c.custom?"":(c.flag||""),sp.name,compRange(c)||"",nItems+" "+unitN].filter(Boolean).join(" · ");
+      const ds=String(p.name||"").trim(),showD=ds&&normS(ds)!==normS(pn);
+      return`<div class="evid v149id"><span class="gspc">${goldSp(sp.id,40)}</span><div class="v149nt"><small>Ta partie${p.demo?" · exemple":""}</small><h1 class="disp v149n${Math.max(...pn.split(/\s+/).map(w=>w.length))>7||pn.length>18?" v149s":""}">${esc(pn)}</h1></div></div>
+    <p class="v149c">${esc(cl)}</p>${showD?`<p class="v149d">${esc(ds)}</p>`:""}`;})()}${rawPlayers(p).length>1?`<div class="evacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}</div>`:`<div class="night"><div class="hero chichero" style="background:transparent"><div class="bar">${backBtn}<span class="chip" style="border:1px solid var(--pink)">Pari libre</span></div><h1 class="disp">${esc(p.name)}</h1><p class="muted">${esc(p.freeTitle||"")}</p></div></div>`);
   const pot=p.amount*effPeople(p),sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));
   if(isMemberView(p)){S.welcome=S.welcome||{};if(!(p.id in S.welcome))S.welcome[p.id]=!welcomeSeen(p.id);
     if(S.welcome[p.id])h+=`<div class="pad" style="margin-top:12px"><div class="vstate ok" style="margin:0">👋 <span style="flex:1"><b>Bienvenue ${esc(meP(p).name)} !</b> ${esc(orgName(p))} t'a inscrit à cette partie. Fais tes pronos dans l'onglet « Matchs » avant la fermeture des paris.</span><button type="button" class="mini" data-act="welcomeClose" aria-label="Fermer le message de bienvenue">OK</button></div></div>`;}
@@ -9847,5 +9854,16 @@ html body #app .lp146 .lp146n>span{min-width:0;overflow:hidden;text-overflow:ell
 html body #app .lp146 .lp146up{flex:none;margin-left:auto;font-style:normal;font-size:15px;color:inherit}
 html body #app .lrfold.lrfold148{display:flex!important;align-items:center;justify-content:center;gap:6px;margin:18px auto 6px!important;width:fit-content!important;max-width:86%;padding:11px 24px!important;border-radius:999px!important;background:rgba(20,14,8,.85)!important;border:1.5px solid #D9B45E!important;color:#F2D28A!important;font:inherit;font-size:14px!important;font-weight:700!important;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 3px 10px rgba(0,0,0,.35)}
 html body #app .lrfold.lrfold148 b{text-transform:uppercase;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis}
+
+/* v149 — en-tête de partie : le NOM de la partie en titre, tuile pleine */
+#app .hero.evhero .evid.v149id{display:flex;align-items:center;gap:12px;margin-top:auto;padding:12px 14px;border-radius:16px;background:#16100A!important;border:1px solid rgba(217,182,106,.6);box-shadow:0 10px 26px rgba(0,0,0,.45);max-width:100%;width:100%;box-sizing:border-box}
+#app .hero.evhero .evid.v149id .gspc{flex:none}
+#app .hero.evhero .v149nt{min-width:0;flex:1}
+#app .hero.evhero .v149nt small{display:block;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(227,194,122,.85)!important;text-shadow:none!important}
+#app .hero.evhero h1.v149n{font-size:30px!important;line-height:1!important;margin:3px 0 0!important;text-transform:uppercase;color:#F4E6C4!important;text-shadow:none!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;word-break:normal;hyphens:none}
+#app .hero.evhero p.v149c{margin:10px 2px 0!important;font-size:13px;font-weight:700;color:#F1E7D0;text-shadow:0 2px 8px rgba(0,0,0,.9)}
+#app .hero.evhero p.v149d{margin:3px 2px 0!important;font-size:12px;font-weight:600;color:rgba(241,231,208,.72);text-shadow:0 2px 8px rgba(0,0,0,.9)}
+#app .hero.evhero h1.v149n.v149s{font-size:24px!important}
+@media (max-width:360px){#app .hero.evhero h1.v149n{font-size:25px!important}#app .hero.evhero h1.v149n.v149s{font-size:20px!important}#app .hero.evhero .evid.v149id{padding:10px 12px;gap:10px}#app .hero.evhero .evid.v149id .gspc{transform:scale(.8);margin:-4px}#app .hero.evhero p.v149c{font-size:12px}}
 </style></body>
 </html>
