@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v154";
+const APP_VER="v155";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4064,10 +4064,10 @@ function tkFlip146(tk0){try{
 function tkRip143(box){try{if(!box||!box.parentElement)return false;
   const W=box.offsetWidth,H=box.offsetHeight;if(!W||!H)return false;
   /* v144 : UNE seule déchirure = l'encoche dentelée déjà dessinée (masque SVG 14px × 58%) prolongée jusqu'en bas */
-  const cx=W/3,x0=cx-7,hN=H*.58,P=(px,py)=>[x0+px/100*14,py/100*hN];
-  const LE=[[8,8],[36,16],[12,25],[38,34],[16,43],[40,52],[22,61],[46,70],[28,79],[40,88],[48,100]].map(p=>P(p[0],p[1]));
-  const RE=[[62,8],[88,15],[55,24],[80,33],[50,42],[70,51],[46,60],[62,69],[44,78],[54,87],[48,100]].map(p=>P(p[0],p[1]));
-  const tipX=x0+.48*14,low=[];let i=0;for(let y=hN+8;y<H-4;y+=8){low.push([tipX+(i%2?2.4:-2.4)*(.6+((i*37)%7)/17),y]);i++;}low.push([tipX,H]);
+  const full=box.classList.contains("hlv155"),cx=W/3,x0=cx-7,hN=full?H:H*.58,P=(px,py)=>[x0+px/100*14,py/100*hN];
+  const LE=[[8,8],[36,16],[12,25],[38,34],[16,43],[40,52],[22,61],[46,70],[28,79],[40,88],full?[45,100]:[48,100]].map(p=>P(p[0],p[1]));
+  const RE=[[62,8],[88,15],[55,24],[80,33],[50,42],[70,51],[46,60],[62,69],[44,78],[54,87],full?[51,100]:[48,100]].map(p=>P(p[0],p[1]));
+  const tipX=x0+.48*14,low=[];let i=0;if(!full)for(let y=hN+8;y<H-4;y+=8){low.push([tipX+(i%2?2.4:-2.4)*(.6+((i*37)%7)/17),y]);i++;}if(!full)low.push([tipX,H]);
   const L=[[0,0],[x0,0],...LE,...low,[0,H]],R=[[W,0],[x0+14,0],...RE,...low,[W,H]];
   const poly=a=>"polygon("+a.map(p=>p[0].toFixed(1)+"px "+p[1].toFixed(1)+"px").join(",")+")";
   const cl=box.cloneNode(true);cl.classList.add("tkpiece");cl.setAttribute("aria-hidden","true");
@@ -6518,10 +6518,11 @@ function partyLabel(p){const b=partyBase(p);let same=[];try{same=(S.parties||[])
   if(d(p)&&same.every(q=>d(q)!==d(p)))return b+" · "+d(p);return dh(p)?b+" · "+dh(p):b;}
 function lvProg(it){const L=LIVE[it.lid]||{};if(inGrace(it))return"Terminé";if(tnIs(it)){const T=tnState(it);return T.live?(T.done.length?"En cours · sets "+T.wa+"-"+T.wb:"En cours"):T.ended?"Terminé":"Pas encore commencé";}const cl=v=>String(v||"").replace(/\s*·\s*en cours$/i,"");
   if(L.minute)return cl(L.minute);if(L.line&&!/^Score final/i.test(L.line))return cl(L.line);return"En cours";}
-function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();if(!MM.length)return"";
-  const one=it=>`<span class="lvone">${lvTkScore(it)}<span class="lvx lvpg">${esc(lvProg(it))}</span></span>`;
-  return`<div class="prowbox hlvb${MM.length>1?" hlvm":""}"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
-   <button type="button" class="lvR" data-act="liveRoom" aria-label="Ouvrir le salon des lives">${MM.slice(0,4).map(m=>one(m.it)).join("")}${MM.length>4?`<span class="lvx">+ ${MM.length-4} autre${MM.length>5?"s":""}</span>`:""}</button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
+function liveTicket(){const A=liveRowsAll();if(!A.length)return"";const MM=liveMatches();if(!MM.length)return"";const n=MM.length;
+  /* v155 : ticket EN DIRECT à la même taille que les autres — plus de liste, une ligne de pouls + « N EVENTS EN LIVE » */
+  const ecg=`<svg class="lvecg155" viewBox="0 0 240 46" preserveAspectRatio="none" aria-hidden="true"><path class="ecgb" d="M0 23 H70 L80 23 L88 8 L98 40 L108 2 L118 34 L126 23 H240"/><path class="ecgp" d="M0 23 H70 L80 23 L88 8 L98 40 L108 2 L118 34 L126 23 H240"/></svg>`;
+  return`<div class="prowbox hlvb hlv155"><button type="button" class="pwid" data-act="liveRoom" aria-label="Ouvrir le salon des lives"><span class="lvpill"><i></i>LIVE</span><b>En direct</b></button>
+   <button type="button" class="lvR lvR155" data-act="liveRoom" aria-label="Ouvrir le salon des lives : ${n} ${n>1?"events":"event"} en live">${ecg}<span class="lvn155"><span class="pfn">${n}</span> ${n>1?"events":"event"} en live</span></button><span class="tearsh" aria-hidden="true"></span><span class="tear" aria-hidden="true"></span></div>`;}
 function vParties(){
   const D=partiesData(),f=S.pf||null;
   /* comme l'accueil : catégories à gauche (1/3), parties de la catégorie choisie à droite (2/3) */
@@ -10136,5 +10137,18 @@ html body #app .rt154f{padding-top:12px!important}
 html body #app .rt154f .rtright{flex:1 1 auto;display:flex}
 html body #app .rt154cta{display:flex!important;align-items:center;justify-content:center;width:100%;margin:0!important}
 @media (max-width:360px){html body #app .rt154 .rtpc>b{font-size:.92em}html body #app .rt154nx em{font-size:10px;letter-spacing:.08em}}
+
+/* v155 : ticket EN DIRECT compact — même hauteur que les autres, déchirure sur toute la hauteur, pouls + compteur */
+html body #app .prowbox.hlvb.hlv155{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 100,0 62,8 88,15 55,24 80,33 50,42 70,51 46,60 62,69 44,78 54,87 51,100 45,100 40,88 28,79 46,70 22,61 40,52 16,43 38,34 12,25 36,16 8,8' fill='black'/%3E%3C/svg%3E") calc(33.333% - 7px) 0/14px 100% no-repeat,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 100,0 62,8 88,15 55,24 80,33 50,42 70,51 46,60 62,69 44,78 54,87 51,100 45,100 40,88 28,79 46,70 22,61 40,52 16,43 38,34 12,25 36,16 8,8' fill='black'/%3E%3C/svg%3E") calc(33.333% - 7px) 0/14px 100% no-repeat exclude,linear-gradient(#000 0 0)}
+html body #app .hlv155>.lvR155{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:12px;padding:16px 16px 16px 22px!important;text-align:center}
+html body #app .hlv155 .lvecg155{display:block;width:100%;max-width:300px;height:46px;overflow:visible}
+html body #app .hlv155 .lvecg155 path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+html body #app .hlv155 .lvecg155 .ecgb{stroke:rgba(246,232,200,.28);stroke-width:2.2}
+html body #app .hlv155 .lvecg155 .ecgp{stroke:#F6E8C8;stroke-width:3;filter:drop-shadow(0 0 4px rgba(255,236,190,.75));stroke-dasharray:70 400;stroke-dashoffset:70;animation:ecg155 1.6s linear infinite}
+@keyframes ecg155{0%{stroke-dashoffset:70}100%{stroke-dashoffset:-400}}
+html body #app .hlv155 .lvn155{display:block;font-family:var(--display)!important;font-weight:900!important;font-size:22px;line-height:.95;text-transform:uppercase;white-space:nowrap;background-image:linear-gradient(180deg,#F6E8C8 0%,#D9BA72 45%,#A88440 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+html body #app .hlv155 .lvn155 .pfn{font:inherit!important}
+@media (max-width:360px){html body #app .hlv155 .lvn155{font-size:16.5px}}
+@media (prefers-reduced-motion:reduce){html body #app .hlv155 .lvecg155 .ecgp{animation:none;stroke-dasharray:none}}
 </style></body>
 </html>
