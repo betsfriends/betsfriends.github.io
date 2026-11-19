@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v155";
+const APP_VER="v156";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -5749,12 +5749,12 @@ function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it
     if(estLive(it))return"";const mn=L.minute||"";return mn||(L.line&&String(L.line).length<=14?L.line:"");})();
   const band=isLv?`<span class="lrband" aria-label="En direct${bandT?" · "+esc(bandT):""}"><i class="lrbdot"></i>EN DIRECT${bandT?` · ${esc(bandT)}`:""}</span>`:"";
   const center=`<div class="mhc">${inGrace(it)?`<span class="mhlive" style="background:rgba(243,224,166,.2);color:#F3E0A6">TERMINÉ</span>`:``}${L.sa!=null?(sp==="tennis"?tnCenter(it,1):`<span class="mhs">${L.sa}<i>–</i>${L.sb}</span>`):`<span class="mhv">VS</span>`}${isLv&&!estLive(it)&&bandT&&(L.minute||sp==="tennis")?"":`<small>${esc(estLive(it)?"Score pas encore disponible":(L.minute||(sp==="tennis"?"":L.line)||""))}</small>`}</div>`;
-  const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
+  const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>${["golf","f1","velo"].includes(sp)?lbHTML156(it,sp,m.rows,c):""}`;
   const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
   const tag=(()=>{const rn=String(it.rn||it.round||String(r.sub||"").split(" · ")[0]||"");const mj=rn.match(/^(?:Journée|Matchday|J)\s*(\d+)$/i);if(mj)return"J"+mj[1];if(/^(finale|demi-finales?|quarts?( de finale)?|huitièmes?( de finale)?|1\/\d+ de finale|barrages?)$/i.test(rn))return rn;try{return new Date(it.date).toLocaleDateString("fr-BE",{day:"numeric",month:"short"}).replace(/\.$/,"")+".";}catch(_){return"";}})();
   let h=`<div class="lrc lrc-${sp}${open?" open":""}${isLv?" lrlive":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
     <span class="lrtop"><span class="spic">${goldSp(sp,20)}</span><span><b>${esc(c.name)}</b>${tag?`<span class="lrtag">${esc(tag)}</span>`:""}</span></span>
-    <span class="lrbody mh-${sp}${isLv?" haslrb":""}">${duoBg(sd,sp,"lr")}${band}${body}</span>
+    <span class="lrbody mh-${sp}${isLv?" haslrb":""}${!sd&&["golf","f1","velo"].includes(sp)?" lbody156":""}">${duoBg(sd,sp,"lr")}${band}${body}</span>
     </button>${lrRows146(m,k,open?sel:null)}`;
   if(open){const mine=(()=>{try{return myPronoLine(p,r);}catch(_){return"";}})();
     h+=`<div class="lrx"><div class="lrone">${esc(partyLabel(p))}</div>
@@ -7202,6 +7202,37 @@ function mcSafeTop(){try{const v=parseFloat(getComputedStyle(document.documentEl
 function mcScrollTo(k,smooth){const e=mcEl(k);if(!e)return false;try{_topUntil=0;}catch(_){}const top=e.getBoundingClientRect().top+window.scrollY-12-mcSafeTop();const rm=matchMedia("(prefers-reduced-motion: reduce)").matches;window.scrollTo({top:Math.max(0,top),behavior:smooth&&!rm?"smooth":"auto"});return true;}
 function mcScrollSoon(k){setTimeout(()=>{mcScrollTo(k,false);mcBarUpd();},90);setTimeout(()=>{const e=mcEl(k);if(e){const t=e.getBoundingClientRect().top;if(t<-4||t>160)mcScrollTo(k,false);}mcBarUpd();},450);}
 function mcGo(pid,key){const p=partyById(pid);if(!p)return;S.fromGroup=false;S.partyView=pid;try{chatSubscribe(p);}catch(_){}try{ensureJoined(p);}catch(_){}S.mailSheet=null;S.emEdit=null;S.myDraft={};S.morphFrom=null;S.retPf=null;S.pay=null;mcOpenIn(pid,key);go("party");mcScrollSoon(key);}
+/* v156 : au repli, on remonte jusqu'aux onglets de la partie (Matchs · Classement · Organisateur) — la tuile refermée reste visible et clignote une fois */
+function mcBack156(k){try{const tb=document.querySelector("#app .v137t"),e=mcEl(k),rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try{_topUntil=0;}catch(_){}
+  if(!tb){mcScrollTo(k,true);}else{let top=tb.getBoundingClientRect().top+window.scrollY-8-mcSafeTop();
+    if(e){const R=e.getBoundingClientRect(),nav=document.getElementById("tabs"),nh=nav&&nav.offsetParent!==null?nav.offsetHeight:0;if(R.bottom+window.scrollY>top+window.innerHeight-nh-16)top=R.top+window.scrollY-Math.round(window.innerHeight*.3);}
+    window.scrollTo({top:Math.max(0,top),behavior:rm?"auto":"smooth"});}
+  setTimeout(()=>{const e2=mcEl(k);if(e2)e2.classList.remove("mcfl");},rm?720:900);}catch(_){}}
+/* v156 : les noms d'équipes des tuiles compactes rétrécissent un peu plutôt que d'être coupés */
+function mcNameFit156(){try{document.querySelectorAll("#app .mc156 .m6n").forEach(b=>{b.style.fontSize="";let f=parseFloat(getComputedStyle(b).fontSize)||16,n=0;while(b.scrollWidth>b.clientWidth+1&&f>9.5&&n<9){f-=1;b.style.fontSize=f+"px";n++;}});}catch(_){}}
+/* v156 : classement provisoire en direct (golf, F1, vélo). Champs FACULTATIFS du doc live, rien n'est inventé :
+   golf  board:[[pos,nom,total,carte,[tours],trou]]   trou = "14" ou "F" (facultatif)
+   f1    board:[[pos,pilote,écart]] · lap · laps
+   vélo  board:[[pos,coureur ou groupe,écart]] · km (km restants)
+   Sans board → « Classement bientôt disponible ». */
+const lbN156=x=>String(x||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+function lbPicks156(rows){const M={};(rows||[]).forEach(({p,r})=>{try{const pk=picksOf(p),pre=r.key+"|",me=myId(p);playersOf(p).forEach(x=>{const o=pk[x.id]||{};Object.keys(o).forEach(k=>{if(!k.startsWith(pre))return;const v=o[k];(Array.isArray(v)?v:[v]).forEach(s=>{if(typeof s!=="string"||!s)return;const q=lbN156(s);if(!q)return;(M[q]=M[q]||new Map()).set(x.id,{nm:String(x.name||"?"),me:x.id===me});});});});}catch(_){}});return M;}
+/* TEST — à retirer après le 30 nov. : ?lbtest dans l'adresse affiche un classement d'exemple (jamais sans ce paramètre) */
+function lbTest156(it,sp,c){try{if(Date.now()>+new Date("2026-11-30T23:00:00Z")||!/[?&]lbtest\b/.test(location.search))return null;
+  if(sp==="golf"){const f=(c?golfBase(c):GOLF_PGA).map(x=>x[0]);const sc=["-8","-7","-6","-6","-5","-4","-3","-2","-2","-1"],th=["14","F","16","12","F","15","13","F","11","17"],ps=["1","2","T3","T3","5","6","7","T8","T8","10"];return f.slice(0,10).map((n,i)=>[ps[i],n,sc[i],"",[],th[i]]).concat(f.length>10?[["23",f[Math.min(23,f.length-1)],"-2","",[],"9"]]:[]);}
+  if(sp==="f1"){return F1_GRID.slice(0,8).map((x,i)=>[String(i+1),x[0],i?"+"+(i*1.7).toFixed(1)+"s":"Leader"]);}
+  return null;}catch(_){return null;}}
+function lbHTML156(it,sp,rows,c){const L=LIVE[it.lid]||{};let B=Array.isArray(L.board)&&L.board.length?L.board:null,tst=false;if(!B){B=lbTest156(it,sp,c);tst=!!B;}
+  const head=sp==="golf"?"Classement provisoire":sp==="f1"?"Course en direct":"Tête de course";
+  const sub=sp==="f1"&&L.lap?`Tour ${esc(L.lap)}${L.laps?"/"+esc(L.laps):""}`:sp==="velo"&&L.km!=null&&L.km!==""?`${esc(L.km)} km restants`:tst?"exemple (test)":"";
+  if(!B)return`<div class="lb156 none"><span class="lbh"><b>${head}</b></span><small class="lbsoon">Classement bientôt disponible</small></div>`;
+  const P=lbPicks156(rows),par=v=>String(v==null?"":v).replace(/^-/,"−");
+  const chips=nm=>{const m=P[lbN156(nm)];if(!m)return"";const a=[...m.values()];return`<span class="lbis">${a.slice(0,3).map(v=>`<i class="lbi${v.me?" me":""}" title="${esc(v.nm)}">${esc(v.nm.trim().charAt(0).toUpperCase())}</i>`).join("")}${a.length>3?`<i class="lbi more">+${a.length-3}</i>`:""}</span>`;};
+  const line=(r,x)=>{const nm=String(r[1]||""),th=r[5]!=null&&r[5]!==""?String(r[5]).toUpperCase():"";
+    return`<div class="lbr${x||""}"><span class="lbp">${esc(String(r[0]||""))}</span><span class="lbn"><b>${esc(nm)}</b>${chips(nm)}</span><span class="lbs"><b>${esc(sp==="golf"?par(r[2]):String(r[2]||""))}</b>${sp==="golf"&&th?`<small>${th==="F"?"F":"trou "+esc(th)}</small>`:""}</span></div>`;};
+  const meSet=new Set(Object.keys(P).filter(q=>[...P[q].values()].some(v=>v.me))),out=B.slice(5).filter(r=>meSet.has(lbN156(r[1]))).slice(0,2);
+  return`<div class="lb156"><span class="lbh"><b>${head}</b>${sub?`<small>${sub}</small>`:""}</span>${B.slice(0,5).map(r=>line(r)).join("")}${out.length?`<div class="lbsep" aria-hidden="true">···</div>${out.map(r=>line(r," mine")).join("")}`:""}</div>`;}
 /* barre collante : le match ouvert reste nommé en haut, « Replier » toujours à portée */
 function mcBarUpd(){/* v153 : barre flottante EN BAS (au-dessus du menu), cadre doré pointillé ; en saisie : « Valider mes paris » + « Replier » */
   let b=document.getElementById("mcbar");const e=S.screen==="party"&&!S.leaveAsk?document.querySelector("#app .mc.open"):null;
@@ -7285,13 +7316,30 @@ function myBetsTab(p,sc){
     const ecus=pls.length>1?pls.map(x=>{const on=Object.keys(pk[x.id]||{}).some(k=>k.startsWith(pre)&&pk[x.id][k]!=null&&pk[x.id][k]!=="");if(on)nOn++;const ph=bubImg(personOf(p,x));return`<i class="ecu${on?" on":""}${ph?" ph":""}" title="${esc(x.name)}${on?" a parié":" n'a pas encore parié"}">${ph||esc(String(x.name||"?").trim().charAt(0).toUpperCase())}</i>`;}).join(""):"";
     const urg=kind==="todo"?urgTag(closeAt(r.it)):"";
     const OPEN=(S.mcOpen||{})[p.id]===r.key,spid=c&&c.sport?c.sport.id:"";
-    const mini=sd?`<span class="mcmt">${mark(sd[0])||""}<b>${esc((shortSides(r.it)||sd)[0])}</b></span><span class="mcms">${sc0?`${sc0.sa}–${sc0.sb}`:esc(fmtT(d0))}</span><span class="mcmt">${mark(sd[1])||""}<b>${esc((shortSides(r.it)||sd)[1])}</b></span>${kind==="live"&&L.minute?`<small class="mcml">${esc(L.minute)}</small>`:""}`:`<b>${esc(r.title)}</b><small class="mcml">${esc(fmtD(d0))}${r.it.tbd?"":" · "+esc(fmtT(d0))}</small>`;
+    const mini=`<em class="mcbn">${num147(r.key)}</em>`+(sd?`<span class="mcmt">${mark(sd[0])||""}<b>${esc((shortSides(r.it)||sd)[0])}</b></span><span class="mcms">${sc0?`${sc0.sa}–${sc0.sb}`:esc(fmtT(d0))}</span><span class="mcmt">${mark(sd[1])||""}<b>${esc((shortSides(r.it)||sd)[1])}</b></span>${kind==="live"&&L.minute?`<small class="mcml">${esc(L.minute)}</small>`:""}`:`<b>${esc(r.title)}</b><small class="mcml">${esc(fmtD(d0))}${r.it.tbd?"":" · "+esc(fmtT(d0))}</small>`);
     const LV=kind==="live"&&r.it.live&&(()=>{try{return liveSt(r.it)==="LIVE"&&!inGrace(r.it);}catch(_){return false;}})(),lvT=LV?mcLiveTxt(r.it,spid):"";
     const lf=mcFoldLbl(spid,r,sd,false),ls=mcFoldLbl(spid,r,sd,true);
+    if(!OPEN){/* v156 : tuile repliée compacte — 2 à 3 matchs visibles d'un coup, toute la tuile s'ouvre */
+      const openK=(S.mcOpen||{})[p.id],dim=!!openK&&openK!==r.key&&rows.some(x=>x.key===openK),fl=!!(S._mcFl&&S._mcFl.k===r.key&&Date.now()-S._mcFl.t<900),vd=!!(res&&res.void);
+      const stC=vd?`<span class="m6st m6mut">Match non joué</span>`:LV?`<span class="m6st m6lv"><i class="lrbdot"></i>EN DIRECT${lvT?` · ${esc(lvT)}`:""}</span>`
+        :kind==="todo"?`<span class="m6st m6urg">${urgTag(closeAt(r.it))}</span>`:kind==="ready"?`<span class="m6st m6ok">✓ Prono fait</span>`
+        :kind==="done"?`<span class="m6st m6mut">🏁 Terminé</span>`:kind==="later"?`<span class="m6st m6mut">🗓️ À venir</span>`:kind==="locked"?`<span class="m6st m6mut">🔒 Paris fermés</span>`
+        :`<span class="m6st m6mut">${res&&res.pending?"⏳ Résultat en attente":"● En cours"}</span>`;
+      const SS=sd?(shortSides(r.it)||sd):null,nm6=k=>{const full=String(pr&&pr.length===2?pr[k]:sd[k]).trim(),v=full.length<=13?full:String(SS[k]);const Lw=Math.max(...v.split(/\s+/).map(w=>w.length));return`<b class="m6n" style="--fs:${Lw>10?12:Lw>8?13:Lw>6?14.5:16}px">${esc(v)}</b>`;};
+      const cr=k=>`<span class="m6c">${mark(sd[k])||`<span class="mcini">${esc(String(sd[k]).charAt(0))}</span>`}</span>`;
+      const mid=sc0?`<b class="mcsc">${sc0.sa}<i>–</i>${sc0.sb}</b>`:`<small>${esc(fmtD(d0))}</small><b class="mctime">${r.it.tbd?"—":esc(fmtT(d0))}</b>`;
+      const ctr=sd?`<span class="m6vs"><span class="m6t">${cr(0)}${nm6(0)}</span><span class="m6m">${mid}</span><span class="m6t r">${nm6(1)}${cr(1)}</span></span>`
+        :`<span class="m6solo"><span class="spic">${goldSp(spid,18)}</span><span class="m6sl"><b>${esc(r.title)}</b><small>${LV?"En cours":esc(fmtD(d0))+(r.it.tbd?"":" · "+esc(fmtT(d0)))}</small></span>${sc0?`<b class="mcsc">${sc0.sa}<i>–</i>${sc0.sb}</b>`:""}</span>`;
+      const rb=String(reoMid(p,r,"reo156")||"").replace("Rouvrir les paris","Rouvrir").replace("Refermer les paris","Refermer");
+      const ptsD=kind==="done"&&gain!=null&&!vd?(()=>{const per=sc.per[r.key]||{},me=myId(p),mine=per[me]||0,ids=pls.map(x=>x.id),rk=ids.filter(id=>(per[id]||0)>mine).length+1;return`<span class="m6pts">+${mine} pt${mine>1?"s":""}${ids.length>1?` · ${rk}${rk>1?"e":"er"}`:""}</span>`;})():"";
+      const rbI=rb?rb.replace(/>🔒 Refermer</,' aria-label="Refermer les paris" title="Refermer les paris">🔒<').replace(/>🔓 Rouvrir</,' aria-label="Rouvrir les paris" title="Rouvrir les paris">🔓<'):"";
+      const act=can?`<button type="button" class="m6a ${pl?"green":"orange"}" data-act="betOne" data-key="${esc(r.key)}">${pl?"Modifier":"Faire mon prono"}</button>${rbI}`:rb||ptsD;
+      const eH=ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:`<span></span>`;
+      return`<div class="mc mc156 k-${kind} mcs-${spid}${LV?" mclv":""}${dim?" mcdim":""}${fl?" mcfl":""}" data-k="${esc(r.key)}" data-blf="${esc(lf)}" data-bls="${esc(ls)}"><template class="mcmini">${mini}</template>${duoBg(sd,spid,"mcb")}${mcBand(spid,r,rows)}<button type="button" class="mch m6h" data-act="mcTog" data-key="${esc(r.key)}" aria-expanded="false" aria-label="${esc(num147(r.key))} · ${esc(r.title)} · voir le détail et les pronos"><span class="m6top"><span class="mcnum">${num147(r.key)}</span>${stC}</span>${ctr}</button><div class="m6bot" data-act="mcTog" data-key="${esc(r.key)}">${eH}<span class="m6r">${act}<span class="m6chev" aria-hidden="true">▾</span></span></div></div>`;}
     return`<div class="mc k-${kind} mcs-${spid}${OPEN?" open":""}${LV?" mclv":""}" data-k="${esc(r.key)}" data-blf="${esc(lf)}" data-bls="${esc(ls)}">${LV?`<span class="mclband" aria-label="En direct${lvT?" · "+esc(lvT):""}"><i class="lrbdot"></i>EN DIRECT${lvT?` · ${esc(lvT)}`:""}</span>`:""}<template class="mcmini">${mini}</template>${duoBg(sd,spid,"mcb")}${mcBand(spid,r,rows)}<button type="button" class="mch" data-act="mcTog" data-key="${esc(r.key)}" aria-expanded="${OPEN}" aria-label="${esc(r.title)} · ${OPEN?"replier":"voir le détail et les pronos"}">
       <span class="mctop"><span class="mcnum">${num147(r.key)}</span><span class="mcst">${kind==="todo"||kind==="ready"?"":kind==="live"&&lv==="LIVE"?(r.it.live&&!inGrace(r.it)?"":`<span class="mckind mklive">EN DIRECT</span>`):`<span class="mckind">${KIND[kind][1]} ${KIND[kind][0]}</span>`}${urg?`<span class="mcurg">${urg}</span>`:""}${kind==="ready"?`<span class="mckind mkok">✓ Prono fait</span>`:""}</span></span>
       ${vs}
-      ${kind==="todo"?"":extra}${orgL}</button>${(()=>{/* v147 : en bas, les potes à gauche et Rouvrir / Refermer à droite */const b=reoMid(p,r),e=ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:"";if(OPEN)return"";return b||e?`<div class="mcbot">${e||"<span></span>"}${b?`<span class="mcbotr">${b}</span>`:""}</div>`:"";})()}${!OPEN&&acts.length?`<div class="mbact">${acts.join("")}</div>`:""}${OPEN?`<div class="mcfold1"><button type="button" class="mcfb on" data-act="mcTog" data-key="${esc(r.key)}" data-lf="${esc(lf)} ▴" data-ls="${esc(ls)} ▴">${esc(lf)} ▴</button></div><div class="mcx">${betInline(p,r.key)}<div class="mcfold2"><button type="button" class="mcfb" data-act="mcTog" data-key="${esc(r.key)}" data-close="1" data-lf="▴ ${esc(lf)}" data-ls="▴ ${esc(ls)}">▴ ${esc(lf)}</button></div></div>`:`${kind==="done"&&gain!=null&&!(res&&res.void)?(()=>{/* v153 : match terminé replié — mes points et ma place sur ce match (ex æquo = même place) */const per=sc.per[r.key]||{},me=myId(p),mine=per[me]||0,ids=pls.map(x=>x.id),rk=ids.filter(id=>(per[id]||0)>mine).length+1;return`<div class="mcpts153"><span>Tu marques <b>+${mine} pt${mine>1?"s":""}</b>${ids.length>1?` · ${rk}${rk>1?"e":"er"} sur ce match`:""}</span></div>`;})():""}<div class="mcfold0"><button type="button" class="mcfb" data-act="mcTog" data-key="${esc(r.key)}">${kind==="done"?"Voir le détail ▾":"Voir les pronos ▾"}</button></div>`}</div>`;};
+      ${kind==="todo"?"":extra}${orgL}</button>${(()=>{/* v147 : en bas, les potes à gauche et Rouvrir / Refermer à droite */const b=reoMid(p,r),e=ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:"";if(OPEN)return"";return b||e?`<div class="mcbot">${e||"<span></span>"}${b?`<span class="mcbotr">${b}</span>`:""}</div>`:"";})()}${!OPEN&&acts.length?`<div class="mbact">${acts.join("")}</div>`:""}${OPEN?`<div class="mcfold1"><button type="button" class="mcfb on" data-act="mcTog" data-key="${esc(r.key)}" data-lf="${esc(lf)} ▴" data-ls="${esc(ls)} ▴">${esc(lf)} ▴</button></div><div class="mcx">${!sd&&["golf","f1","velo"].includes(spid)&&(LV||kind==="live")?`<div class="lbw156">${lbHTML156(r.it,spid,[{p,r}],c)}</div>`:""}${betInline(p,r.key)}<div class="mcfold2"><button type="button" class="mcfb" data-act="mcTog" data-key="${esc(r.key)}" data-close="1" data-lf="▴ ${esc(lf)}" data-ls="▴ ${esc(ls)}">▴ ${esc(lf)}</button></div></div>`:`${kind==="done"&&gain!=null&&!(res&&res.void)?(()=>{/* v153 : match terminé replié — mes points et ma place sur ce match (ex æquo = même place) */const per=sc.per[r.key]||{},me=myId(p),mine=per[me]||0,ids=pls.map(x=>x.id),rk=ids.filter(id=>(per[id]||0)>mine).length+1;return`<div class="mcpts153"><span>Tu marques <b>+${mine} pt${mine>1?"s":""}</b>${ids.length>1?` · ${rk}${rk>1?"e":"er"} sur ce match`:""}</span></div>`;})():""}<div class="mcfold0"><button type="button" class="mcfb" data-act="mcTog" data-key="${esc(r.key)}">${kind==="done"?"Voir le détail ▾":"Voir les pronos ▾"}</button></div>`}</div>`;};
   /* filtres : À faire (paris ouverts) · En cours (commencés ou fermés) · Terminés · Tous */
   const FILT={edit:["todo","ready"],done:["live","wait","locked","done"]}; /* 2 filtres seulement : on parie (En attente) ou on regarde le résultat (Terminés) */ /* un prono fait quitte « À faire » : il attend son résultat dans « En cours » */
   const SECT=[["todo","Pronos en attente"],["ready","Pronos faits · encore modifiables"],["later","À venir"],["live","En cours"],["locked","Paris fermés"],["done","Terminés"]];
@@ -8529,7 +8577,7 @@ document.addEventListener("click",e=>{
 case "kf":{const p=partyById(S.partyView),k=t.dataset.k,cur=(S.kf||{})[p.id];S.kf=Object.assign({},S.kf,{[p.id]:cur===k?"all":k});render();break;}
     case "mcTog":{const p=partyById(S.partyView);if(!p)break;const k=t.dataset.key,cur=(S.mcOpen||{})[p.id],close=cur===k;
       if(close&&S.editKey===k){discardDraft(k);S.editKey=null;}S.mcOpen=Object.assign({},S.mcOpen,{[p.id]:close?null:k});const fromBar=!!t.closest("#mcbar");const e0=mcEl(k),y0=e0?e0.getBoundingClientRect().top:null;
-      render();if(close){const e1=mcEl(k);if(e1){const tp=e1.getBoundingClientRect().top;if(fromBar||t.dataset.close||tp<0||tp>window.innerHeight*.6)mcScrollTo(k,true);}}
+      if(close)S._mcFl={k,t:Date.now()};render();if(close){mcBack156(k);}
       else{const e1=mcEl(k);if(e1&&y0!=null){const d=e1.getBoundingClientRect().top-y0;if(Math.abs(d)>1)window.scrollBy(0,d);}mcScrollTo(k,true);}
       setTimeout(mcBarUpd,30);setTimeout(mcBarUpd,450);break;}
     case "betOne":{/* v153 : « Faire / Modifier mon prono » déplie la carte en mode saisie (plus d'écran à part) */const k=t.dataset.key,pid=S.partyView;S.myDraft={};S.missHi=null;S.editKey=k;
@@ -8913,7 +8961,7 @@ function lrScoreFlash(){try{const M=window._lrSc||(window._lrSc={});document.que
   const parts=[...sc.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()!=="");const vals=parts.map(n=>n.textContent.trim());const old=M[id];M[id]=vals.join("|");if(!old||old===M[id])return;const ov=old.split("|");
   parts.forEach((n,i)=>{if(ov[i]!==vals[i]){const sp=document.createElement("span");sp.className="scfl";sp.textContent=n.textContent;n.replaceWith(sp);}});});}catch(_){}}
 render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="lives")lrScoreFlash();}catch(_){}return r;};})(render);
-render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="party"){mcFit();mcScoreFlash();if(S._mcRet){const k=S._mcRet;S._mcRet=null;mcScrollSoon(k);}}mcBarUpd();}catch(_){}return r;};})(render);
+render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="party"){mcFit();mcNameFit156();mcScoreFlash();if(S._mcRet){const k=S._mcRet;S._mcRet=null;mcScrollSoon(k);}}mcBarUpd();}catch(_){}return r;};})(render);
 /* v148 : pastilles de choix de partie — toutes à la largeur de la plus large (plafonnée à 80 %) */
 function lrPillW(){try{document.querySelectorAll("#app .lrp148").forEach(f=>{const B=[...f.querySelectorAll(".lp148")];if(B.length<2)return;f.style.removeProperty("--lpw");const w=Math.max(...B.map(b=>b.getBoundingClientRect().width));f.style.setProperty("--lpw",Math.ceil(w)+"px");});}catch(_){}}
 render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="lives")requestAnimationFrame(lrPillW);}catch(_){}return r;};})(render);
@@ -10150,5 +10198,90 @@ html body #app .hlv155 .lvn155{display:block;font-family:var(--display)!importan
 html body #app .hlv155 .lvn155 .pfn{font:inherit!important}
 @media (max-width:360px){html body #app .hlv155 .lvn155{font-size:16.5px}}
 @media (prefers-reduced-motion:reduce){html body #app .hlv155 .lvecg155 .ecgp{animation:none;stroke-dasharray:none}}
+
+/* v156 : tuiles de match repliées compactes · repères à l'ouverture · classement provisoire */
+html body #app .mc.mc156{margin-bottom:10px;border-radius:18px}
+html body #app .mc.mc156 .m6h{padding:10px 14px 4px!important}
+html body #app .mc.mc156 .m6top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px}
+html body #app .mc.mc156 .mcnum{font-size:11px!important;padding:3px 9px!important;letter-spacing:.12em}
+html body #app .m6st{font-size:12px;font-weight:800;letter-spacing:.04em;white-space:nowrap;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.42);color:#F3E0A6;max-width:62%;overflow:hidden;text-overflow:ellipsis}
+html body #app .m6st.m6lv{background:#D93A36;color:#fff;letter-spacing:.08em;display:inline-flex;align-items:center;gap:6px}
+html body #app .m6st.m6lv .lrbdot{width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;animation:kblink 1.4s infinite}
+html body #app .m6st.m6ok{color:#9FE2B5}
+html body #app .m6st.m6mut{color:#E8D9BC}
+html body #app .m6st.m6urg{background:rgba(0,0,0,.42)}
+html body #app .m6vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;margin:8px 0 2px}
+html body #app .m6t{display:flex;align-items:center;gap:8px;min-width:0}
+html body #app .m6t.r{justify-content:flex-end;text-align:right}
+html body #app .m6t b{font-family:var(--display);font-weight:900;line-height:1.05;text-transform:uppercase;color:#FFF3D6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-width:0;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+html body #app .m6c{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,rgba(255,240,220,.16),rgba(0,0,0,.3));box-shadow:inset 0 0 0 1.2px rgba(232,180,138,.4);overflow:hidden}
+html body #app .m6c .clogo{width:24px!important;height:26px!important}
+html body #app .m6c .flg{font-size:20px;line-height:1}
+html body #app .m6c .crest{transform:scale(.9)}
+html body #app .m6c .tbar{display:none}
+html body #app .m6c .mcini{font-size:16px}
+html body #app .m6m{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:58px}
+html body #app .m6m small{font-size:12px;font-weight:700;color:#E8D9BC;white-space:nowrap}
+html body #app .mc.mc156 .mcsc{font-size:30px!important}
+html body #app .mc.mc156 .mctime{font-size:26px!important}
+html body #app .m6solo{display:flex;align-items:center;gap:10px;margin:8px 0 2px;min-width:0}
+html body #app .m6solo .spic{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;border:1.4px solid #D9A84E;background:rgba(0,0,0,.45)}
+html body #app .m6sl{display:flex;flex-direction:column;min-width:0;flex:1}
+html body #app .m6sl b{font-family:var(--display);font-weight:900;font-size:21px;line-height:1;text-transform:uppercase;color:#FFF3D6;text-shadow:0 1px 4px rgba(0,0,0,.6);overflow-wrap:anywhere}
+html body #app .m6sl small{font-size:12.5px;color:#E8D9BC;font-weight:700;margin-top:3px}
+html body #app .m6bot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px 10px 14px;cursor:pointer;position:relative;z-index:1}
+html body #app .m6bot .ecu{width:24px;height:24px;font-size:11px}
+html body #app .m6r{display:flex;align-items:center;gap:8px;flex:none;min-width:0}
+html body #app .m6chev{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#F3E0A6;border:1.2px solid rgba(232,190,110,.55);background:rgba(0,0,0,.35);flex:none}
+html body #app .m6a{border:0;border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:800;white-space:nowrap;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+html body #app .m6a.orange{background:linear-gradient(180deg,#F3A044,#C9661E)}
+html body #app .m6a.green{background:linear-gradient(180deg,#5BC08A,#2E7D4F)}
+html body #app .m6pts{font-size:13px;font-weight:800;color:#FFE7B8;white-space:nowrap}
+html body #app .mc.mc156 .reo156,html body #app .mc.mc156 .reomid{padding:7px 12px!important;font-size:13px!important;min-height:0!important;white-space:nowrap}
+html body #app .mc.mc156 .reosince{display:none!important}
+html body #app .mc.mc156.mclv{border:1.5px solid #E5534B!important}
+html body #app .mc.mc156 .mclband{display:none!important}
+@media (max-width:360px){html body #app .m6c{width:28px;height:28px}html body #app .m6c .flg{font-size:17px}html body #app .mc.mc156 .mcsc{font-size:28px!important}html body #app .mc.mc156 .mctime{font-size:24px!important}html body #app .m6a{padding:7px 11px;font-size:12.5px}html body #app .m6st{font-size:12px;padding:3px 7px}html body #app .m6bot .ecu{width:22px;height:22px}}
+/* tuile ouverte : cadre doré net, les autres restent visibles mais atténuées */
+html body #app .mc.open{border:2px solid #E3C27A!important;box-shadow:0 0 0 1px rgba(227,194,122,.35),0 10px 26px rgba(0,0,0,.5)!important}
+html body #app .mc.mcdim{opacity:.55;transition:opacity .25s}
+html body #app .mc.mcdim:active{opacity:.8}
+/* tuile qu'on vient de refermer : un éclair doré */
+@keyframes mcfl156{0%{box-shadow:0 0 0 0 rgba(243,210,138,0)}25%{box-shadow:0 0 0 3px rgba(243,210,138,.95),0 0 22px rgba(243,210,138,.55)}100%{box-shadow:0 0 0 0 rgba(243,210,138,0)}}
+html body #app .mc.mcfl{animation:mcfl156 .8s ease-out 1}
+@media (prefers-reduced-motion:reduce){html body #app .mc.mcfl{animation:none;box-shadow:0 0 0 3px rgba(243,210,138,.9)}}
+/* barre du bas : « MATCH 2/3 » devant le mini-score */
+#mcbar .mcbn{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#E3C27A;flex:none;padding:2px 6px;border:1px solid rgba(227,194,122,.5);border-radius:999px}
+@media (max-width:360px){#mcbar .mcbn{font-size:9.5px;padding:1px 5px}}
+/* classement provisoire en direct (golf, F1, vélo) */
+html body #app .lb156{margin:10px 0 2px;padding:10px 12px;border-radius:14px;background:rgba(10,6,4,.72);border:1px solid rgba(227,194,122,.35);text-align:left}
+html body #app .lb156 .lbh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
+html body #app .lb156 .lbh b{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#E3C27A}
+html body #app .lb156 .lbh small{font-size:12px;color:#E8D9BC;font-weight:700}
+html body #app .lb156 .lbsoon{display:block;font-size:13px;color:#BFAF92;font-style:italic;padding:4px 0 2px}
+html body #app .lbr{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,.07)}
+html body #app .lbr:first-of-type{border-top:0}
+html body #app .lbp{font-size:13px;font-weight:800;color:#E8D9BC}
+html body #app .lbn{display:flex;align-items:center;gap:6px;min-width:0}
+html body #app .lbn b{font-size:14px;font-weight:700;color:#FFF3D6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html body #app .lbis{display:inline-flex;gap:2px;flex:none}
+html body #app .lbi{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:900;color:#2A1C08;background:#E3C27A}
+html body #app .lbi.me{background:#F3A044;color:#fff;box-shadow:0 0 0 1.5px #FFE7B8}
+html body #app .lbi.more{background:rgba(255,255,255,.2);color:#fff;width:auto;padding:0 4px;border-radius:9px}
+html body #app .lbs{display:flex;flex-direction:column;align-items:flex-end;line-height:1.05}
+html body #app .lbs b{font-family:var(--display);font-weight:900;font-size:17px;color:#FFE7B8}
+html body #app .lbs small{font-size:11.5px;color:#E8D9BC;font-weight:700}
+html body #app .lbsep{text-align:center;color:#BFAF92;font-size:13px;line-height:1;padding:2px 0}
+html body #app .lbr.mine{background:rgba(243,160,68,.14);border-radius:8px;padding:6px 6px;border-top:0}
+html body #app .lbw156{padding:0 14px}
+html body #app .lrbody .lb156{margin:10px 12px 12px}
+html body #app .m6t b.m6n{font-size:var(--fs,16px)}
+@media (max-width:360px){html body #app .m6t b.m6n{font-size:calc(var(--fs,16px) - 1.5px)}html body #app .m6vs{gap:5px}html body #app .m6t{gap:5px}html body #app .m6m{min-width:52px}}
+html body #app .m6bot .mcecus{min-width:0;flex:0 1 auto}
+@media (max-width:360px){html body #app .m6bot .mcecus .ecu+.ecu{margin-left:-7px}html body #app .m6bot{padding:6px 10px 10px 12px}html body #app .m6r{gap:6px}html body #app .m6chev{width:24px;height:24px}html body #app .m6a{padding:7px 10px}}
+html body #app .lrc:not(.rtile) .lrbody.lbody156{height:auto!important;min-height:150px;justify-content:flex-start!important;padding:40px 12px 12px!important}
+html body #app .lrc:not(.rtile) .lrbody.lbody156 .lrsolo{padding:0 4px}
+html body #app .lrc:not(.rtile) .lrbody.lbody156 .lrline{padding:0 4px}
+html body #app .lrc:not(.rtile) .lrbody.lbody156 .lb156{margin:10px 0 0!important}
 </style></body>
 </html>
