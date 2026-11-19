@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v156";
+const APP_VER="v157";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6361,13 +6361,18 @@ function rtile(p,D,k154){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"
     const when=t0?new Date(t0).toLocaleString("fr-BE",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
     const plN=(()=>{try{return playersOf(p).filter(x=>!x.fake).length;}catch(_){return 0;}})();
     const u1=sp==="f1"?"1re session":sp==="velo"?"1re étape":sp==="golf"?"1re sélection":"1er match",uN=sp==="f1"?"session":sp==="golf"?"sélection":sp==="velo"?"étape":"match";
-    return rtileWrap(p,c,sp,sub,k154==="pending"||k154==="ready"?"":`<div class="rtc cur"><div class="rtlist rtsoon"><span class="rtst soon">● À venir</span>${when?`<b class="rtwhen">${u1} · ${esc(when)}</b>`:""}<span class="rtchips"><i>👥 ${plN} joueur${plN>1?"s":""}</i>${hasPot?`<i>💰 mise ${p.amount} cr.</i>`:""}<i>${SPEM[sp]||"🏁"} ${rows.length} ${uN}${rows.length>1?"s":""}</i></span>${myPronoSt(p)}</div></div>`,k154);}
+    return rtileWrap(p,c,sp,sub,"",k154,{live:false,panel:"",state:when?`⏳ ${u1} · ${esc(when)}`:"⏳ À venir"});}
   const head=fin?`<span class="rtst fin">Terminée</span>`:onAir?`<span class="rtst live">● En direct · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""} · provisoire</span>`:`<span class="rtst cur">En cours · ${sc?sc.done:0}/${sc?sc.total:rows.length} joué${(sc&&sc.done>1)?"s":""} · provisoire${att?` · ${att} résultat${att>1?"s":""} attendu${att>1?"s":""}`:""}</span>`;
   const myRk=meI>=0?tieRank(R,meI):null;
+  /* v157 : tuile unique — UNE ligne d'état + le classement complet qui se déplie dans la tuile */
+  {const plc=n=>n+(n>1?"e":"er"),pt=n=>n+" pt"+(n>1?"s":""),full=R.map((x,i)=>line(i)).join("");let state="";
+   if(fin){if(myRk){const cr=hasPot?tieGain(R,meI,p.split,pot):null;state=`🏆 Tu as fini <b>${plc(myRk)}</b> · ${cr!=null?`<u class="${cr>0?"up":""}">${cr>0?"+"+cr:"0"} cr.</u>`:pt(R[meI].pts)}`;}else if(R.length)state=`🏆 ${plc(tieRank(R,0))} ${esc(nm(R[0]))} · ${pt(R[0].pts)}`;}
+   else{const ic=onAir?"🔴":"⏳";if(myRk){const oi=R.findIndex((x,i)=>i!==meI);state=`${ic} Tu es <b>${plc(myRk)}</b> · ${pt(R[meI].pts)}${oi>=0?` <span class="rt157o">— ${plc(tieRank(R,oi))} ${esc(nm(R[oi]))} ${pt(R[oi].pts)}</span>`:""}`;}else if(R.length)state=`${ic} ${plc(tieRank(R,0))} ${esc(nm(R[0]))} · ${pt(R[0].pts)}`;}
+   return rtileWrap(p,c,sp,sub,"",k154,{live:onAir,panel:R.length?full:"",state});}
   const center=fin?`<div class="rtc fin">${myRk?`<div class="rtme2"><b>${myRk}<sup>${myRk>1?"e":"er"}</sup></b><small>sur ${R.length}</small></div>`:""}<div class="rtlist">${head}${list}</div></div>`
     :`<div class="rtc cur"><div class="rtlist">${head}${list}${myPronoSt(p)||`<small class="rtprov">Classement provisoire${hasPot?" · crédits si ça tient":""}</small>`}</div></div>`;
   return rtileWrap(p,c,sp,sub,center,k154);}
-function rtileWrap(p,c,sp,sub,center,k154){const deco="";
+function rtileWrap(p,c,sp,sub,center,k154,X){const deco="";if(X)return rtile157(p,c,sp,k154,X);
   const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?(myLabel()||x.name):x.name;
   let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
   const avs=`<span class="rtav152">${pl.slice(0,5).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)" title="${esc(nm(x))}">${im||esc(String(nm(x)||"?").charAt(0).toUpperCase())}</i>`;}).join("")}${pl.length>5?`<i class="more">+${pl.length-5}</i>`:""}</span>`;
@@ -6389,6 +6394,19 @@ function rtileWrap(p,c,sp,sub,center,k154){const deco="";
     ${wl&&!String(center||"").trim()?"":`<span class="lrbody mh-${sp} rtbody">${deco}${center}</span>`}
     ${ub}
     <span class="lrfoot rtfoot${wl?" rt154f":""}">${wl?"":`<span class="rtfl">${pill}</span>`}<span class="rtright">${cta}</span></span></button>`;}
+function rtile157(p,c,sp,k,X){const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?(myLabel()||x.name):x.name;
+  let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
+  const avs=`<span class="rtav152">${pl.slice(0,5).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)" title="${esc(nm(x))}">${im||esc(String(nm(x)||"?").charAt(0).toUpperCase())}</i>`;}).join("")}${pl.length>5?`<i class="more">+${pl.length-5}</i>`:""}</span>`;
+  const grp=grpWith153(p),nx=nxt154(p,c,sp),wl=k==="pending"||k==="ready",ub=wl&&!X.live?urg154(p,k):"",on=!!(S.rtRk||{})[p.id]&&!!X.panel;
+  const hasLg=typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id];
+  const chev=`<i class="rt157c" aria-hidden="true">${on?"▴":"▾"}</i>`;
+  const row=wl&&ub?`<span class="rt157s rt157w">${ub}${X.panel?`<span class="rt157t" role="button" tabindex="0" data-act="rtRk" data-id="${esc(p.id)}" aria-expanded="${on}" aria-label="Voir le classement">Classement ${chev}</span>`:""}</span>`
+    :`<span class="rt157s${X.panel?" rt157k":""}"${X.panel?` role="button" tabindex="0" data-act="rtRk" data-id="${esc(p.id)}" aria-expanded="${on}" aria-label="Voir le classement"`:""}><span class="rt157x">${X.state||""}</span>${X.panel?chev:""}</span>`;
+  const panel=X.panel?`<span class="rt157p"><span class="rt157pi"><span class="rtlist rt157l">${X.panel}</span></span></span>`:"";
+  const cta=k==="pending"?`<span class="bigact orange rt154cta">Faire mon prono</span>`:k==="ready"?`<span class="bigact green rt154cta">Modifier mon prono</span>`:`<span class="bigact gold rt154cta">Voir la partie</span>`;
+  return`<button type="button" class="lrc lrc-${sp} rtile rtA rt152 rt154 rt157${on?" rkon":""}" data-act="party" data-id="${esc(p.id)}"><span class="rtband"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span>${X.live?'<span class="rtlive">● EN DIRECT</span>':""}<span class="rtpty"><small>Ta partie</small><span class="rtpc"><span class="spic${hasLg?" haslg":""}">${hasLg?`<img src="${COMP_LOGO[c.id]}" alt="">`:goldSp(sp,18)}</span><b>${esc(evTitle153(p,c,SPORTS.find(x=>x.id===sp)))}</b>${nx.l?`<span class="rt154nx"><em>${esc(nx.l)}</em>${nx.pl?`<small>${esc(nx.pl)}</small>`:""}</span>`:""}</span></span></span>
+    <span class="rtev rt153w">${grp?`<span class="rt153g">👥 avec <b>${esc(grp)}</b></span>`:"<span></span>"}${avs}</span>${row}${panel}
+    <span class="lrfoot rtfoot rt154f rt157f"><span class="rtright">${cta}</span></span></button>`;}
 function nxt154(p,c,sp){try{const R=rowsOfParty(p).filter(r=>r.it).sort((a,b)=>+a.it.date-+b.it.date);if(!R.length)return{};let i=R.findIndex(r=>!isDone(r.it));if(i<0)i=R.length-1;const it=R[i].it,lb=String(it.label||R[i].title||"").trim(),N=R.length;
   const gen=/^(Europe|Monde|International|Angleterre|Espagne|Italie|Allemagne|France|Belgique)$/i;let pl=c.flag&&!gen.test(c.flag)?String(c.flag).split(",")[0].trim():"";if(/\d/.test(pl))pl="";
   if(sp==="f1"||sp==="golf"||sp==="velo"){const parts=lb.split(/\s*·\s*/);let l=parts[0]||"";if(/^tout/i.test(l))l="Tournoi";if(sp==="velo"&&parts[1])pl=parts[1];if(!l)l=sp==="f1"?"Session "+(i+1):sp==="golf"?"Jour "+(i+1):"Étape "+(i+1);if(l.length>16)l=l.slice(0,15)+"…";return{l:l.toUpperCase(),pl:pl.length>18?"":pl};}
@@ -7358,7 +7376,9 @@ function myBetsTab(p,sc){
     h+=`<div class="kjbar" role="tablist" aria-label="Choisir la journée">${suIds.map(id=>{const su=subs.find(x=>x.id===id),n=inF.filter(x=>suOf(x)===id).length,on=id===kj;return`<button type="button" role="tab" aria-selected="${on}" class="kj${on?" on":""}" data-act="kj" data-k="${esc(KJ)}" data-v="${esc(id)}" title="${esc(su.name)}"><b>${esc(lab(su))}</b><small>${n}</small></button>`;}).join("")}</div>`;}
   const vis=kj?items.filter(x=>suOf(x)===kj):items;
   const shown=SECT.filter(([k])=>kf==="all"||FILT[kf].includes(k));let any=false;
-  shown.forEach(([k,t])=>{let l=vis.filter(x=>x.kind===k);if(k==="todo")l=l.slice().sort((x,y)=>(closeAt(x.r.it)-closeAt(y.r.it)));if(!l.length)return;any=true;const n=l.length,cap=k==="later"||k==="done"?(S.kmore&&S.kmore[p.id+k]?9999:12):9999;if(k==="done")l=l.slice().reverse();
+  /* v157 : vue « tout » = UNE liste dans l'ordre chronologique (MATCH 1/N en premier) ; l'urgence reste visible par la pastille / le bouton orange */
+  if(kf==="all"){const ks=new Set(shown.map(([k])=>k)),l=vis.filter(x=>ks.has(x.kind)).sort((x,y)=>+x.r.it.date-+y.r.it.date);if(l.length){any=true;h+=`<div class="list v7sec k-all">${l.map(card).join("")}</div>`;}}
+  else shown.forEach(([k,t])=>{let l=vis.filter(x=>x.kind===k);if(k==="todo")l=l.slice().sort((x,y)=>(closeAt(x.r.it)-closeAt(y.r.it)));if(!l.length)return;any=true;const n=l.length,cap=k==="later"||k==="done"?(S.kmore&&S.kmore[p.id+k]?9999:12):9999;if(k==="done")l=l.slice().reverse();
     h+=`<div class="list v7sec k-${k}">${l.slice(0,cap).map(card).join("")}</div>${n>cap?`<div class="pad"><button type="button" class="btn ghost block" data-act="kmore" data-k="${p.id+k}">Voir les ${n-cap} autres</button></div>`:""}`;});
   if(!any)h+=`<div class="pad"><div class="kempty">${kf==="edit"?"✓ Plus rien à parier pour l'instant.":kf==="live"?"Aucun match en cours.":kf==="done"?"Aucun match terminé pour l'instant.":"Rien ici pour le moment."}</div></div>`;
   return h;
@@ -8597,6 +8617,7 @@ case "kf":{const p=partyById(S.partyView),k=t.dataset.k,cur=(S.kf||{})[p.id];S.k
       Object.keys(d).forEach(k=>{if(key==="free"?/^q\d+$/.test(k):k.startsWith(key+"|")){if(d[k]==null||d[k]==="")delete mine[k];else mine[k]=d[k];delete d[k];n++;}});
       if(!n)return toast("Rien de nouveau à enregistrer.");S.mbOpen=null;writeMyPicks(p,mine,"Pronos enregistrés");render();break;}
     case "match":go("match",{mitem:t.dataset.item});break;
+    case "rtRk":{const id=t.dataset.id;S.rtRk=Object.assign({},S.rtRk);const on=!S.rtRk[id];S.rtRk[id]=on;const tl=t.closest(".rt157");if(tl){tl.classList.toggle("rkon",on);tl.querySelectorAll('[data-act="rtRk"]').forEach(x=>x.setAttribute("aria-expanded",String(on)));tl.querySelectorAll(".rt157c").forEach(x=>x.textContent=on?"▴":"▾");}break;}
     case "rtSort":S.rtSort=t.dataset.v;try{localStorage.setItem("bf_rtsort",S.rtSort);}catch(_){}render();break;
     case "pf":S.pfStack=(S.pfStack||[]).concat([S.pf||null]);S.pf={k:t.dataset.k,v:t.dataset.v};render();window.scrollTo(0,0);break;
     case "psport":S.psport=t.dataset.v;render();break;
@@ -10186,6 +10207,36 @@ html body #app .rt154f .rtright{flex:1 1 auto;display:flex}
 html body #app .rt154cta{display:flex!important;align-items:center;justify-content:center;width:100%;margin:0!important}
 @media (max-width:360px){html body #app .rt154 .rtpc>b{font-size:.92em}html body #app .rt154nx em{font-size:10px;letter-spacing:.08em}}
 
+
+/* v157 : tuile de partie unique — ligne d'état, classement dépliable dans la tuile, une seule grosse touche */
+html body #app .rt157 .rt157s{display:flex;align-items:center;gap:10px;min-height:36px;margin:12px 16px 0;padding:0;color:#F3E6C8;font-size:14px;line-height:1.25;-webkit-tap-highlight-color:transparent}
+html body #app .rt157 .rt157s.rt157k{cursor:pointer;padding:6px 10px;margin:10px 12px 0;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(217,180,94,.22)}
+html body #app .rt157 .rt157x{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #app .rt157 .rt157x b{color:#F2D28A;font-weight:900}
+html body #app .rt157 .rt157x .rt157o{color:rgba(243,230,200,.7)}
+html body #app .rt157 .rt157x u{text-decoration:none;font-weight:800;color:#F3E6C8}
+html body #app .rt157 .rt157x u.up{color:#7FD39A}
+html body #app .rt157 .rt157c{flex:none;font-style:normal;font-size:12px;color:#E3C27A;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(217,180,94,.45)}
+html body #app .rt157 .rt157w .rt154u{flex:1 1 auto;margin:0!important}
+html body #app .rt157 .rt157t{flex:none;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.04em;color:#E3C27A;cursor:pointer;padding:4px 0 4px 6px}
+html body #app .rt157 .rt157p{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s ease;margin:0 12px}
+html body #app .rt157.rkon .rt157p{grid-template-rows:1fr}
+html body #app .rt157 .rt157pi{overflow:hidden;min-height:0}
+html body #app .rt157 .rt157l{display:flex!important;flex-direction:column;gap:0;padding:8px 4px 2px}
+html body #app .rt157 .rt157l .rtl{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;color:#F3E6C8}
+html body #app .rt157 .rt157l .rtl:last-child{border-bottom:0}
+html body #app .rt157 .rt157l .rtl.me{background:rgba(217,180,94,.12);border-radius:10px}
+html body #app .rt157 .rt157l .rtl>i{font-style:normal;font-weight:900;width:18px;color:#E3C27A}
+html body #app .rt157 .rt157l .rtl>b{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #app .rt157 .rt157l .rtl>em{font-style:normal;font-weight:800;white-space:nowrap}
+html body #app .rt157 .rt157l .rtl>u{text-decoration:none;white-space:nowrap;min-width:64px;text-align:right;font-size:13px}
+html body #app .rt157 .rt157l .rtl>u.up{color:#7FD39A}
+html body #app .rt157 .rt157l .rtfc{width:28px;height:28px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
+html body #app .rt157 .rt157l .rtfc img{width:100%;height:100%;object-fit:cover}
+html body #app .rt157 .rt157f{padding-top:12px!important}
+.bigact.gold,.btn.bigact.gold{background:linear-gradient(150deg,#F2D28A 0%,#D2A954 60%,#A97F33 100%)!important;color:#1a1208!important;text-shadow:none!important;box-shadow:0 0 0 3px rgba(217,169,84,.2),0 10px 22px -10px rgba(217,169,84,.8)!important}
+@media (prefers-reduced-motion:reduce){html body #app .rt157 .rt157p{transition:none}}
+@media (max-width:360px){html body #app .rt157 .rt157s{font-size:12.5px}html body #app .rt157 .rt157x .rt157o{display:none}}
 /* v155 : ticket EN DIRECT compact — même hauteur que les autres, déchirure sur toute la hauteur, pouls + compteur */
 html body #app .prowbox.hlvb.hlv155{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 100,0 62,8 88,15 55,24 80,33 50,42 70,51 46,60 62,69 44,78 54,87 51,100 45,100 40,88 28,79 46,70 22,61 40,52 16,43 38,34 12,25 36,16 8,8' fill='black'/%3E%3C/svg%3E") calc(33.333% - 7px) 0/14px 100% no-repeat,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 100,0 62,8 88,15 55,24 80,33 50,42 70,51 46,60 62,69 44,78 54,87 51,100 45,100 40,88 28,79 46,70 22,61 40,52 16,43 38,34 12,25 36,16 8,8' fill='black'/%3E%3C/svg%3E") calc(33.333% - 7px) 0/14px 100% no-repeat exclude,linear-gradient(#000 0 0)}
 html body #app .hlv155>.lvR155{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:12px;padding:16px 16px 16px 22px!important;text-align:center}
