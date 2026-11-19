@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v151";
+const APP_VER="v152";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -5719,6 +5719,7 @@ function vChatRoom(){const p=partyById(S.chatParty||S.partyView);if(!p)return vC
   return`<div class="chhead"><button type="button" class="back" data-act="back" aria-label="Retour">‹</button>${c?compBadge(c,34):`<span class="prfree">🥂</span>`}<span><b>${esc(g?g.name:p.name)}</b><small>${esc(g?p.name:(c?c.name:"Pari libre"))}</small></span><button type="button" class="link chgo" data-act="party" data-id="${esc(p.id)}">Voir la partie</button></div>${chatTab(p,true)}`;}
 /* ===================================================================== v39 : SALON DES LIVES
    Le ticket Live mène toujours ici. 1 seul event : déjà déplié. Plusieurs : on déplie celui qu'on veut, les autres restent sur la page. */
+function lrStand(p){try{const sc=scoreProv(Object.assign({},p,{players:playersOf(p)}));if(!sc||!sc.rows||sc.rows.length<2)return"";const me=myId(p),mine=sc.rows.find(x=>x.id===me);if(!mine)return"";const rk=1+sc.rows.filter(x=>x.pts>mine.pts).length;return"tu serais "+rk+(rk>1?"e":"er");}catch(_){return"";}}
 function lrIsOpen(n,k){S.lrOpen=S.lrOpen||{};if(k in S.lrOpen)return S.lrOpen[k];return false;}
 function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),pls=playersOf(p),pk=picksOf(p),me=myId(p);
   const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text")
@@ -5733,7 +5734,7 @@ function liveBetsHTML(p,r,c){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"
 function lrRows146(m,k,sel){S.lrFlip146=S.lrFlip146||{};const MO=/\d{1,2} (janv|févr|mars|avr|mai|juin|juil|août|sept|oct|nov|déc)/;
   if(!sel){const n=m.rows.length;/* v148 : carte repliée = choix de la partie, sans Rouvrir */
     const nm=x=>{const b=partyBase(x.p);return m.rows.some(y=>y!==x&&partyBase(y.p)===b)?partyLabel(x.p):b;};
-    return`<div class="lrfoot lrp148"><p class="lrexp">${n>1?`Dans ${n} de tes parties · choisis`:`Dans ta partie`}</p>${m.rows.map(x=>`<button type="button" class="lp148" data-act="lrPick146" data-k="${esc(k)}" data-p="${esc(x.p.id)}" aria-label="Ouvrir la partie ${esc(nm(x))}"><span class="lp148t">${esc(nm(x))}</span><span class="lp148c" aria-hidden="true"> ▾</span></button>`).join("")}</div>`;}
+    return`<div class="lrfoot lrp148"><p class="lrexp">${n>1?`Dans ${n} de tes parties · choisis`:`Dans ta partie`}</p>${m.rows.map(x=>`<button type="button" class="lp148" data-act="lrPick146" data-k="${esc(k)}" data-p="${esc(x.p.id)}" aria-label="Aller dans la partie ${esc(nm(x))}"><span class="lp148w"><span class="lp148t">${esc(nm(x))}</span>${(()=>{const st=lrStand(x.p);return st?`<small class="lp148s">${esc(st)}</small>`:"";})()}</span><span class="lp148c" aria-hidden="true">›</span></button>`).join("")}</div>`;}
   return`<div class="lrfoot lrp146" role="list">${m.rows.filter(x=>x===sel).map(x=>{const p=x.p,r=x.r,on=x===sel;
     let lab=partyLabel(p);if(!MO.test(lab)&&p.made){try{lab+=" · "+new Date(p.made).toLocaleDateString("fr-BE",{day:"numeric",month:"short"});}catch(_){}}
     let right="";const st=itemState(p,r),fk=p.id+"|"+r.key,pend=S.lrFlip146[fk];let cl=st==="closed";if(pend!=null)cl=pend==="open"?false:true;
@@ -5751,7 +5752,7 @@ function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it
   const body=sd?`<div class="mhg">${pl(0)}${center}${pl(1)}</div>`:`<h3 class="lrsolo">${esc(it.label||r.title)}</h3><p class="lrline">${esc(L.line||L.minute||"En cours")}</p>`;
   const where=m.rows.length>1?`Dans ${m.rows.length} parties : ${m.rows.map(x=>esc(partyLabel(x.p))).join(" · ")}`:`Partie : ${esc(partyLabel(p))}`;
   const tag=(()=>{const rn=String(it.rn||it.round||String(r.sub||"").split(" · ")[0]||"");const mj=rn.match(/^(?:Journée|Matchday|J)\s*(\d+)$/i);if(mj)return"J"+mj[1];if(/^(finale|demi-finales?|quarts?( de finale)?|huitièmes?( de finale)?|1\/\d+ de finale|barrages?)$/i.test(rn))return rn;try{return new Date(it.date).toLocaleDateString("fr-BE",{day:"numeric",month:"short"}).replace(/\.$/,"")+".";}catch(_){return"";}})();
-  let h=`<div class="lrc lrc-${sp}${open?" open":""}${isLv?" lrlive":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">${open||m.rows.length===1?`<span class="lrchev lrtgl" aria-hidden="true">${open?"Replier ▴":"Voir les paris ▾"}</span>`:""}
+  let h=`<div class="lrc lrc-${sp}${open?" open":""}${isLv?" lrlive":""}" id="lr-${esc(k.replace(/[^\w-]/g,"_"))}"><button type="button" class="lrhd" data-act="lrTog" data-k="${esc(k)}" aria-expanded="${open}">
     <span class="lrtop"><span class="spic">${goldSp(sp,20)}</span><span><b>${esc(c.name)}</b>${tag?`<span class="lrtag">${esc(tag)}</span>`:""}</span></span>
     <span class="lrbody mh-${sp}${isLv?" haslrb":""}">${duoBg(sd,sp,"lr")}${band}${body}</span>
     </button>${lrRows146(m,k,open?sel:null)}`;
@@ -5761,7 +5762,7 @@ function lrCard(m,open){const it=m.it,c=m.c,sp=c.sport.id,sd=sides(it),L=LIVE[it
   return h+`</div>`;}
 function vLiveRoom(){const M=liveMatches();let h=pageHead("LE SALON <b>DES LIVES</b>",M.length?M.length+" match"+(M.length>1?"s":"")+" en direct dans tes parties":"Rien en direct pour l'instant",`<button type="button" class="back phback" data-act="lrBack" aria-label="Retour à Mes parties"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>`);
   if(!M.length)return h+`<p class="empty">Aucun match en direct en ce moment. Le salon s'anime dès qu'un match de tes parties commence.</p>`;
-  return h+`<div class="lrlist">${M.map(m=>lrCard(m,lrIsOpen(M.length,m.k))).join("")}</div>`;}
+  return h+`<div class="lrlist">${M.map(m=>lrCard(m,false)).join("")}</div>`;}
 function vGroup(){
   const g=groupById(S.groupView);if(!g)return vGroups();
   const ps=groupParties(g);
@@ -6349,7 +6350,7 @@ function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done"
   const sub=one?(one.label||""):(()=>{const n=rows.length,u=sp==="f1"?"session":sp==="velo"?"étape":sp==="golf"?"sélection":"match";const t=n?n+" "+u+(n>1?(u==="match"?"s":"s"):""):"";return p.full?("Tout le tournoi"+(t?" · "+t:"")):t;})();
   let sc=null;try{sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));}catch(_){}
   const R=sc?sc.rows.slice().sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name))):[],me=myId(p),pot=(+p.amount||0)*effPeople(p),hasPot=pot>0&&(p.split||[]).length;
-  const meI=R.findIndex(x=>x.id===me||x.name==="Toi"),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
+  const meI=R.findIndex(x=>x.id===me||x.name==="Toi"),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?(myLabel()||x.name):x.name;
   let PL=[];try{PL=playersOf(p);}catch(_){}
   const face=x=>{const pl=PL.find(y=>y.id===x.id)||{id:x.id,name:x.name};let im="";try{im=bubImg(personOf(p,pl));}catch(_){}return`<span class="rtfc" style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(nm(x)||"?").charAt(0).toUpperCase())}</span>`;};
   const line=i=>{const x=R[i],rk=tieRank(R,i),cr=hasPot&&(fin||R.some(y=>y.pts>0))?tieGain(R,i,p.split,pot):null;return`<span class="rtl r${Math.min(rk,4)}${i===meI?" me":""}"><i>${rk}</i>${face(x)}<b>${esc(nm(x))}</b><em>${x.pts} pt${x.pts>1?"s":""}</em>${cr!=null?`<u class="${cr>0?(fin?"up":"up pv"):""}">${cr>0?(fin?"+":"≈ +")+cr:"0"} cr.</u>`:""}</span>`;};
@@ -6367,19 +6368,21 @@ function rtile(p,D){const c=p.free?null:FIND[p.comp];if(!c)return ntile(p,"done"
     :`<div class="rtc cur"><div class="rtlist">${head}${list}${myPronoSt(p)||`<small class="rtprov">Classement provisoire${hasPot?" · crédits si ça tient":""}</small>`}</div></div>`;
   return rtileWrap(p,c,sp,sub,center);}
 function rtileWrap(p,c,sp,sub,center){const deco="";
-  const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?"Toi":x.name;
-  let g=partyGroup(p);if(!g){try{g=allGroups().find(x=>gSameCrew(x,p))||null;}catch(_){}}
-  let who="";if(g)who=`<span class="rtgrp">👥 ${esc(g.name)}</span>`;else{let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
-    who=`<span class="rtpl"><span class="rtav">${pl.slice(0,4).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)">${im||esc(String(x.name||"?").charAt(0).toUpperCase())}</i>`;}).join("")}</span><span class="rtnm">${esc(pl.map(x=>nm(x)).join(", "))}</span></span>`;}
+  const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||isMeName(x.name)?(myLabel()||x.name):x.name;
+  let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(_){}
+  const avs=`<span class="rtav152">${pl.slice(0,5).map(x=>{const im=bubImg(personOf(p,x));return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)" title="${esc(nm(x))}">${im||esc(String(nm(x)||"?").charAt(0).toUpperCase())}</i>`;}).join("")}${pl.length>5?`<i class="more">+${pl.length-5}</i>`:""}</span>`;
+  let pn="";try{pn=partyHeroName(p);}catch(_){pn=partyLabel(p);}
   /* v136 (proposition A) : une seule carte — bandeau photo du terrain vu d'en haut, classement à même le fond sombre, pied avec l'état de mes pronos */
   let live=false,played="",pill="";
   center=String(center).replace(/<span class="rtst (live|cur)">([^<]*)<\/span>/,(m0,k,tx)=>{if(k==="live")live=true;const mm=tx.match(/(\d+\/\d+ jou\S*)/);if(mm)played=mm[1];const extra=(tx.match(/·\s*(\d+ résultats? attendus?)/)||[])[1];return`<span class="rtst lbl">Classement provisoire${extra?" · "+extra:""}</span>`;});
   center=center.replace(/<span class="rtst fin">[^<]*<\/span>/,'<span class="rtst lbl">Classement</span>');
   center=center.replace(/<span class="(?:rttodo|rtok)[^"]*">[^<]*<\/span>/g,m0=>{pill=m0;return"";});
   const sub2=[sub,played].filter(Boolean).join(" · ");
-  return`<button type="button" class="lrc lrc-${sp} rtile rtA" data-act="party" data-id="${esc(p.id)}"><span class="rtband"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span>${live?'<span class="rtlive">● EN DIRECT</span>':""}<span class="lrtop"><span class="spic${typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id]?" haslg":""}">${typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id]?`<img src="${COMP_LOGO[c.id]}" alt="">`:goldSp(sp,20)}</span><span><b>${esc(c.name)}</b>${(()=>{const cy=c.flag&&!/^(Europe|Monde|International|Angleterre|Espagne|Italie|Allemagne|France|Belgique)$/i.test(c.flag)&&c.flag.length<22&&!String(sub2).includes(c.flag)?c.flag:"";const t=[cy,sub2].filter(Boolean).join(" · ");return t?`<small>${esc(t)}</small>`:"";})()}</span></span></span>
+  const evSmall=(()=>{const cy=c.flag&&!/^(Europe|Monde|International|Angleterre|Espagne|Italie|Allemagne|France|Belgique)$/i.test(c.flag)&&c.flag.length<22&&!String(sub2).includes(c.flag)?c.flag:"";return[cy,sub2].filter(Boolean).join(" · ");})();
+  return`<button type="button" class="lrc lrc-${sp} rtile rtA rt152" data-act="party" data-id="${esc(p.id)}"><span class="rtband"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span>${live?'<span class="rtlive">● EN DIRECT</span>':""}<span class="rtpty"><small>Ta partie</small><span class="rtpc"><b>${esc(pn)}</b>${avs}</span></span></span>
+    <span class="rtev"><span class="spic${typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id]?" haslg":""}">${typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id]?`<img src="${COMP_LOGO[c.id]}" alt="">`:goldSp(sp,18)}</span><span class="rtevt"><b>${esc(c.name)}</b>${evSmall?`<small>${esc(evSmall)}</small>`:""}</span></span>
     <span class="lrbody mh-${sp} rtbody">${deco}${center}</span>
-    <span class="lrfoot rtfoot"><span class="rtfl">${pill}${who}</span><span class="rtright"><span class="lrcta">Voir le détail</span></span></span></button>`;}
+    <span class="lrfoot rtfoot"><span class="rtfl">${pill}</span><span class="rtright"><span class="lrcta">Voir le détail</span></span></span></button>`;}
 function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK.get(p.id),u=k==="pending"?urgMark(p):null,fin=D.sec.done.includes(p),st=!fin&&tileStarted(p);
   let nPl=0;try{nPl=playersOf(p).length;}catch(_){}
   return`<button type="button" class="pcard pc2 ntile pcsu pcsp sp-${sid}${S.justNew&&S.justNew.id===p.id?" pcnew":""}" style="--t1:${tk[0]};--t2:${tk[1]};--tg:${tk[2]}" data-act="party" data-id="${esc(p.id)}"><span class="pcbg pcsart" aria-hidden="true"><span class="pcart sp-${sid} tkart"></span></span>
@@ -7166,6 +7169,45 @@ function pronoBit(b,def,txt){const id=b.id,lab=String(def&&def[1]||""),t=def&&de
 function myPronoLine(p,r){const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),out=[];
   cfg.bets.forEach((b,bi)=>{if(!b.on)return;const v=savedVal(p,r.key+"|"+b.id);if(v==null||v===""||(Array.isArray(v)&&!v.some(Boolean)))return;const def=(BETS[r.cat]||[])[bi];out.push(esc(pronoBit(b,def,String(tnL(r,b.id,Array.isArray(v)?v.filter(Boolean):v)))));});
   return out.length?out.slice(0,3).join(" · ")+(out.length>3?` <span class="muted">· +${out.length-3} autre${out.length-3>1?"s":""}</span>`:""):"";}
+/* v152 : la partie est le centre — un match se déplie DANS sa partie (plus de page « match » à part) */
+function betInline(p,key){const sv={q:S.betQueue,i:S.betIdx,e:S.editKey,pv:S.partyView,mh:S.missHi};
+  try{S.betQueue=[key];S.betIdx=0;S.editKey=null;S.partyView=p.id;S._inl=1;return vBet();}catch(e){try{gErrLog(e,"match déplié");}catch(_){}return`<div class="pad"><p class="muted">Ce match n'a pas pu s'afficher.</p></div>`;}
+  finally{S._inl=0;S.betQueue=sv.q;S.betIdx=sv.i;S.editKey=sv.e;S.partyView=sv.pv;S.missHi=sv.mh;}}
+function mcOpenIn(pid,key){S.mcOpen=Object.assign({},S.mcOpen,{[pid]:key});S.ptv=Object.assign({},S.ptv,{[pid]:"games"});S.ptab="games";S.ptOpen="pt-games";S.orgMode=null;
+  S.kf=Object.assign({},S.kf,{[pid]:"all"});const su=String(key).split("/")[0];S.kj=Object.assign({},S.kj,{[pid+":all"]:su});}
+function mcEl(k){try{return document.querySelector('#app .mc[data-k="'+CSS.escape(k)+'"]');}catch(_){return null;}}
+function mcSafeTop(){try{const v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sat"))||0;return v;}catch(_){return 0;}}
+function mcScrollTo(k,smooth){const e=mcEl(k);if(!e)return false;try{_topUntil=0;}catch(_){}const top=e.getBoundingClientRect().top+window.scrollY-12-mcSafeTop();const rm=matchMedia("(prefers-reduced-motion: reduce)").matches;window.scrollTo({top:Math.max(0,top),behavior:smooth&&!rm?"smooth":"auto"});return true;}
+function mcScrollSoon(k){setTimeout(()=>{mcScrollTo(k,false);mcBarUpd();},90);setTimeout(()=>{const e=mcEl(k);if(e){const t=e.getBoundingClientRect().top;if(t<-4||t>160)mcScrollTo(k,false);}mcBarUpd();},450);}
+function mcGo(pid,key){const p=partyById(pid);if(!p)return;S.fromGroup=false;S.partyView=pid;try{chatSubscribe(p);}catch(_){}try{ensureJoined(p);}catch(_){}S.mailSheet=null;S.emEdit=null;S.myDraft={};S.morphFrom=null;S.retPf=null;S.pay=null;mcOpenIn(pid,key);go("party");mcScrollSoon(key);}
+/* barre collante : le match ouvert reste nommé en haut, « Replier » toujours à portée */
+function mcBarUpd(){let b=document.getElementById("mcbar");const e=S.screen==="party"?document.querySelector("#app .mc.open"):null;
+  if(!e){if(b)b.classList.remove("on");return;}
+  if(!b){b=document.createElement("div");b.id="mcbar";b.setAttribute("role","region");b.setAttribute("aria-label","Match ouvert");document.body.appendChild(b);}
+  const k=e.dataset.k;if(b.dataset.k!==k){const tp=e.querySelector("template.mcmini");b.innerHTML=`<div class="mcbi"><span class="mcbt">${tp?tp.innerHTML:""}</span><button type="button" class="mcbr" data-act="mcTog" data-key="${esc(k)}" data-close="1" data-lf="${esc(e.dataset.blf||"Replier")} ▴" data-ls="${esc(e.dataset.bls||"Replier")} ▴">${esc(e.dataset.blf||"Replier")} ▴</button></div>`;b.dataset.k=k;b.dataset.w="";}
+  {const w=String(Math.round(document.getElementById("app").getBoundingClientRect().width));if(b.dataset.w!==w){b.dataset.w=w;b.style.width=w+"px";mcFit(b);const bt=b.querySelector(".mcbr");b.classList.toggle("lbfull",!!bt&&bt.textContent===bt.dataset.lf&&/–/.test(bt.dataset.lf));}}
+  const ap=document.getElementById("app").getBoundingClientRect();b.style.left=ap.left+"px";b.style.width=ap.width+"px";
+  const hd=e.querySelector(".mch"),r=e.getBoundingClientRect(),hr=hd?hd.getBoundingClientRect():r,bh=b.offsetHeight||52;
+  b.classList.toggle("on",hr.bottom<bh-4&&r.bottom>bh+70);}
+addEventListener("scroll",()=>{try{mcBarUpd();}catch(_){}},{passive:true});addEventListener("resize",()=>{try{mcBarUpd();}catch(_){}});
+function mcFoldLbl(sp,r,sd,short){const t=String((r&&r.title)||"");
+  if(sd){if(short)return"Replier le match";let a=shortSides(r.it)||sd;if(sp==="tennis")a=sd.map(x=>String(x).trim().split(/\s+/).slice(-1)[0]);return"Replier "+a[0]+" – "+a[1];}
+  if(sp==="golf")return short?"Replier la journée":"Replier "+t;
+  if(sp==="f1"){if(short)return"Replier la session";const ty=mcType(sp,r);return ty==="q"?"Replier les qualifs":ty==="r"?"Replier la course":ty==="s"?"Replier le sprint":"Replier la session";}
+  if(sp==="velo"){const m=t.match(/(\d+)/);return short||!m?"Replier l'étape":"Replier l'étape "+m[1];}
+  return"Replier le match";}
+/* le libellé long s'il tient sur une ligne, sinon le court — jamais de « … » */
+function mcFit(root){try{(root||document.getElementById("app")).querySelectorAll("button[data-ls]").forEach(el=>{el.textContent=el.dataset.lf;if(el.scrollWidth>el.clientWidth+1)el.textContent=el.dataset.ls;});}catch(_){}}
+function mcLiveTxt(it,sp){try{if(sp==="tennis"){const T=tnState(it);if(T&&T.live&&T.label)return String(T.label).toUpperCase();return"";}if(estLive(it))return"";const L=LIVE[it.lid]||{};const mn=L.minute||"";return mn||(L.line&&String(L.line).length<=14?L.line:"");}catch(_){return"";}}
+function mcScoreFlash(){try{const M=window._mcSc||(window._mcSc={});document.querySelectorAll("#app .mc.mclv").forEach(card=>{const id=card.dataset.k,sc=card.querySelector(".mcsc");if(!sc)return;
+  const parts=[...sc.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()!=="");const vals=parts.map(n=>n.textContent.trim());const old=M[id];M[id]=vals.join("|");if(!old||old===M[id])return;const ov=old.split("|");
+  parts.forEach((n,i)=>{if(ov[i]!==vals[i]){const sp=document.createElement("span");sp.className="scfl";sp.textContent=n.textContent;n.replaceWith(sp);}});});}catch(_){}}
+function mcType(sp,r){const t=String((r&&r.title)||"");if(sp==="f1")return/qualif/i.test(t)?"q":/sprint/i.test(t)?"s":/course|race|gp/i.test(t)?"r":"p";return"";}
+function mcBand(sp,r,rows){if(!["f1","golf","velo"].includes(sp)&&!(r&&!sides(r.it)))return"";const t=String(r.title||""),ty=mcType(sp,r);
+  let deco="";if(sp==="f1")deco=ty==="r"?`<span class="mcflag" aria-hidden="true"></span>`:ty==="q"||ty==="s"?`<span class="mcchr" aria-hidden="true">⏱</span>`:"";
+  else if(sp==="golf"){const m=t.match(/(\d+)/);deco=`<span class="mcpin" aria-hidden="true">⛳</span>${m?`<span class="mcday">${m[1]}/4</span>`:""}`;}
+  else if(sp==="velo")deco=`<svg class="mcprof" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 52 L30 48 L55 40 L80 44 L105 30 L130 34 L160 14 L185 22 L210 10 L240 28 L265 24 L300 40" fill="none" stroke="rgba(255,240,210,.55)" stroke-width="2.2"/><path d="M0 52 L30 48 L55 40 L80 44 L105 30 L130 34 L160 14 L185 22 L210 10 L240 28 L265 24 L300 40 L300 60 L0 60Z" fill="rgba(255,240,210,.10)"/></svg>`;
+  return`<span class="mcband mb-${sp}${ty?" mt-"+ty:""}" aria-hidden="true"></span>${deco?`<span class="mcdeco">${deco}</span>`:""}`;}
 function myBetsTab(p,sc){
   const me=myId(p);let h="";
   if(p.free){const st0=p.closedAt?"done":"open",fsaved=hasSaved(p,"free"),fedit=st0==="open"&&(!fsaved||S.editKey==="free"),st=fedit?"open":"done";h+=`<div class="list" style="margin-top:12px">`+p.items.map((q,i)=>{const k="q"+i,t=q.type==="choice"?"choice":q.type,v=myVal(p,k);
@@ -7186,6 +7228,7 @@ function myBetsTab(p,sc){
   const items=rows.map(r=>{const st=itemState(p,r),su=subs.find(s=>s.id===r.key.split("/")[0]),res=resultOf(c,su,r.it);
     const kind=st==="open"?(isLater(r.it)?"later":todoK.has(r.key)?"todo":"ready"):st==="done"?(res&&!res.pending?"done":"live"):+r.it.date>+NOW?"locked":"live";
     return{r,st,res,kind};});
+  if(rows.length===1&&!(S.mcOpen&&p.id in S.mcOpen))S.mcOpen=Object.assign({},S.mcOpen,{[p.id]:rows[0].key});
   const ord147=rows.slice().sort((a,b)=>+a.it.date-+b.it.date).map(x=>x.key),num147=k=>`MATCH ${ord147.indexOf(k)+1}/${ord147.length}`;
   const card=({r,st,res,kind})=>{const gain=kind==="done"&&sc.per[r.key]?sc.per[r.key][myId(p)]||0:null,w=kind==="done"?stageWinner(p,r,sc):null;
     const L=r.it.live?(LIVE[r.it.lid]||{}):{};
@@ -7205,7 +7248,7 @@ function myBetsTab(p,sc){
     
     if(own&&c.custom&&!r.it.res)acts.push(`<button type="button" class="mini warn" data-act="cuDelGame" data-key="${esc(r.key)}">${S.delArmG===r.key?"Confirmer la suppression":"Supprimer"}</button>`);
     /* carte de match : l'affiche en grand, l'état en petit, les joueurs en écus dorés */
-    const sd=sides(r.it),sc0=res&&res.sa!=null?res:(kind==="live"&&L.sa!=null?{sa:L.sa,sb:L.sb}:null),d0=new Date(r.it.date);
+    const sd=["velo","f1","golf"].includes(c&&c.sport?c.sport.id:"")?null:sides(r.it),sc0=res&&res.sa!=null?res:(kind==="live"&&L.sa!=null?{sa:L.sa,sb:L.sb}:null),d0=new Date(r.it.date);
     const pr=sd?r.it.label.split(r.it.label.includes(" @ ")?" @ ":" – "):null,nm=k=>{const v=String(pr&&pr.length===2?pr[k]:sd[k]),L=Math.max(...v.split(/\s+/).map(w=>w.length));return`<span style="font-size:${L>10?14:L>8?16:19}px">${esc(v)}</span>`;};
     const vs=sd?`<div class="mcvs"><span class="mcteam"><span class="mccrest">${mark(sd[0])||`<span class="mcini">${esc(String(sd[0]).charAt(0))}</span>`}</span><b>${nm(0)}${kind==="live"&&srvSide(r.it)===0?SRV_BALL:""}</b></span>
       <span class="mcmid">${kind==="live"&&tnMid(r.it)?tnMid(r.it):sc0?`<b class="mcsc">${sc0.sa}<i>–</i>${sc0.sb}</b>${kind==="live"&&L.minute?`<small class="mclive">${esc(L.minute)}</small>`:""}`:`<small>${esc(fmtD(d0))}</small><b class="mctime">${r.it.tbd?"—":esc(fmtT(d0))}</b>`}</span>
@@ -7214,10 +7257,14 @@ function myBetsTab(p,sc){
     const pls=playersOf(p),pk=picksOf(p),pre=r.key+"|";let nOn=0;
     const ecus=pls.length>1?pls.map(x=>{const on=Object.keys(pk[x.id]||{}).some(k=>k.startsWith(pre)&&pk[x.id][k]!=null&&pk[x.id][k]!=="");if(on)nOn++;const ph=bubImg(personOf(p,x));return`<i class="ecu${on?" on":""}${ph?" ph":""}" title="${esc(x.name)}${on?" a parié":" n'a pas encore parié"}">${ph||esc(String(x.name||"?").trim().charAt(0).toUpperCase())}</i>`;}).join(""):"";
     const urg=kind==="todo"?urgTag(closeAt(r.it)):"";
-    return`<div class="mc k-${kind}">${duoBg(sd,(c&&c.sport?c.sport.id:""),"mcb")}<button type="button" class="mch" data-act="betOne" data-key="${esc(r.key)}" aria-label="${esc(r.title)}">
-      <span class="mctop"><span class="mcnum">${num147(r.key)}</span><span class="mcst">${kind==="todo"||kind==="ready"?"":kind==="live"&&lv==="LIVE"?`<span class="mckind mklive">EN DIRECT</span>`:`<span class="mckind">${KIND[kind][1]} ${KIND[kind][0]}</span>`}${urg?`<span class="mcurg">${urg}</span>`:""}${kind==="ready"?`<span class="mckind mkok">✓ Prono fait</span>`:""}</span></span>
+    const OPEN=(S.mcOpen||{})[p.id]===r.key,spid=c&&c.sport?c.sport.id:"";
+    const mini=sd?`<span class="mcmt">${mark(sd[0])||""}<b>${esc((shortSides(r.it)||sd)[0])}</b></span><span class="mcms">${sc0?`${sc0.sa}–${sc0.sb}`:esc(fmtT(d0))}</span><span class="mcmt">${mark(sd[1])||""}<b>${esc((shortSides(r.it)||sd)[1])}</b></span>${kind==="live"&&L.minute?`<small class="mcml">${esc(L.minute)}</small>`:""}`:`<b>${esc(r.title)}</b><small class="mcml">${esc(fmtD(d0))}${r.it.tbd?"":" · "+esc(fmtT(d0))}</small>`;
+    const LV=kind==="live"&&r.it.live&&(()=>{try{return liveSt(r.it)==="LIVE"&&!inGrace(r.it);}catch(_){return false;}})(),lvT=LV?mcLiveTxt(r.it,spid):"";
+    const lf=mcFoldLbl(spid,r,sd,false),ls=mcFoldLbl(spid,r,sd,true);
+    return`<div class="mc k-${kind} mcs-${spid}${OPEN?" open":""}${LV?" mclv":""}" data-k="${esc(r.key)}" data-blf="${esc(lf)}" data-bls="${esc(ls)}">${LV?`<span class="mclband" aria-label="En direct${lvT?" · "+esc(lvT):""}"><i class="lrbdot"></i>EN DIRECT${lvT?` · ${esc(lvT)}`:""}</span>`:""}<template class="mcmini">${mini}</template>${duoBg(sd,spid,"mcb")}${mcBand(spid,r,rows)}<button type="button" class="mch" data-act="mcTog" data-key="${esc(r.key)}" aria-expanded="${OPEN}" aria-label="${esc(r.title)} · ${OPEN?"replier":"voir le détail et les pronos"}">
+      <span class="mctop"><span class="mcnum">${num147(r.key)}</span><span class="mcst">${kind==="todo"||kind==="ready"?"":kind==="live"&&lv==="LIVE"?(r.it.live&&!inGrace(r.it)?"":`<span class="mckind mklive">EN DIRECT</span>`):`<span class="mckind">${KIND[kind][1]} ${KIND[kind][0]}</span>`}${urg?`<span class="mcurg">${urg}</span>`:""}${kind==="ready"?`<span class="mckind mkok">✓ Prono fait</span>`:""}</span></span>
       ${vs}
-      ${kind==="todo"?"":extra}${orgL}</button>${(()=>{/* v147 : en bas, les potes à gauche et Rouvrir / Refermer à droite */const b=reoMid(p,r),e=ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:"";return b||e?`<div class="mcbot">${e||"<span></span>"}${b?`<span class="mcbotr">${b}</span>`:""}</div>`:"";})()}${acts.length?`<div class="mbact">${acts.join("")}</div>`:""}</div>`;};
+      ${kind==="todo"?"":extra}${orgL}</button>${(()=>{/* v147 : en bas, les potes à gauche et Rouvrir / Refermer à droite */const b=reoMid(p,r),e=ecus?`<span class="mcecus" aria-label="${nOn} sur ${pls.length} ont parié">${ecus}<small>${nOn}/${pls.length}</small></span>`:"";if(OPEN)return"";return b||e?`<div class="mcbot">${e||"<span></span>"}${b?`<span class="mcbotr">${b}</span>`:""}</div>`:"";})()}${!OPEN&&acts.length?`<div class="mbact">${acts.join("")}</div>`:""}${OPEN?`<div class="mcfold1"><button type="button" class="mcfb on" data-act="mcTog" data-key="${esc(r.key)}" data-lf="${esc(lf)} ▴" data-ls="${esc(ls)} ▴">${esc(lf)} ▴</button></div><div class="mcx">${betInline(p,r.key)}<div class="mcfold2"><button type="button" class="mcfb" data-act="mcTog" data-key="${esc(r.key)}" data-close="1" data-lf="▴ ${esc(lf)}" data-ls="▴ ${esc(ls)}">▴ ${esc(lf)}</button></div></div>`:`<div class="mcfold0"><button type="button" class="mcfb" data-act="mcTog" data-key="${esc(r.key)}">Voir les pronos ▾</button></div>`}</div>`;};
   /* filtres : À faire (paris ouverts) · En cours (commencés ou fermés) · Terminés · Tous */
   const FILT={edit:["todo","ready"],done:["live","wait","locked","done"]}; /* 2 filtres seulement : on parie (En attente) ou on regarde le résultat (Terminés) */ /* un prono fait quitte « À faire » : il attend son résultat dans « En cours » */
   const SECT=[["todo","Pronos en attente"],["ready","Pronos faits · encore modifiables"],["later","À venir"],["live","En cours"],["locked","Paris fermés"],["done","Terminés"]];
@@ -7329,7 +7376,7 @@ function chatBar0(p,title){if(!p)return"";try{chatSubscribe(p);}catch(_){}const 
 /* v139 : chat DANS l'encart — onglet vertical C/H/A/T sur toute la hauteur du bord droit ; ouvert = panneau qui glisse et couvre ~84 % de l'encart */
 /* v140 : un contexte (match) peut ouvrir le chat de la partie ; l'ouverture ne concerne que l'encart d'où on l'a ouvert */
 function mpParties(p,r){try{return(S.parties||[]).filter(q=>q&&!q.free&&!q.demo&&q.comp===p.comp&&rowsOfParty(q).some(x=>x.key===r.key));}catch(_){return[];}}
-function mpSelHTML(p,r){const L=mpParties(p,r);if(L.length<2)return"";return`<div class="pad mpselw"><p class="mpselt">Ce match est dans ${L.length} parties :</p><div class="lrpsel" role="group" aria-label="Partie">${L.map(q=>`<button type="button" class="lrpb${q.id===p.id?" on":""}" aria-pressed="${q.id===p.id}" data-act="mpSel" data-id="${esc(q.id)}" data-key="${esc(r.key)}">${esc(partyLabel(q))}</button>`).join("")}</div></div>`;}
+function mpSelHTML(p,r){if(S._inl)return"";const L=mpParties(p,r);if(L.length<2)return"";return`<div class="pad mpselw"><p class="mpselt">Ce match est dans ${L.length} parties :</p><div class="lrpsel" role="group" aria-label="Partie">${L.map(q=>`<button type="button" class="lrpb${q.id===p.id?" on":""}" aria-pressed="${q.id===p.id}" data-act="mpSel" data-id="${esc(q.id)}" data-key="${esc(r.key)}">${esc(partyLabel(q))}</button>`).join("")}</div></div>`;}
 function ctxLabel(sp,it,title){try{const sd=sides(it),sh=n=>{n=String(n||"").replace(/^(Pays de|République de|République|Îles?)\s+/i,"").trim();const w=n.split(/\s+/);return sp==="tennis"?w[w.length-1]:n;};return(SPEM[sp]||"")+" "+(sd?sh(sd[0])+"–"+sh(sd[1]):(title||it.label||""));}catch(_){return title||"";}}
 function heroChat(p,ctx){try{chatSubscribe(p);}catch(_){}const ck=ctx?ctx.k:"",op=S.chatOpen===p.id&&(S.chatCtx||"")===ck,n=op?0:chatUnread(p),tt=p.isGroupChat?"Chat du groupe":"Chat de la partie",id=esc(p.id),cx=ctx?` data-ctx="${esc(ctx.k)}" data-lbl="${esc(ctx.label)}"`:"";
   if(!op)return`<button type="button" class="hctab${n?" hot":""}${S.hcAnimC&&Date.now()-S.hcAnimC<500&&S.hcAnimK===p.id+"|"+ck?" hcback":""}" data-act="chatTog" data-id="${id}"${cx} aria-expanded="false" aria-label="Ouvrir le ${tt.toLowerCase()}${n?" · "+n+" non lu"+(n>1?"s":""):""}"><span class="hcbub" aria-hidden="true">💬${n?`<i class="hcdot">${n>9?"9+":n}</i>`:""}</span><span class="hclet" aria-hidden="true"><b>C</b><b>H</b><b>A</b><b>T</b></span></button>`;
@@ -7459,7 +7506,7 @@ function tnGrid(sd,line,live){const t=String(line||"").split("·")[0].replace(/\
   const ln=n=>{const w=String(n).trim().split(/\s+/);return w[w.length-1];};
   const cell=(k,side)=>{const s=sets[k],cur=live&&k===sets.length-1,won=!cur&&s[side]>s[1-side];return`<td class="${won?"w":""}${cur?" cur":""}">${s[side]}</td>`;};
   return`<table class="tngrid"><thead><tr><th></th>${sets.map((_,k)=>`<th>${live&&k===sets.length-1?(k===0?"1er set":(k+1)+"e set")+" ●":"Set "+(k+1)}</th>`).join("")}</tr></thead><tbody>${[0,1].map(side=>`<tr><th>${esc(ln(sd[side]))}</th>${sets.map((_,k)=>cell(k,side)).join("")}</tr>`).join("")}</tbody></table>`;}
-function matchHero(c,it,res,chipTxt,title,extra){const sp=c.sport.id,sd=sides(it),os=c.custom?null:sd?oddsOf(sp,it,sd):(Object.entries(oddsMap(c,it)).sort((a,b)=>a[1]-b[1]).slice(0,4).map(([n,o])=>["",n,o.toFixed(2)])),win=res&&res.ans?(res.ans.win||res.ans.res||res.ans.pole||res.ans.lead):null,isW=n=>win&&(Array.isArray(win)?win.includes(n):win===n);
+function matchHero(c,it,res,chipTxt,title,extra){if(S._inl)return"";const sp=c.sport.id,sd=sides(it),os=c.custom?null:sd?oddsOf(sp,it,sd):(Object.entries(oddsMap(c,it)).sort((a,b)=>a[1]-b[1]).slice(0,4).map(([n,o])=>["",n,o.toFixed(2)])),win=res&&res.ans?(res.ans.win||res.ans.res||res.ans.pole||res.ans.lead):null,isW=n=>win&&(Array.isArray(win)?win.includes(n):win===n);
   const LL=it.live?(LIVE[it.lid]||{}):{},onAir=it.live&&liveSt(it)==="LIVE";
   /* v58 : cote discrète sous le nom (N = match nul, sous le score) */
   const odd=n=>{if(!os||!os.length||!sd)return"";const o=n==="N"?os.find(x=>x[0]==="N"):os.find(x=>x[1]===n)||os.find(x=>lvSame(x[1],n));return o?`<small class="mhod">${n==="N"?"nul ":"cote "}${o[2]}</small>`:"";};
@@ -7663,7 +7710,7 @@ function projLine(p,r){let sc=null;try{sc=scoreProv(Object.assign({},p,{players:
   const rk=id=>1+R.filter(x=>x.pts>(R.find(y=>y.id===id)||{pts:0}).pts).length,mine=R.find(x=>x.id===me);
   const nm=x=>{let n=x.name;if(!n||/^toi$/i.test(n)){const pl=rawPlayers(p).find(y=>y.id===x.id);n=pl&&pl.name&&!/^toi$/i.test(pl.name)?pl.name:(x.id===me?(myLabel()||"?"):"?");}return esc(n);};
   return`<div class="pad" style="margin-top:12px"><div class="card projc"><div class="projh">🔮 Si ça finit comme ça${r?" · sur ce match":""}</div>${mine?`<div class="projme">Tu serais <b>${rk(me)}${rk(me)>1?"e":"er"}</b> avec <b>${mine.pts} pts</b></div>`:""}<div class="projl">${R.slice(0,5).map(x=>`<span class="${x.id===me?"me":""}"><i>${rk(x.id)}</i>${nm(x)}<b>${x.pts}</b></span>`).join("")}</div></div></div>`;}
-function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div><button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button></div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
+function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Match non joué",r.title);if(c.custom&&orgOn(p))h+=cuEditor(p,r);return h+`<div class="pad" style="margin-top:12px"><div class="kempty">⏸️ Ce match n'a pas eu lieu (annulé ou reporté). Aucun point n'a été distribué, les pronos ne comptent pas.</div>${S._inl?"":`<button type="button" class="btn block" style="margin-top:12px" data-act="back">Retour</button>`}</div>`;}const sp=c.sport,me=myId(p),R=itemRecap(p,r,res,cfg),mv=rankMove(p,r),sd=sides(r.it);
   const mine=R.board.find(x=>x.pl.id===me);let place=1;const ranks=R.board.map((x,i)=>{if(i&&x.pts<R.board[i-1].pts)place=i+1;return place;});const myPlace=ranks[R.board.indexOf(mine)];
   const arrow=m=>m>0?`<span class="mvup">▲${m}</span>`:m<0?`<span class="mvdn">▼${-m}</span>`:`<span class="mveq">=</span>`;
   let h=matchHero(c,r.it,res,"🏁 Récap des points",r.title);h+=mpSelHTML(p,r);
@@ -7677,20 +7724,21 @@ function vRecap(p,r,res,cfg,c){if(res&&res.void){let h=matchHero(c,r.it,res,"Mat
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">${(x=>x==="velo"?"Les points de l'étape":x==="f1"?"Les points de la session":x==="golf"?"Les points du tour":"Les points du match")(c.sport.id)}</h3><div class="card" style="padding:4px 14px">${R.board.map((x,i)=>`<div class="br simple${x.pl.id===me?" me":""}"><span class="rk">${x.pts?ranks[i]:"–"}</span><span class="nm">${esc(x.pl.name&&!/^toi$/i.test(x.pl.name)?x.pl.name:(x.pl.id===me?(myLabel()||x.pl.name):x.pl.name))}</span><span class="pt" style="color:${x.pts?"var(--lime)":"var(--muted)"}">+${x.pts}<small>pts</small></span></div>`).join("")}</div></div>`;
   h+=`<div class="pad" style="margin-top:14px"><h3 class="rch">Question par question</h3>${R.qs.map(q=>`<div class="card rcq bl8">${bl8Head(q.label,q.truth==null?'<em class="rcnow wait">Pas encore relevé</em>':`<em class="rcnow fin"><small>Bonne réponse :</small> ${esc(Array.isArray(q.truth)?q.truth.join(", "):tnL(q.row,q.bid,q.truth))}</em>`,q.w?q.pts+" pts × cote":q.pts+" pts")}
     ${q.picks.slice().sort((A,B)=>(B.pl.id===me)-(A.pl.id===me)).map(x=>{const has=x.v!=null&&x.v!=="";return bl8Row({me:x.pl.id===me,name:bl8Name(p,x.pl),ph:bubImg(personOf(p,x.pl)),pick:has?(q.t==="choice"?mark(x.v):"")+esc(tnL(q.row,q.bid,x.v))+chgMark(p,x.pl.id,q.row.key+"|"+q.bid):"",st:q.truth==null||!has?"":x.won?"win":"lose",pts:x.won,odd:x.odd&&has?x.odd:null});}).join("")}</div>`).join("")}
-        <div style="margin-top:10px"><button type="button" class="btn block" data-act="back">Retour</button></div></div>`;
+        ${S._inl?"":`<div style="margin-top:10px"><button type="button" class="btn block" data-act="back">Retour</button></div>`}</div>`;
   return h;}
 function vBet(){
   const p=partyById(S.partyView);if(!p)return vParties();const q=S.betQueue||[];const key=q[S.betIdx||0];const c=FIND[p.comp],sp=c.sport;
   const r=rowsOfParty(p).find(x=>x.key===key);
   if(!r){return`<div class="night"><div class="hero" style="background:transparent;min-height:0"><div class="bar">${backBtn}<span class="chip">Parier</span></div><h1 class="disp">C'est fait !</h1><p class="muted">Tous tes pronos sont enregistrés.</p></div></div><div class="pad"><button type="button" class="btn block" data-act="back">Retour à la partie</button></div>`;}
-  const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),i=S.betIdx||0,sd=sides(r.it);const st=itemState(p,r),locked=st!=="open",one=q.length===1,saved=hasSaved(p,r.key),editing=!locked&&(!saved||S.editKey===r.key),ro=locked||!editing,dirty=draftDirty(p,r.key),subs=subsOf(c),su=subs.find(x=>x.id===r.key.split("/")[0]),res=resultOf(c,su,r.it),sc=scoreParty(Object.assign({},p,{players:playersOf(p)})),gain=res&&sc.per[r.key]?sc.per[r.key][myId(p)]||0:null;
+  const cfg=normCfg(effCfg(p,r)||defaultCfg(r.cat,"C"),r.cat),i=S.betIdx||0,sd=sides(r.it);const st=itemState(p,r),locked=st!=="open",one=q.length===1,saved=hasSaved(p,r.key),editing=!S._inl&&!locked&&(!saved||S.editKey===r.key),ro=locked||!editing,dirty=draftDirty(p,r.key),subs=subsOf(c),su=subs.find(x=>x.id===r.key.split("/")[0]),res=resultOf(c,su,r.it),sc=scoreParty(Object.assign({},p,{players:playersOf(p)})),gain=res&&sc.per[r.key]?sc.per[r.key][myId(p)]||0:null;
+  if(!S._inl&&locked){try{const st0=S.stack[S.stack.length-1];if(st0&&st0.screen==="party")S.stack.pop();}catch(_){}S.screen="party";S.betQueue=[];S.editKey=null;mcOpenIn(p.id,key);mcScrollSoon(key);return vParty();}
   if(st==="done"&&res&&!res.pending&&one)return vRecap(p,r,res,cfg,c);
   /* v134 : les réponses manquantes restent entourées dès qu'on a commencé */
   const MISS=editing?missKeysOf(p,r.key):[],NEED=editing?needKeys(p,r.key).length:0;if(editing&&MISS.length&&NEED-MISS.length>0)S.missHi=MISS;else if(editing&&!MISS.length)S.missHi=null;
   let h=matchHero(c,r.it,res,one?(locked?(st==="done"?"Terminé":(r.it.live&&liveSt(r.it)==="LIVE")?"● En direct":"🔒 Paris fermés"):"Mon prono"):"Pronos "+(i+1)+" / "+q.length,r.title,one?"":`<div class="wprog" style="margin-top:12px"><i style="width:${Math.round((i+1)/q.length*100)}%"></i></div>`);
   const onAir=r.it.live&&liveSt(r.it)==="LIVE";
   /* v43 : qui a déjà joué ce match (photos), sans dévoiler les pronos avant le coup d'envoi */
-  h+=mpSelHTML(p,r);{const b=reoMid(p,r,"",mpParties(p,r).length>1?partyLabel(p):"");if(b)h+=`<div class="pad reorow rmatch">${b}</div>`;}{/* v147 : historique masqué pendant le match, visible une fois terminé */const inProg147=onAir||(st!=="done"&&+r.it.date<=+NOW&&!(res&&!res.pending));if(!inProg147)h+=rlogFold(p,r.key);}
+  h+=mpSelHTML(p,r);{const b=reoMid(p,r,"",!S._inl&&mpParties(p,r).length>1?partyLabel(p):"");if(b)h+=`<div class="pad reorow rmatch">${b}</div>`;}{/* v147 : historique masqué pendant le match, visible une fois terminé */const inProg147=onAir||(st!=="done"&&+r.it.date<=+NOW&&!(res&&!res.pending));if(!inProg147)h+=rlogFold(p,r.key);}
   try{if(!p.free&&rawPlayers(p).length>1){const pk=picksOf(p),me=myId(p);const L=playersOf(p).map(x=>{const o=pk[x.id]||{},done=Object.keys(o).some(k=>k.startsWith(r.key+"|")&&o[k]!=null&&o[k]!=="");return{pr:personOf(p,x),name:x.name,st:done?"in":"wait"};});
     h+=`<div class="pad" style="margin-top:12px"><div class="card ptacc whop">${bubRow(L,"ont joué ce match")}</div></div>`;}}catch(_){}
   if(c.custom&&orgOn(p))h+=cuEditor(p,r);
@@ -7700,11 +7748,11 @@ function vBet(){
   if(locked&&st!=="done"){const pls=playersOf(p),pk=picksOf(p);const qs=cfg.bets.map((b,bi)=>b.on?[b,BETS[r.cat][bi]]:null).filter(Boolean).filter(([b,d])=>d[2]!=="text");
     if(onAir)h+=projLine(p,r);
     const others=pls.filter(pl=>pl.id===myId(p)).concat(pls.filter(pl=>pl.id!==myId(p)));if(others.length>1){allIn147=true;}if(others.length>1)h+=`<div class="pad" style="margin-top:12px"><h3 class="rch">Les pronos de tes potes</h3>${qs.map(([b,d])=>`<div class="card rcq bl8">${bl8Head(d[1],rcNow(c,r,b,d),ODD_BETS.has(b.id)&&!c.custom?b.pts+" pts × cote":b.pts+" pts")}${others.map(pl=>{const v=(pk[pl.id]||{})[r.key+"|"+b.id],has=v!=null&&v!=="";const od=has&&d[2]==="choice"?oddFor(c,r.it,b.id,v):null;return bl8Row({me:pl.id===myId(p),name:bl8Name(p,pl),ph:bubImg(personOf(p,pl)),pick:has?(d[2]==="choice"?mark(v):"")+esc(tnL(r,b.id,v))+chgMark(p,pl.id,r.key+"|"+b.id):"",st:onAir&&has?liveVerdict(c,r,b,d[2],v):"",odd:od});}).join("")}</div>`).join("")}</div>`;}
-  let qn=0;h+=`<div class="pad" style="margin-top:12px">${locked&&!allIn147?`<h3 class="rch">Mes pronos</h3>`:""}<div class="qlist"${allIn147?' hidden style="display:none"':""}>${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
+  let qn=0;h+=`<div class="pad" style="margin-top:12px">${(locked&&!allIn147)||(S._inl&&!locked&&saved)?`<h3 class="rch">Mes pronos</h3>`:""}<div class="qlist"${allIn147||(S._inl&&!locked&&!saved)?' hidden style="display:none"':""}>${cfg.bets.map((b,bi)=>{if(!b.on)return"";const[,label,t]=BETS[r.cat][bi];const mv=myVal(p,r.key+"|"+b.id),has=mv!=null;const truth=res&&res.ans?res.ans[b.id]:undefined,good=truth!=null&&has&&betGood(t,truth,mv);
      if(locked&&t==="text"&&!has)return"";
      qn++;return`<section class="qcard${has?" has":""}${!has&&(S.missHi||[]).includes(r.key+"|"+b.id)?" miss":""}"><header class="qh"><span class="qn">${has&&!locked?"✓":qn}</span><span class="ql"><b>${esc(label)}</b>${has?`<small class="qodd">${(()=>{if(Array.isArray(mv)){const fo=myVal(p,r.key+"|"+b.id+"@odd");const l=mv.map(x=>{const o=fixedOdd(fo,x)||oddFor(c,r.it,"top10",x);return o?esc(x.split(" ").slice(-1)[0])+" "+ptsW(c,r.it,b,x,o)+" pts":"";}).filter(Boolean);return l.length?"Si T10 : "+l.join(", "):"";}const od=fixedOdd(myVal(p,r.key+"|"+b.id+"@odd"),mv)||oddFor(c,r.it,b.id,mv);return od?`Cote ${od.toFixed(2)} → <em>${ptsW(c,r.it,b,mv,od)} pts</em> si gagné`:"";})()}</small>`:`<small class="qto">À choisir</small>`}${truth!=null?`<small>Réponse : ${esc(Array.isArray(truth)?truth.join(", "):tnL(r,b.id,truth))} ${good?"✓":"✗"}</small>`:""}</span><span class="qp">${ODD_BETS.has(b.id)&&!c.custom?`${b.pts} pt${b.pts>1?"s":""} × cote`:`${b.pts} pt${b.pts>1?"s":""}`}</span></header>${betInput(p,r,b,t,label,ro)}</section>`;}).join("")}</div>
-    ${locked?"":saved&&!editing?`<div class="vstate ok">✓ <span><b>Ton prono est validé</b> Tu peux le modifier jusqu'au coup d'envoi.</span></div>`:saved?`<div class="vstate edit">✏️ <span><b>Ton prono actuel est coché</b> Change ce que tu veux : rien n'est modifié tant que tu ne confirmes pas.</span></div>`:`<div class="vstate todo">✏️ <span><b>Pas encore validé</b> Fais tes choix puis valide ton prono.</span></div>`}
-    ${(()=>{const last=i+1>=q.length;
+    ${locked||S._inl?"":saved&&!editing?`<div class="vstate ok">✓ <span><b>Ton prono est validé</b> Tu peux le modifier jusqu'au coup d'envoi.</span></div>`:saved?`<div class="vstate edit">✏️ <span><b>Ton prono actuel est coché</b> Change ce que tu veux : rien n'est modifié tant que tu ne confirmes pas.</span></div>`:`<div class="vstate todo">✏️ <span><b>Pas encore validé</b> Fais tes choix puis valide ton prono.</span></div>`}
+    ${(()=>{if(S._inl){if(locked||isLater(r.it))return"";return`<div class="mcxgo"><button type="button" class="btn block bigact ${saved?"green":"orange"}" data-act="betOne" data-key="${esc(r.key)}">${saved?"Modifier mon prono":"Faire mon prono"}</button></div>`;}const last=i+1>=q.length;
       if(locked)return one?`<div style="margin-top:14px"><button type="button" class="btn block" data-act="back">Retour</button></div>`:`<div class="wnav">${i>0?`<button type="button" class="btn ghost" data-act="betPrev">← Précédent</button>`:"<span></span>"}<button type="button" class="btn" data-act="betNext">${last?"Terminer ✓":"Suivant →"}</button></div>`;
       const vLabel=saved?"Je valide la modification":"Je valide mon prono";
       let b="";
@@ -8338,7 +8386,7 @@ document.addEventListener("click",e=>{
       if(window._tkF)break;if(!(tk&&!rm&&S.screen==="parties"&&!tk.classList.contains("tkrip")&&tkFlip146(tk)))go("lives");break;}
     case "lockQuick":{const p=partyById(t.dataset.id);if(!p)break;S.partyView=p.id;p.state=Object.assign({},p.state,{[t.dataset.key]:"closed"});{const r=rowsOfParty(p).find(x=>x.key===t.dataset.key);rlogAdd(p,t.dataset.key,r,"close");reoCloseNtf(p,r);}savePartyDoc(p,"Paris refermés");break;}
     case "mpSel":{const id=t.dataset.id;if(!partyById(id))break;if(S.chatOpen&&S.chatCtx==="m:"+t.dataset.key){S.chatOpen=id;S.chatPid=id;S.hcAnim=0;}S.partyView=id;S.editKey=null;S.myDraft={};S.missHi=null;render();break;}
-    case "lrPick146":{const k=t.dataset.k,A=liveMatches(),id="lr-"+k.replace(/[^\w-]/g,"_");const e0=document.getElementById(id),y0=e0?e0.getBoundingClientRect().top:null;const prevSel=(S.lrSel||{})[k];
+    case "lrPick146":{{const A0=liveMatches(),m0=A0.find(x=>x.k===t.dataset.k),row=m0&&m0.rows.find(x=>x.p.id===t.dataset.p);if(row&&row.r){mcGo(row.p.id,row.r.key);break;}}const k=t.dataset.k,A=liveMatches(),id="lr-"+k.replace(/[^\w-]/g,"_");const e0=document.getElementById(id),y0=e0?e0.getBoundingClientRect().top:null;const prevSel=(S.lrSel||{})[k];
       S.lrSel=S.lrSel||{};S.lrSel[k]=t.dataset.p;if(S.chatOpen&&S.chatCtx==="lr:"+k){S.chatOpen=t.dataset.p;S.chatPid=t.dataset.p;S.hcAnim=0;try{chatSeen(t.dataset.p,Date.now());}catch(_){}}
       const wasOpen=lrIsOpen(A.length,k),m0=A.find(x=>x.k===k),cur=m0?(m0.rows.find(x=>x.p.id===prevSel)||m0.rows[0]).p.id:null,same=wasOpen&&cur===t.dataset.p;
       S.lrSel=S.lrSel||{};S.lrSel[k]=t.dataset.p;S.lrOpen={};A.forEach(m=>{S.lrOpen[m.k]=false;});S.lrOpen[k]=!same;render();
@@ -8351,7 +8399,7 @@ document.addEventListener("click",e=>{
         (document.querySelector("#app")||document.body).appendChild(f);try{f.click();}finally{f.remove();delete S.lrFlip146[fk];}
         if(S.screen==="lives"){render();if(Math.abs(window.scrollY-y)>1)window.scrollTo(0,y);}},rm?0:460);break;}
     case "lrPick":{S.lrSel=S.lrSel||{};S.lrSel[t.dataset.k]=t.dataset.p;if(S.chatOpen&&S.chatCtx==="lr:"+t.dataset.k){S.chatOpen=t.dataset.p;S.chatPid=t.dataset.p;S.hcAnim=0;chatSeen(t.dataset.p,Date.now());}render();break;}
-    case "lrTog":{const k=t.dataset.k,A=liveMatches(),was=lrIsOpen(A.length,k),id="lr-"+k.replace(/[^\w-]/g,"_");const e0=document.getElementById(id),y0=e0?e0.getBoundingClientRect().top:null;
+    case "lrTog":{{const A0=liveMatches(),m0=A0.find(x=>x.k===t.dataset.k);if(m0&&m0.rows.length===1&&m0.rows[0].r){mcGo(m0.rows[0].p.id,m0.rows[0].r.key);break;}}const k=t.dataset.k,A=liveMatches(),was=lrIsOpen(A.length,k),id="lr-"+k.replace(/[^\w-]/g,"_");const e0=document.getElementById(id),y0=e0?e0.getBoundingClientRect().top:null;
       if(!was){const mm=A.find(x=>x.k===k);if(mm&&mm.rows.length>1){const ch=document.querySelector("#"+id+" .lrp148");if(ch){ch.classList.remove("pulse");void ch.offsetWidth;ch.classList.add("pulse");}break;}}S.lrOpen={};A.forEach(m=>{S.lrOpen[m.k]=false;});S.lrOpen[k]=!was;if(!was){const m0=A.find(x=>x.k===k);if(m0&&m0.rows[0]){S.lrSel=S.lrSel||{};S.lrSel[k]=m0.rows[0].p.id;}}render();
       const e1=document.getElementById(id);if(e1&&y0!=null){const d=e1.getBoundingClientRect().top-y0;if(Math.abs(d)>1)window.scrollBy(0,d);}lrScrollTop(id,!was);break;}
     case "lrFold":{const k=t.dataset.k,id="lr-"+k.replace(/[^\w-]/g,"_");S.lrOpen=Object.assign({},S.lrOpen,{[k]:false});render();
@@ -8439,9 +8487,14 @@ document.addEventListener("click",e=>{
     case "kmore":S.kmore=Object.assign({},S.kmore,{[t.dataset.k]:1});render();break;
     case "kj":{S.kj=Object.assign({},S.kj,{[t.dataset.k]:t.dataset.v});render();requestAnimationFrame(()=>{const b=document.querySelector(".kj.on");if(b)b.scrollIntoView({inline:"center",block:"nearest"});});break;}
 case "kf":{const p=partyById(S.partyView),k=t.dataset.k,cur=(S.kf||{})[p.id];S.kf=Object.assign({},S.kf,{[p.id]:cur===k?"all":k});render();break;}
-    case "betOne":S.myDraft={};S.editKey=t.dataset.key;S.missHi=null;S.betQueue=[t.dataset.key];S.betIdx=0;go("bet");break;
+    case "mcTog":{const p=partyById(S.partyView);if(!p)break;const k=t.dataset.key,cur=(S.mcOpen||{})[p.id],close=cur===k;
+      S.mcOpen=Object.assign({},S.mcOpen,{[p.id]:close?null:k});const fromBar=!!t.closest("#mcbar");const e0=mcEl(k),y0=e0?e0.getBoundingClientRect().top:null;
+      render();if(close){const e1=mcEl(k);if(e1){const tp=e1.getBoundingClientRect().top;if(fromBar||t.dataset.close||tp<0||tp>window.innerHeight*.6)mcScrollTo(k,true);}}
+      else{const e1=mcEl(k);if(e1&&y0!=null){const d=e1.getBoundingClientRect().top-y0;if(Math.abs(d)>1)window.scrollBy(0,d);}mcScrollTo(k,true);}
+      setTimeout(mcBarUpd,30);setTimeout(mcBarUpd,450);break;}
+    case "betOne":S.mcOpen=Object.assign({},S.mcOpen,{[S.partyView]:t.dataset.key});S._mcRet=t.dataset.key;S.myDraft={};S.editKey=t.dataset.key;S.missHi=null;S.betQueue=[t.dataset.key];S.betIdx=0;go("bet");break;
     case "betKeep":{discardDraft(curBetKey());S.editKey=null;S.missHi=null;S.myDraft={};const q=S.betQueue||[];if((S.betIdx||0)+1<q.length){S.betIdx++;S.editKey=q[S.betIdx];render();window.scrollTo(0,0);}else{S.ptab="games";back();}break;}
-    case "betValidate":{const p=partyById(S.partyView),k=curBetKey();if(!commitPick(p,k))break;const q=S.betQueue||[];if((S.betIdx||0)+1<q.length){S.betIdx++;S.myDraft={};render();window.scrollTo(0,0);}else{S.ptab="games";S.myDraft={};back();}break;}
+    case "betValidate":{const p=partyById(S.partyView),k=curBetKey();if(!commitPick(p,k))break;const q=S.betQueue||[];if((S.betIdx||0)+1<q.length){S.betIdx++;S.myDraft={};render();window.scrollTo(0,0);}else{S.ptab="games";S.myDraft={};S.mcOpen=Object.assign({},S.mcOpen,{[p.id]:k});back();mcScrollSoon(k);}break;}
     case "betEdit":{S.editKey=curBetKey();S.myDraft={};render();break;}
     case "betCancel":{discardDraft(curBetKey());toast("Modification annulée");render();break;}
     case "leaveStay":S.leaveAsk=null;render();break;
@@ -8817,6 +8870,7 @@ function lrScoreFlash(){try{const M=window._lrSc||(window._lrSc={});document.que
   const parts=[...sc.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim()!=="");const vals=parts.map(n=>n.textContent.trim());const old=M[id];M[id]=vals.join("|");if(!old||old===M[id])return;const ov=old.split("|");
   parts.forEach((n,i)=>{if(ov[i]!==vals[i]){const sp=document.createElement("span");sp.className="scfl";sp.textContent=n.textContent;n.replaceWith(sp);}});});}catch(_){}}
 render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="lives")lrScoreFlash();}catch(_){}return r;};})(render);
+render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="party"){mcFit();mcScoreFlash();if(S._mcRet){const k=S._mcRet;S._mcRet=null;mcScrollSoon(k);}}mcBarUpd();}catch(_){}return r;};})(render);
 /* v148 : pastilles de choix de partie — toutes à la largeur de la plus large (plafonnée à 80 %) */
 function lrPillW(){try{document.querySelectorAll("#app .lrp148").forEach(f=>{const B=[...f.querySelectorAll(".lp148")];if(B.length<2)return;f.style.removeProperty("--lpw");const w=Math.max(...B.map(b=>b.getBoundingClientRect().width));f.style.setProperty("--lpw",Math.ceil(w)+"px");});}catch(_){}}
 render=(function(o){return function(){const r=o.apply(this,arguments);try{if(S.screen==="lives")requestAnimationFrame(lrPillW);}catch(_){}return r;};})(render);
@@ -9887,5 +9941,100 @@ html body #app .hero.hcon>.hctab{border-left:1px solid rgba(233,199,122,.85)!imp
 html body #app .lrc .lrhcw>.hctab{border-radius:0!important}
 /* v151 · chat ouvert : l'en-tête (et la croix ✕) ne passent plus sous la barre d'état de l'iPhone */
 html body #app .hero.hcon>.hcpanel{padding-top:calc(env(safe-area-inset-top,0px) + 56px)!important}
+
+/* ===== v152 : la partie est le centre, le match se déplie dedans ===== */
+/* — cartes de match : bandeau visuel en haut, fondu vers le corps sombre — */
+html body #app .mc{background:linear-gradient(180deg,#1b140c 0%,#120d08 55%,#0e0a06 100%)!important;isolation:isolate}
+html body #app .mc>.mhbg.mcb{opacity:.78!important;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.35) 62%,transparent 86%);mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.35) 62%,transparent 86%)}
+html body #app .mc>.mhbg.mcb::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 42%,rgba(8,5,3,.55),transparent 75%),linear-gradient(180deg,rgba(8,5,3,.25),rgba(8,5,3,.1) 40%,transparent)}
+html body #app .mc>.mch,html body #app .mc>.mcbot,html body #app .mc>.mbact,html body #app .mc>[class^="mcfold"],html body #app .mc>.mcx{position:relative;z-index:2}
+html body #app .mc .mcteam b{text-shadow:0 2px 8px rgba(0,0,0,.85)}
+html body #app .mc .mcsc,html body #app .mc .mctime{text-shadow:0 2px 10px rgba(0,0,0,.8)}
+html body #app .mc>.mcband{position:absolute;left:0;right:0;top:0;height:150px;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.95;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 35%,rgba(0,0,0,.4) 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 35%,rgba(0,0,0,.4) 70%,transparent 100%)}
+html body #app .mc>.mcband::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,7,4,.78) 0%,rgba(10,7,4,.35) 55%,rgba(10,7,4,.15) 100%)}
+html body #app .mc>.mcband.mb-f1{background-image:var(--ph-f1_top)}
+html body #app .mc>.mcband.mb-golf{background-image:var(--ph-golf_top)}
+html body #app .mc>.mcband.mb-velo{background-image:var(--ph-velo_top)}
+html body #app .mc>.mcband:not(.mb-f1):not(.mb-golf):not(.mb-velo){background-image:radial-gradient(90% 80% at 85% 0%,rgba(242,210,138,.35),transparent 60%),linear-gradient(160deg,#4a3518,#17110a)}
+html body #app .mc>.mcband.mt-q{box-shadow:inset 0 3px 0 #A35BFF}
+html body #app .mc>.mcband.mt-r{box-shadow:inset 0 3px 0 #F2D28A}
+html body #app .mc>.mcdeco{position:absolute;right:14px;top:46px;z-index:1;display:flex;align-items:center;gap:8px;pointer-events:none}
+html body #app .mc .mcflag{display:block;width:84px;height:20px;border-radius:3px;background:conic-gradient(#f4f1ea 25%,#141414 0 50%,#f4f1ea 0 75%,#141414 0) 0 0/10px 10px;transform:skewX(-14deg);box-shadow:0 3px 10px rgba(0,0,0,.55);opacity:.92}
+html body #app .mc .mcchr{font-size:24px;line-height:1;filter:drop-shadow(0 0 8px rgba(163,91,255,.9))}
+html body #app .mc.mcs-f1 .mcband.mt-q~.mch .mcsolo b{color:#E4CCFF}
+html body #app .mc .mcpin{font-size:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
+html body #app .mc .mcday{font-size:11px;font-weight:900;letter-spacing:.1em;color:#1a1208;background:linear-gradient(180deg,#F2D28A,#C79A45);padding:4px 8px;border-radius:999px}
+html body #app .mc.mcs-velo>.mcdeco{left:0;right:0;top:58px;height:62px}
+html body #app .mc .mcprof{display:block;width:100%;height:62px}
+html body #app .mc .mcsolo{margin:16px 0 12px!important}
+html body #app .mc .mcsolo b{font-size:28px!important;color:#FFF3D6;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+html body #app .mc .mcsolo small{color:#F1E6D2!important;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+/* — dépliage — */
+html body #app .mc [class^="mcfold"]{display:flex;justify-content:center}
+html body #app .mc .mcfold0{padding:2px 14px 14px}
+html body #app .mc .mcfold1{padding:0 14px 12px}
+html body #app .mc .mcfold2{padding:16px 14px 4px}
+html body #app .mc .mcfb{appearance:none;border:1.5px solid #D9B45E;background:rgba(12,8,5,.7);color:#F2D28A;font:inherit;font-weight:800;font-size:13.5px;letter-spacing:.02em;padding:9px 20px;border-radius:999px;cursor:pointer;min-height:40px}
+html body #app .mc .mcfb.on{background:linear-gradient(180deg,#F2D28A,#C79A45);color:#1a1208;border-color:transparent;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+html body #app .mc.open{border-color:rgba(242,210,138,.6)!important;box-shadow:0 0 0 1px rgba(242,210,138,.2),0 12px 30px rgba(0,0,0,.5)}
+html body #app .mc.open.k-live{border-color:rgba(229,83,75,.75)!important}
+html body #app .mc .mcx{background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.25));border-top:1px solid rgba(243,224,166,.22);padding:4px 0 14px}
+html body #app .mc .mcx>.pad,html body #app .mc .mcx .pad{padding-left:14px!important;padding-right:14px!important}
+html body #app .mc .mcx .mcxgo{padding:14px 14px 0}
+html body #app .mc .mcx .reorow.rmatch{margin-top:12px}
+html body #app .mc .mch{cursor:pointer}
+/* — barre collante du match ouvert — */
+#mcbar{position:fixed;top:0;left:0;width:100%;z-index:45;padding-top:env(safe-area-inset-top);background:rgba(16,11,7,.97);border-bottom:1px solid rgba(217,180,94,.6);box-shadow:0 8px 20px rgba(0,0,0,.55);transform:translateY(-110%);transition:transform .22s ease;pointer-events:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#mcbar.on{transform:none;pointer-events:auto}
+#mcbar .mcbi{display:flex;align-items:center;gap:10px;padding:7px 10px 7px 14px;min-height:50px;box-sizing:border-box}
+#mcbar .mcbt{flex:1;min-width:0;display:flex;align-items:center;gap:8px;color:#FFF3D6;font-size:14px;white-space:nowrap;overflow:hidden}
+#mcbar .mcbt>b{font-weight:800;overflow:hidden;text-overflow:ellipsis}
+#mcbar .mcmt{display:inline-flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto}
+#mcbar .mcmt b{font-weight:800;overflow:hidden;text-overflow:ellipsis}
+#mcbar .mcmt>*:not(b){flex:none}
+#mcbar .mcmt img,#mcbar .mcmt svg,#mcbar .mcmt .clogo{width:auto!important;height:18px!important;max-width:26px}
+#mcbar .mcmt .flg,#mcbar .mcmt .crest{font-size:16px!important;transform:none!important;line-height:1}
+#mcbar .mcms{flex:none;font-family:var(--display);font-weight:900;font-size:19px;color:#F2D28A;letter-spacing:.02em}
+#mcbar .mcml{flex:none;color:#FF8A73;font-weight:800;font-size:12px}
+#mcbar .mcbr{flex:none;appearance:none;border:0;font:inherit;font-weight:800;font-size:13.5px;color:#1a1208;background:linear-gradient(180deg,#F2D28A,#C79A45);padding:9px 16px;border-radius:999px;min-height:40px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+@media (prefers-reduced-motion:reduce){#mcbar{transition:none}}
+/* — cartouches de partie : la PARTIE d'abord, l'événement ensuite — */
+html body #app .rt152 .rtband{height:128px!important}
+html body #app .rt152 .rtpty{position:absolute;left:12px;right:12px;bottom:8px;z-index:3;display:flex;flex-direction:column;gap:5px}
+html body #app .rt152 .rtpty>small{font-size:10.5px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#F2D28A;text-shadow:0 1px 5px rgba(0,0,0,.95);padding-left:2px}
+html body #app .rt152 .rtpc{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#140E08;border:1px solid rgba(217,180,94,.75);border-radius:14px;padding:10px 12px 10px 14px;box-shadow:0 8px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,236,190,.08)}
+html body #app .rt152 .rtpc>b{min-width:0;font-family:var(--display);font-weight:900;font-size:22px;line-height:1.02;letter-spacing:.01em;color:#FFF3D6;text-transform:uppercase;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+html body #app .rtav152{display:flex;flex:none;padding-left:8px}
+html body #app .rtav152 i{width:26px;height:26px;margin-left:-8px;border-radius:50%;overflow:hidden;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:11px;color:#fff;border:1.5px solid #140E08;box-shadow:0 0 0 1px rgba(217,180,94,.45)}
+html body #app .rtav152 i img{width:100%;height:100%;object-fit:cover;display:block}
+html body #app .rtav152 i.more{background:#2a1f12;color:#F2D28A;font-size:10px}
+html body #app .rt152 .rtev{position:relative;z-index:2;display:flex;align-items:center;gap:10px;margin:10px 14px 0;padding:10px 0 2px;border-top:1px solid rgba(217,180,94,.45)}
+html body #app .rt152 .rtev .spic{width:30px;height:30px;border-radius:50%;border:1.5px solid #D9A84E;display:grid;place-items:center;background:rgba(0,0,0,.5);flex:none;overflow:hidden}
+html body #app .rt152 .rtev .spic img{width:22px;height:22px;object-fit:contain}
+html body #app .rt152 .rtevt{min-width:0}
+html body #app .rt152 .rtevt b{display:block;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#F2D28A;line-height:1.15}
+html body #app .rt152 .rtevt small{display:block;font-size:12.5px;color:#E9DECB;opacity:.9;margin-top:1px}
+html body #app .rt152 .rtbody{padding-top:2px!important}
+/* — Salon : boutons de partie = raccourcis, avec ta place en direct — */
+html body #app .lrp148 .lp148.lp148 .lp148w{display:flex;flex-direction:column;align-items:center;min-width:0;line-height:1.2}
+html body #app .lrp148 .lp148.lp148 .lp148s{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:none;opacity:.78;margin-top:2px}
+html body #app .lrp148 .lp148.lp148 .lp148c{font-size:1.25em!important;opacity:.8!important;margin-left:8px!important}
+
+/* v152 : match EN DIRECT dans la partie = mêmes signaux que le Salon */
+html body #app .mc.mclv{border:1.5px solid #E0393B!important;animation:lrpulse 2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){html body #app .mc.mclv{animation:none;box-shadow:0 0 14px 2px rgba(224,57,59,.5)}}
+html body #app .mc>.mclband{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;gap:7px;height:28px;background:linear-gradient(180deg,#E0393B,#B8262A);color:#fff;font-size:12.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+html body #app .mc>.mclband .lrbdot{width:8px;height:8px;border-radius:50%;background:#fff;animation:kblink 1.4s infinite}
+html body #app .mc .scfl{display:inline-block;animation:scfl .65s ease-out}
+@media (prefers-reduced-motion:reduce){html body #app .mc .scfl{animation:none}}
+html body #app .mc .mcfb{white-space:nowrap;max-width:100%;overflow:hidden}
+#mcbar .mcbr{max-width:60%;white-space:nowrap;overflow:hidden}
+
+#mcbar.lbfull .mcmt b{display:none}
+#mcbar.lbfull .mcbt{gap:6px}
+html body #app .kjbar .kj b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #app .kjbar .kj{min-width:0;overflow:hidden}
+
+@media (max-width:360px){#mcbar .mcmt b{display:none}}
 </style></body>
 </html>
