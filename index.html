@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v161";
+const APP_VER="v162";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4011,7 +4011,7 @@ function lvEndOk(k,v){if(!v||v.manual||!(v.status==="FT"||v.status==="END"))retu
 let LV_RAW=false;
 /* v139 TEST — à retirer : Pays de Galles – Portugal (Ligue des nations, 17 nov.) reste « en direct » pour les tests de Thomas (rouvrir / modifier / refermer). Supprimer TEST_LIVE + tlIs + la ligne tlIs dans liveWrap. */
 const TEST_LIVE={cid:"unl",a:"Pays de Galles",b:"Portugal",day:"2026-11-17",until:"2026-11-30T23:00:00Z"};
-function tlIs(k){try{if(Date.now()>+new Date(TEST_LIVE.until))return false;const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+function tlIs(k){return false;try{if(Date.now()>+new Date(TEST_LIVE.until))return false;const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
   const m=String(k).match(/^E([^~]+)~(.+)$/);if(m&&m[1]==="unl"){const K=LCAL[m[1]],e=K&&(K.ev||[]).find(x=>String(x.i)===m[2]);if(!e||String(e.d||"").slice(0,10)!=="2026-11-17")return false;return TEST_PAIRS.some(([a,b])=>n(e.a)===n(a)&&n(e.b)===n(b));}
   if(/^atpf~/.test(String(k))){const c=FIND.atpf;if(!c)return false;const it=lvItems(c).map(x=>x[1]).find(i=>i.lid===k);if(!it)return false;let sd=[];try{sd=sides(it)||[];}catch(_){}const L=n((it.label||"")+" "+sd.join(" "));return /zverev/.test(L)&&/shelton/.test(L)&&String(new Date(it.date).toISOString()).slice(0,10)==="2026-11-17";}
   return false;}catch(_){return false;}}
@@ -4108,7 +4108,8 @@ const LIVE=liveWrap({
 });
 const liveSt=it=>{const st=(LIVE[it.lid]||{}).status||"NS";if(st!=="LIVE"&&tlItem(it))return"LIVE";return st;};
 /* v142 TEST — à retirer : les 3 matchs du 17 nov. restent en direct (lecture par l'affiche, pas par la clé) */
-function tlItem(it){try{if(!it||Date.now()>+new Date("2026-11-30T23:00:00Z"))return false;const t=+new Date(it.date);if(!(t>=Date.UTC(2026,10,17,10)&&t<=Date.UTC(2026,10,18,4)))return false;
+function tlItem(it){return false;}
+function tlItem0(it){try{if(!it)return false;const t=+new Date(it.date);if(!(t>=Date.UTC(2026,10,17,10)&&t<=Date.UTC(2026,10,18,4)))return false;
   const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();let sd=null;try{sd=sides(it);}catch(_){}const txt=n((sd||[]).join(" | ")+" | "+(it.a||"")+" | "+(it.b||"")+" | "+(it.label||""));
   return[["galles|wales","portugal"],["danemark|denmark","norvege|norway"],["zverev","shelton"]].some(([a,b])=>new RegExp(a).test(txt)&&new RegExp(b).test(txt));}catch(_){return false;}}
 const LV=(lid,label,a,b,date,sub)=>({id:lid.split("-")[1],lid,live:true,label,a,b,date,sub});
@@ -9044,8 +9045,8 @@ document.addEventListener("animationend",e=>{const t=e.target;if(t&&t.classList&
 function tlFallback(it){const n=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();let sd=[];try{sd=sides(it)||[];}catch(_){}const t=n(sd.join("|")+"|"+(it.label||""));
   if(/zverev/.test(t))return{status:"LIVE",sa:2,sb:0,line:"6-2 7-6 0-0",minute:""};return{status:"LIVE",sa:2,sb:3,minute:"90'"};}
 /* v142 TEST — à retirer : remet en direct les matchs de test que la source aurait passés « Terminé » */
-function tlSweep(){try{let ch=false;(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p);}catch(_){}rows.forEach(r=>{const it=r.it;if(!it||!it.live||!it.lid)return;let L=LIVE[it.lid];if(!tlItem(it)||(L&&L.status==="LIVE"))return;if(!L)L=tlFallback(it);
-  LV_RAW=true;try{const v=Object.assign({},L,{status:"LIVE",minute:L.minute&&!/Terminé/i.test(L.minute)?L.minute:(tnIs(it)?"":"90'"),winner:undefined});if(tnIs(it))v.line=String(L.line||"").replace(/\s*·.*$/,"").replace(/^Vainqueur.*$/,"");else v.line="";delete v.ftAt;LIVE[it.lid]=v;}finally{LV_RAW=false;}if(FTAT[it.lid]){delete FTAT[it.lid];try{ftatSave();}catch(_){}}ch=true;});});if(ch)dataRender();}catch(_){}}
+function tlSweep(){/* v162 : faux lives retirés — les anciens matchs de test repassent « Terminé » à leur place */try{let ch=false;(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{rows=rowsOfParty(p);}catch(_){}rows.forEach(r=>{const it=r.it;if(!it||!it.lid||!tlItem0(it))return;const L=LIVE[it.lid];if(!L||L.status==="FT")return;if(Date.now()<+new Date(it.date)+4*3600e3)return;
+  LV_RAW=true;try{const v=Object.assign({},L,{status:"FT",minute:"Terminé"});if(!tnIs(it))v.line="";LIVE[it.lid]=v;}finally{LV_RAW=false;}if(!FTAT[it.lid]){FTAT[it.lid]=+new Date(it.date)+2*3600e3;try{ftatSave();}catch(_){}}ch=true;});});if(ch)dataRender();}catch(_){}}
 setTimeout(tlSweep,1500);setInterval(tlSweep,4000);
 </script>
 <style id="v128">/* ===== v128 · habillage : photos réalistes par sport partout, palette chaude, accent par sport ===== */
