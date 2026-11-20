@@ -3789,7 +3789,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v163";
+const APP_VER="v164";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4547,13 +4547,13 @@ const urgIc=p=>{const u=urgency(p);return u?`<span class="urg" title="${u}" aria
 /* évents mis en avant (accueil « Nouveautés » + onglet Évents « À la une ») : [compétition, journée, badge, titre, nombre, dates] */
 const NEWS=[["unl",null,"Ce soir","Ligue des nations","Portugal – Danemark…","14 – 17 nov."],["st26",null,"Aujourd'hui","ATP 250 Stockholm","La finale","14 nov."],["atpf",null,"Groupes connus","ATP Finals · Turin","McEnroe & Lendl","15 – 22 nov."],["ucl","r5","Ouvert","Ligue des champions · J5","18 matchs","24 – 26 nov."],["six",null,"Nouveau","Six Nations 2027","15 matchs","Fév. – mars"],["dpw",null,"Cette semaine","DP World Tour Championship","4 tours","12 – 15 nov."]];
 /* onglet Évents : à la une, en direct, filtres quand / sport, agenda par semaine */
-function compSpan(c){const ds=[];let n=0;try{subsOf(c).forEach(su=>su.items.forEach(i=>{if(/^(wdc|wcc|rook)$/.test(i.id)||i.tbd)return;ds.push(+i.date);n++;}));}catch(e){}if(!ds.length)return null;return{a:Math.min(...ds),b:Math.max(...ds),n};}
+function compSpan(c){/* v164 : les matchs « à déterminer » (tbd) comptent aussi — sinon un tournoi en cours (ATP Finals) paraissait terminé */const ds=[];let n=0;try{subsOf(c).forEach(su=>su.items.forEach(i=>{if(/^(wdc|wcc|rook)$/.test(i.id)||!i.date)return;ds.push(+i.date);n++;}));}catch(e){}if(!ds.length)return null;return{a:Math.min(...ds),b:Math.max(...ds),n};}
 function vEvents(home){const now=+NOW,day=864e5,F=["best","new","all"].includes(S.evF)?S.evF:"best",SP=S.evS&&spOn(S.evS)?S.evS:"";
   const EM={foot:"⚽",tennis:"🎾",f1:"🏁",basket:"🏀",rugby:"🏉",golf:"⛳",velo:"🚴"};
   /* compétitions longues (saisons) : on montre la prochaine journée / le prochain GP plutôt que toute la saison */
   const all=[];SPORTS.forEach(sp=>sp.comps.forEach(c0=>{const c=FIND[c0.id]||c0;if(!c||c.custom)return;const s=compSpan(c);if(!s)return;
     if(s.b-s.a<=21*864e5){all.push({c,sp,s,t:c.name});return;}
-    let nx=null;try{subsOf(c).forEach(su=>{const ds=su.items.filter(i=>!/^(wdc|wcc|rook)$/.test(i.id)&&!i.tbd).map(i=>+i.date);if(!ds.length)return;const ss={a:Math.min(...ds),b:Math.max(...ds),n:ds.length};if(ss.b>=now-day&&(!nx||ss.a<nx.s.a))nx={su,s:ss};});}catch(e){}
+    let nx=null;try{subsOf(c).forEach(su=>{const ds=su.items.filter(i=>!/^(wdc|wcc|rook)$/.test(i.id)&&i.date).map(i=>+i.date);if(!ds.length)return;const ss={a:Math.min(...ds),b:Math.max(...ds),n:ds.length};if(ss.b>=now-day&&(!nx||ss.a<nx.s.a))nx={su,s:ss};});}catch(e){}
     if(nx)all.push({c,sp,s:nx.s,t:c.name+" · "+nx.su.name,sub:nx.su.id});}));
   const live=[],seen=new Set();all.forEach(({c})=>{try{subsOf(c).forEach(su=>su.items.forEach(i=>{if(i.live&&liveSt(i)==="LIVE"&&!seen.has(i.lid)){seen.add(i.lid);live.push({c,su,i});}}));}catch(e){}});
   const fmt=t=>new Date(t).toLocaleDateString("fr-BE",{day:"numeric",month:"short"});
@@ -4561,7 +4561,7 @@ function vEvents(home){const now=+NOW,day=864e5,F=["best","new","all"].includes(
   const d0=new Date(now);d0.setHours(0,0,0,0);const dow=(d0.getDay()+6)%7,wk0=+d0-dow*day;
   const lim=Infinity;
   /* filtre « Nouveautés & best-sellers » (par défaut) : les évents mis en avant dans NEWS */
-  const HOTL=(()=>{const xs=[];NEWS.forEach(([cid,sid],i)=>{try{const c=FIND[cid];if(!c||!c.sport||(SP&&c.sport.id!==SP))return;const hot=i%2?"Best-seller":"Nouveauté";const spanOf=its=>{let ds=its.filter(i=>!i.tbd&&!/^(wdc|wcc|rook)$/.test(i.id)).map(i=>+i.date);if(!ds.length)ds=its.map(i=>+i.date).filter(Boolean);return ds.length?{a:Math.min(...ds),b:Math.max(...ds),n:ds.length}:null;};
+  const HOTL=(()=>{const xs=[];NEWS.forEach(([cid,sid],i)=>{try{const c=FIND[cid];if(!c||!c.sport||(SP&&c.sport.id!==SP))return;const hot=i%2?"Best-seller":"Nouveauté";const spanOf=its=>{let ds=its.filter(i=>i.date&&!/^(wdc|wcc|rook)$/.test(i.id)).map(i=>+i.date);if(!ds.length)ds=its.map(i=>+i.date).filter(Boolean);return ds.length?{a:Math.min(...ds),b:Math.max(...ds),n:ds.length}:null;};
     if(sid){const su=subsOf(c).find(u=>u.id===sid);if(!su)return;const s=spanOf(su.items);if(s&&s.b>=now-day)xs.push({c,sp:c.sport,s,t:c.name+" · "+su.name,sub:sid,hot});return;}
     const s=compSpan(c)||spanOf([].concat(...subsOf(c).map(u=>u.items)));if(s&&s.b>=now-day)xs.push({c,sp:c.sport,s,t:c.name,hot});}catch(e){}});return xs;})();
   /* v58 : Best-sellers (les évents où l'on crée le plus de parties) · Nouveautés · Tout */
@@ -4585,10 +4585,20 @@ function vEvents(home){const now=+NOW,day=864e5,F=["best","new","all"].includes(
     const st=nl?`● EN DIRECT`:x.hot?(x.hot==="Nouveauté"?"✨ ":"🔥 ")+x.hot.toUpperCase():tl.toUpperCase();
     return`<div class="prowbox tkv tkev${op?" torn open":""}" style="--t1:${col[0]};--t2:${col[1]};--tg:${col[2]}"><span class="pcart sp-${sp.id} tkart" aria-hidden="true"></span><button type="button" class="pwid" data-act="comp" data-comp="${esc(c.id)}" data-k="${K}"><b>${esc(x.t)}</b></button><div class="pflip" data-k="${K}"><button type="button" class="pfront" data-act="comp" data-comp="${esc(c.id)}" aria-label="Ouvrir ${esc(x.t)}"><span class="evst ${nl?"live":x.hot?"hot":tc}">${st}</span><span class="pfrow pfbar"></span><span class="pfl pfl2">${x.s.n} ${un}</span><span class="evdt">${miniFlag(c.id)}${esc(rng(x.s))} · dès ${esc(pr)}</span></button><div class="tkl"><div class="tkh"><b>${esc(x.t)}</b><small>${esc(rng(x.s))} · ${x.s.n} ${un}</small></div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>${x.hot?'<span class="hotfx" aria-hidden="true"></span>':""}</div>`;};
   let h=home?"":pageHead("LES <b>ÉVENTS</b>","Ce qui se joue maintenant et ce qui arrive.");
-  h+=`<div class="evfl"><div class="evchips">${[["best","🔥 Best-sellers"],["new","✨ Nouveautés"],["all","Tout"]].map(([k,l])=>`<button type="button" class="pick${F===k?" on":""}" data-act="evF" data-v="${k}" aria-pressed="${F===k}">${l}</button>`).join("")}</div>
+  h+=home?`<div class="evfl gb164"><div class="evsps gb164r" style="--n:${SPORTS.filter(sp=>spOn(sp.id)).length}">${SPORTS.filter(sp=>spOn(sp.id)).map(sp=>`<button type="button" class="evsp${SP===sp.id?" on":""}" data-act="evS" data-v="${sp.id}" aria-pressed="${SP===sp.id}" aria-label="${esc(sp.name)}" title="${esc(sp.name)}">${goldSp(sp.id,28)}</button>`).join("")}</div></div>`:"";
+  if(!home)h+=`<div class="evfl"><div class="evchips">${[["best","🔥 Best-sellers"],["new","✨ Nouveautés"],["all","Tout"]].map(([k,l])=>`<button type="button" class="pick${F===k?" on":""}" data-act="evF" data-v="${k}" aria-pressed="${F===k}">${l}</button>`).join("")}</div>
    <div class="evsps" style="--n:${SPORTS.filter(sp=>spOn(sp.id)).length}">${SPORTS.filter(sp=>spOn(sp.id)).map(sp=>`<button type="button" class="evsp${SP===sp.id?" on":""}" data-act="evS" data-v="${sp.id}" aria-pressed="${SP===sp.id}" aria-label="${esc(sp.name)}" title="${esc(sp.name)}">${goldSp(sp.id,30)}</button>`).join("")}</div></div>`;
-  if(!list.length)h+=`<p class="empty">Aucun évent pour ce filtre.</p>`;
-  let cur="",body="";list.forEach(x=>{const wl=F==="best"?"Best-sellers":wkLabel(x.s.a);if(wl!==cur){cur=wl;body+=`<h3 class="tksec evwk">${wl}</h3>`;}body+=ticket(x);});
+  if(!home&&!list.length)h+=`<p class="empty">Aucun évent pour ce filtre.</p>`;
+  let cur="",body="";
+  if(home){/* v164 : accueil = sections qui défilent (plus de boutons) — Best-sellers puis Nouveautés ; ATP Finals forcé en best-seller tant qu'il est jouable */
+    const BEST164=new Set(["atpf"]),isBest=x=>BEST164.has(x.c.id)||(cntP[x.c.id]||0)>0||flag(x,"Best-seller");
+    const bs=base.filter(isBest).sort((x,y)=>(BEST164.has(y.c.id)?1:0)-(BEST164.has(x.c.id)?1:0)||(cntP[y.c.id]||0)-(cntP[x.c.id]||0)||byDate(x,y)).slice(0,4);
+    const ids=new Set(bs.map(x=>x.c.id+"|"+(x.sub||"")));
+    const nw=base.filter(x=>!ids.has(x.c.id+"|"+(x.sub||""))&&(flag(x,"Nouveauté")||x.c.auto||NEWC.has(x.c.id))).sort(byDate).slice(0,4);
+    if(bs.length){body+=`<h3 class="tksec evwk">Best-sellers</h3>`;bs.forEach(x=>body+=ticket(x));}
+    if(nw.length){body+=`<h3 class="tksec evwk">Nouveautés</h3>`;nw.forEach(x=>body+=ticket(x));}
+    if(!bs.length&&!nw.length)body+=`<p class="empty hs164e">Pas d'événement en ce moment pour ce sport.</p>`;
+  }else list.forEach(x=>{const wl=F==="best"?"Best-sellers":wkLabel(x.s.a);if(wl!==cur){cur=wl;body+=`<h3 class="tksec evwk">${wl}</h3>`;}body+=ticket(x);});
   /* v163 : dernier ticket de l'accueil = « Tous les sports » → page Sports */
   if(home){const SPL=H3_SP.filter(([id])=>id==="free"||spOn(id));body+=`<div class="prowbox tkv tkev tkall163" style="--t1:#6B5214;--t2:#1E1606;--tg:rgba(243,224,166,.45)"><span class="tkart tkall163a" aria-hidden="true"></span><button type="button" class="pwid" data-act="sportsHub"><b>Tous les sports</b></button><div class="pflip"><button type="button" class="pfront" data-act="sportsHub" aria-label="Voir tous les sports"><span class="evst open">${SPL.length} TERRAINS</span><span class="tka163">${SPL.filter(([id])=>id!=="free").map(([id])=>goldSp(id,18)).join("")}</span><span class="pfl pfl2">Découvrir →</span><span class="evdt">Foot, tennis, F1, golf… ou ton pari perso</span></button></div></div>`;}
   h+=`<div class="pdash">${body}</div>`;
@@ -10454,5 +10464,22 @@ html body #app .tkall163 .pfl2,html body #app .tksp163 .pfl2{font-size:clamp(17p
 html body #app .prowbox.tkall163::before{display:none!important}
 .tka163 .gsp{display:inline-flex;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
 .tksp163 .evdt .gsp{display:inline-flex;vertical-align:-3px;margin-right:6px}
+/* v164 : « Choisis ton terrain de jeu… » + icônes = UN bloc or plein */
+html body #app #h3l2.h3lab{background:linear-gradient(180deg,#F1D58E,#D9B05A 55%,#B88A37)!important;color:#1A1206!important;border-radius:18px 18px 0 0!important;margin:0!important;padding:14px 12px 12px!important;text-align:center;border:0!important;box-shadow:none!important;text-shadow:none!important;position:relative;z-index:1}
+html body #app #h3l2.h3lab em,html body #app #h3l2.h3lab *{color:#1A1206!important;-webkit-text-fill-color:#1A1206!important;background:none!important;text-shadow:none!important}
+html body #app #h3l2.h3lab::before,html body #app #h3l2.h3lab::after{display:none!important}
+html body #app .hshelf{margin-top:0!important}
+html body #app .hshelf .gb164{margin:0 0 14px!important;padding:0!important}
+html body #app .gb164r.evsps{display:grid!important;grid-template-columns:repeat(var(--n),1fr)!important;gap:0!important;background:linear-gradient(180deg,#D9B05A,#B88A37)!important;border-radius:0 0 18px 18px!important;border-top:1px solid rgba(26,18,6,.55)!important;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.35);padding:0!important;margin:0!important}
+html body #app .gb164r .evsp{all:unset;box-sizing:border-box;display:flex!important;align-items:center;justify-content:center;height:54px;cursor:pointer;border-left:1px solid rgba(26,18,6,.45);background:transparent;transition:background .2s}
+html body #app .gb164r .evsp:first-child{border-left:0}
+html body #app .gb164r .evsp .gsp svg *{stroke:#1A1206!important}
+html body #app .gb164r .evsp .gsp svg [fill]:not([fill="none"]){fill:#1A1206!important}
+html body #app .gb164r .evsp.on{background:#1A1206}
+html body #app .gb164r .evsp.on .gsp svg *{stroke:#E9C877!important}
+html body #app .gb164r .evsp.on .gsp svg [fill]:not([fill="none"]){fill:#E9C877!important}
+html body #app .gb164r .evsp:focus-visible{outline:2px solid #1A1206;outline-offset:-4px}
+@media (max-width:360px){html body #app .gb164r .evsp{height:46px}html body #app .gb164r .evsp .gsp{width:22px!important;height:22px!important}}
+.hs164e{text-align:center;opacity:.8;margin:6px 0 14px}
 </style></body>
 </html>
