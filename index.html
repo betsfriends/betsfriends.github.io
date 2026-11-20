@@ -3725,8 +3725,6 @@ html body .prowbox.tkev .pwid .tkhl165{align-self:stretch;justify-content:center
 .tkev .pfront .pfl2{margin-top:10px}
 .hshelf .pdash>.prowbox.tkev:first-child{margin-top:6px}
 
-/* v169 : pas de pastille d icônes sur le ticket « Tous les sports » */
-html body #app .tklg166.lgall{display:none!important}
 </style>
 </head>
 <body>
@@ -3801,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v169";
+const APP_VER="v170";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -10592,5 +10590,13 @@ html body #app .prowbox.tkall163>.tkmix166{opacity:1!important;mix-blend-mode:no
 html body #app .hmvs .hmvok{flex:none;align-self:center;margin:0 0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:44px;padding:8px 14px;border-radius:12px;font-size:13.5px;font-weight:900;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.45)}
 html body #app .hmvs .hmvok small{font-size:10px;font-weight:800;opacity:.8;max-width:110px;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:370px){html body #app .hmvs:not(.empty){flex-wrap:wrap}html body #app .hmvs .hmvok{flex:1 1 100%;margin:4px 0 0;flex-direction:row;gap:8px}}
+/* v170 : façon classeur DANS le grand cadre — l'onglet actif descend et se soude au trait or du contenu */
+html body #app .pfr161>.v137t.v137t.v137t{align-items:end!important}
+html body #app .pfr161>.v137t.v137t.v137t>button{margin-bottom:6px!important}
+html body #app .pfr161>.v137t.v137t.v137t>button.on,html body #app .pfr161>.v137t.v137t.v137t>button[aria-selected="true"]{margin-bottom:-11px!important;min-height:62px!important;border-radius:14px 14px 0 0!important;position:relative;z-index:3;box-shadow:none!important}
+html body #app .pfr161>.ptbody{margin-top:10px!important;border-top:2px solid #D9B25E!important}
+/* v169 : pas de pastille d icônes sur le ticket « Tous les sports » */
+html body #app .tklg166.lgall{display:none!important}
+
 </style></body>
 </html>
