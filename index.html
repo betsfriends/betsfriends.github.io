@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v172";
+const APP_VER="v173";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -10784,5 +10784,11 @@ html body #app .suwrap>.suhd.mpev{padding-left:16px!important;padding-right:16px
 html body #app .suwrap>.susec>*{margin-left:0!important;margin-right:0!important}
 html body #app .suwrap>.susec.mpform .h3grid{margin-left:0!important;margin-right:0!important;width:auto!important}
 @media (max-width:360px){html body #app .suwrap>*:not(.sutop):not(.top){margin-left:10px!important;margin-right:10px!important}}
+
+/* v173 : intercalaire — onglet actif arrondi aux 4 coins, relié au trait or par un col plus étroit */
+html body #app .pfr161>.v137t.v137t.v137t>button.on,html body #app .pfr161>.v137t.v137t.v137t>button[aria-selected="true"]{border-radius:14px!important;margin-bottom:0!important;min-height:54px!important;overflow:visible!important}
+html body #app .pfr161>.v137t.v137t.v137t>button.on::before,html body #app .pfr161>.v137t.v137t.v137t>button[aria-selected="true"]::before{display:none!important}
+html body #app .pfr161>.v137t.v137t.v137t>button.on::after,html body #app .pfr161>.v137t.v137t.v137t>button[aria-selected="true"]::after{content:""!important;display:block!important;position:absolute!important;top:calc(100% - 2px)!important;bottom:auto!important;left:22%!important;right:22%!important;width:auto!important;height:16px!important;background:linear-gradient(180deg,#CFA552,#C9A04E)!important;border-radius:0!important;opacity:1!important;z-index:2!important;pointer-events:none}
+html body #app .pfr161>.ptbody{margin-top:12px!important}
 </style></body>
 </html>
