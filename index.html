@@ -3715,6 +3715,15 @@ html body .goldhome .h3hd{padding-top:6px!important;padding-bottom:4px!important
 #h3grid .h3sp[data-id=velo] .tsf .h3tk{opacity:0!important}
 #h3grid .h3sp[data-id=free] .tsf .pcart.h3art{background-image:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.35)),var(--ph-free)!important;background-size:cover!important;background-position:50% 55%!important;mix-blend-mode:normal!important;opacity:1!important;filter:none!important}
 #h3grid .h3sp[data-id=free] .tsf .h3tk{opacity:0!important}
+
+/* v165 : étiquette Best-seller / Nouveauté sur le talon ; tickets d'évents et de sports sans gros code-barres */
+.tkev .pwid .tkhl165{display:inline-flex;align-items:center;gap:2px;margin-top:8px;max-width:100%;box-sizing:border-box;padding:3px 6px;border-radius:999px;background:var(--goldg,linear-gradient(180deg,#F6E3A6,#C9A24E));color:#1A1406;font-size:clamp(7.5px,2.25vw,9.5px);font-weight:900;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.45);text-shadow:none}
+.tkev .pwid .tkhl165 i{font-style:normal;font-size:1.1em}
+/* bandeau doré pleine largeur du talon (le talon est trop étroit pour une pastille) */
+html body .prowbox.tkev .pwid .tkhl165{align-self:stretch;justify-content:center;margin:10px -14px 0;max-width:none;width:auto;border-radius:0;padding:4px 2px;font-size:clamp(7.5px,2.35vw,10px);letter-spacing:.04em;overflow:hidden}
+.tkev .pfront{justify-content:center!important;gap:6px}
+.tkev .pfront .pfl2{margin-top:10px}
+.hshelf .pdash>.prowbox.tkev:first-child{margin-top:6px}
 </style>
 </head>
 <body>
@@ -3789,7 +3798,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v164";
+const APP_VER="v165";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -3900,9 +3909,12 @@ function atpfBuild(){
   const T=(id,g,n,dt)=>({id,label:"Match "+n+" · "+ATPF_GN[g],sub:"Affiche fixée après le tour précédent",date:dt,tbd:true});
   days.push({id:"j0",name:"Dimanche 15 · "+ATPF_GN.A,sub:"Phase de groupes · 1re journée",items:[M("m0","Alexander Zverev","Rafael Jódar","A",D(2026,11,15,14,0)),M("m1","Ben Shelton","Arthur Fils","A",D(2026,11,15,20,30))]});
   days.push({id:"j1",name:"Lundi 16 · "+ATPF_GN.B,sub:"Phase de groupes · 1re journée",items:[M("m0","Carlos Alcaraz","Frances Tiafoe","B",D(2026,11,16,14,0)),M("m1","Daniil Medvedev","Flavio Cobolli","B",D(2026,11,16,20,30))]});
-  [["j2","Mardi 17","A",17,"2e"],["j3","Mercredi 18","B",18,"2e"],["j4","Jeudi 19","A",19,"3e"],["j5","Vendredi 20","B",20,"3e"]].forEach(([id,dn,g,d,r])=>
+  [["j2","Mardi 17","A",17,"2e"],["j3","Mercredi 18","B",18,"2e"]].forEach(([id,dn,g,d,r])=>
     days.push({id,name:dn+" · "+ATPF_GN[g],sub:"Phase de groupes · "+r+" journée (programme à confirmer)",items:[T("m0",g,1,D(2026,11,d,14,0)),T("m1",g,2,D(2026,11,d,20,30))]}));
-  days.push({id:"sf",name:"Demi-finales",sub:"Samedi 21 novembre",items:[{id:"m0",label:"1er McEnroe – 2e Lendl",sub:"Demi-finale 1",date:D(2026,11,21,14,0),tbd:true},{id:"m1",label:"1er Lendl – 2e McEnroe",sub:"Demi-finale 2",date:D(2026,11,21,20,30),tbd:true}]});
+  /* v165 : 3e journée — vraies affiches (mêmes clés m0/m1 et mêmes heures : les parties gardent leurs choix) */
+  days.push({id:"j4",name:"Jeudi 19 · "+ATPF_GN.A,sub:"Phase de groupes · 3e journée",items:[M("m0","Ben Shelton","Rafael Jódar","A",D(2026,11,19,14,0)),M("m1","Alexander Zverev","Arthur Fils","A",D(2026,11,19,20,30))]});
+  days.push({id:"j5",name:"Vendredi 20 · "+ATPF_GN.B,sub:"Phase de groupes · 3e journée",items:[M("m0","Carlos Alcaraz","Flavio Cobolli","B",D(2026,11,20,14,0)),M("m1","Daniil Medvedev","Frances Tiafoe","B",D(2026,11,20,20,30))]});
+  days.push({id:"sf",name:"Demi-finales",sub:"Samedi 21 novembre",items:[{id:"m0",label:"Zverev – 2e Lendl",sub:"Demi-finale 1 · 1er McEnroe contre 2e Lendl",date:D(2026,11,21,14,0),tbd:true},{id:"m1",label:"1er Lendl – Shelton",sub:"Demi-finale 2 · 1er Lendl contre 2e McEnroe",date:D(2026,11,21,20,30),tbd:true}]});
   days.push({id:"f",name:"Finale",sub:"Dimanche 22 novembre",items:[{id:"m0",label:"La finale",sub:"Inalpi Arena, Turin",date:D(2026,11,22,18,0),tbd:true}]});
   days.push({id:"season",name:"Paris du tournoi",sub:"Réglés après la finale",items:[{id:"wdc",label:"Vainqueur des ATP Finals",sub:"Pari de long terme",date:D(2026,11,22,18,0)},{id:"wcc",label:"Vainqueur du groupe John McEnroe",sub:"Pari de long terme",date:D(2026,11,19,20,30)},{id:"rook",label:"Vainqueur du groupe Ivan Lendl",sub:"Pari de long terme",date:D(2026,11,20,20,30)}]});
   return days;
@@ -4576,14 +4588,14 @@ function vEvents(home){const now=+NOW,day=864e5,F=["best","new","all"].includes(
   /* 1 évent = 1 ticket (même style que Mes parties et Sports) */
   const TK={foot:["#1E7A3A","#062A1C","rgba(46,204,113,.45)"],tennis:["#B5532A","#3A1607","rgba(255,140,80,.5)"],f1:["#8E1B1B","#16070A","rgba(255,70,60,.45)"],golf:["#3B7A3F","#0F2A12","rgba(243,224,166,.4)"],velo:["#B8901F","#2A1E05","rgba(255,226,120,.45)"],basket:["#B8682A","#2A1709","rgba(255,154,60,.45)"],rugby:["#1B5A3D","#0B2117","rgba(233,220,195,.35)"]};
   const liveOf=c=>live.filter(x=>x.c.id===c.id).length;
-  const ticket=x=>{const c=x.c,sp=x.sp,K="ev-"+c.id+(x.sub?"-"+x.sub:""),op=S.pfOpen===K,col=TK[sp.id]||TK.foot,[tl,tc]=tag(x),nl=liveOf(c),u=sp.id==="f1"?"session":sp.id==="golf"?"tour":sp.id==="velo"?(c.id==="monu27"||c.id==="wc27"?"course":"étape"):"match",un=u+(x.s.n>1?"s":"");
+  const ticket=(x,lab)=>{const c=x.c,sp=x.sp,K="ev-"+c.id+(x.sub?"-"+x.sub:""),op=S.pfOpen===K,col=TK[sp.id]||TK.foot,[tl,tc]=tag(x),nl=liveOf(c),u=sp.id==="f1"?"session":sp.id==="golf"?"tour":sp.id==="velo"?(c.id==="monu27"||c.id==="wc27"?"course":"étape"):"match",un=u+(x.s.n>1?"s":"");
     let pr="";try{pr=fromPrice(1).replace(/^dès /,"");}catch(e){}
     const subs=(()=>{try{return subsOf(c).filter(su=>!x.sub||su.id===x.sub);}catch(e){return[];}})();
     const rows=subs.map(su=>{const ds=su.items.filter(i=>!i.tbd&&!/^(wdc|wcc|rook)$/.test(i.id)).map(i=>+i.date);const ss=ds.length?{a:Math.min(...ds),b:Math.max(...ds)}:null;const nd=su.items.filter(i=>isDone(i)).length;
       return`<button type="button" class="item" data-act="sub" data-comp="${esc(c.id)}" data-sub="${esc(su.id)}"><span class="main"><b>${esc(su.name)}</b><span>${ss?esc(rng(ss)):esc(su.sub||"")} · ${su.items.length} ${su.items.length>1?u+"s":u}${nd?" · "+nd+" joué"+(nd>1?"s":""):""}</span></span>${arrow}</button>`;}).join("");
     const inner=`<div class="list" style="padding:0;gap:8px">${rows}</div><button type="button" class="item cubanner" data-act="comp" data-comp="${esc(c.id)}" style="margin-top:12px"><span class="main"><b>🎟️ Créer une partie</b><span>${esc(c.name)} · dès ${esc(pr)}</span></span>${arrow}</button>`;
-    const st=nl?`● EN DIRECT`:x.hot?(x.hot==="Nouveauté"?"✨ ":"🔥 ")+x.hot.toUpperCase():tl.toUpperCase();
-    return`<div class="prowbox tkv tkev${op?" torn open":""}" style="--t1:${col[0]};--t2:${col[1]};--tg:${col[2]}"><span class="pcart sp-${sp.id} tkart" aria-hidden="true"></span><button type="button" class="pwid" data-act="comp" data-comp="${esc(c.id)}" data-k="${K}"><b>${esc(x.t)}</b></button><div class="pflip" data-k="${K}"><button type="button" class="pfront" data-act="comp" data-comp="${esc(c.id)}" aria-label="Ouvrir ${esc(x.t)}"><span class="evst ${nl?"live":x.hot?"hot":tc}">${st}</span><span class="pfrow pfbar"></span><span class="pfl pfl2">${x.s.n} ${un}</span><span class="evdt">${miniFlag(c.id)}${esc(rng(x.s))} · dès ${esc(pr)}</span></button><div class="tkl"><div class="tkh"><b>${esc(x.t)}</b><small>${esc(rng(x.s))} · ${x.s.n} ${un}</small></div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>${x.hot?'<span class="hotfx" aria-hidden="true"></span>':""}</div>`;};
+    const st=nl?`● EN DIRECT`:!lab&&x.hot?(x.hot==="Nouveauté"?"✨ ":"🔥 ")+x.hot.toUpperCase():tl.toUpperCase();
+    return`<div class="prowbox tkv tkev${op?" torn open":""}" style="--t1:${col[0]};--t2:${col[1]};--tg:${col[2]}"><span class="pcart sp-${sp.id} tkart" aria-hidden="true"></span><button type="button" class="pwid" data-act="comp" data-comp="${esc(c.id)}" data-k="${K}"><b>${esc(x.t)}</b>${lab?`<span class="tkhl165">${lab}</span>`:""}</button><div class="pflip" data-k="${K}"><button type="button" class="pfront" data-act="comp" data-comp="${esc(c.id)}" aria-label="Ouvrir ${esc(x.t)}"><span class="evst ${nl?"live":!lab&&x.hot?"hot":tc}">${st}</span><span class="pfl pfl2">${x.s.n} ${un}</span><span class="evdt">${miniFlag(c.id)}${esc(rng(x.s))} · dès ${esc(pr)}</span></button><div class="tkl"><div class="tkh"><b>${esc(x.t)}</b><small>${esc(rng(x.s))} · ${x.s.n} ${un}</small></div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div>${x.hot?'<span class="hotfx" aria-hidden="true"></span>':""}</div>`;};
   let h=home?"":pageHead("LES <b>ÉVENTS</b>","Ce qui se joue maintenant et ce qui arrive.");
   h+=home?`<div class="evfl gb164"><div class="evsps gb164r" style="--n:${SPORTS.filter(sp=>spOn(sp.id)).length}">${SPORTS.filter(sp=>spOn(sp.id)).map(sp=>`<button type="button" class="evsp${SP===sp.id?" on":""}" data-act="evS" data-v="${sp.id}" aria-pressed="${SP===sp.id}" aria-label="${esc(sp.name)}" title="${esc(sp.name)}">${goldSp(sp.id,28)}</button>`).join("")}</div></div>`:"";
   if(!home)h+=`<div class="evfl"><div class="evchips">${[["best","🔥 Best-sellers"],["new","✨ Nouveautés"],["all","Tout"]].map(([k,l])=>`<button type="button" class="pick${F===k?" on":""}" data-act="evF" data-v="${k}" aria-pressed="${F===k}">${l}</button>`).join("")}</div>
@@ -4595,9 +4607,15 @@ function vEvents(home){const now=+NOW,day=864e5,F=["best","new","all"].includes(
     const bs=base.filter(isBest).sort((x,y)=>(BEST164.has(y.c.id)?1:0)-(BEST164.has(x.c.id)?1:0)||(cntP[y.c.id]||0)-(cntP[x.c.id]||0)||byDate(x,y)).slice(0,4);
     const ids=new Set(bs.map(x=>x.c.id+"|"+(x.sub||"")));
     const nw=base.filter(x=>!ids.has(x.c.id+"|"+(x.sub||""))&&(flag(x,"Nouveauté")||x.c.auto||NEWC.has(x.c.id))).sort(byDate).slice(0,4);
-    if(bs.length){body+=`<h3 class="tksec evwk">Best-sellers</h3>`;bs.forEach(x=>body+=ticket(x));}
-    if(nw.length){body+=`<h3 class="tksec evwk">Nouveautés</h3>`;nw.forEach(x=>body+=ticket(x));}
-    if(!bs.length&&!nw.length)body+=`<p class="empty hs164e">Pas d'événement en ce moment pour ce sport.</p>`;
+    /* v165 : UNE seule liste mélangée (pas d'intitulés) — en cours d'abord, puis par date de début ; ATP Finals en tête tant qu'il est jouable.
+       L'étiquette Best-seller / Nouveauté est sur le talon du ticket (aucune si l'évent n'est ni l'un ni l'autre). 8 tickets max. */
+    const isNew=x=>flag(x,"Nouveauté")||x.c.auto||NEWC.has(x.c.id),bsK=new Set(bs.map(x=>x.c.id+"|"+(x.sub||""))),kk=x=>x.c.id+"|"+(x.sub||"");
+    const seen=new Set(),one=[];base.forEach(x=>{const k=kk(x);if(seen.has(k))return;seen.add(k);one.push(x);});
+    const lv=x=>x.s.a<=now?0:1;
+    const lab=x=>bsK.has(kk(x))||isNew(x)?1:0,pick=one.slice().sort((x,y)=>(BEST164.has(y.c.id)?1:0)-(BEST164.has(x.c.id)?1:0)||lab(y)-lab(x)||byDate(x,y)).slice(0,8);/* on garde d'abord les évents étiquetés */
+    pick.sort((x,y)=>(BEST164.has(y.c.id)?1:0)-(BEST164.has(x.c.id)?1:0)||lv(x)-lv(y)||byDate(x,y));
+    pick.forEach(x=>body+=ticket(x,bsK.has(kk(x))?"<i>🔥</i>Best-seller":isNew(x)?"<i>✨</i>Nouveauté":""));
+    if(!one.length)body+=`<p class="empty hs164e">Pas d'événement en ce moment pour ce sport.</p>`;
   }else list.forEach(x=>{const wl=F==="best"?"Best-sellers":wkLabel(x.s.a);if(wl!==cur){cur=wl;body+=`<h3 class="tksec evwk">${wl}</h3>`;}body+=ticket(x);});
   /* v163 : dernier ticket de l'accueil = « Tous les sports » → page Sports */
   if(home){const SPL=H3_SP.filter(([id])=>id==="free"||spOn(id));body+=`<div class="prowbox tkv tkev tkall163" style="--t1:#6B5214;--t2:#1E1606;--tg:rgba(243,224,166,.45)"><span class="tkart tkall163a" aria-hidden="true"></span><button type="button" class="pwid" data-act="sportsHub"><b>Tous les sports</b></button><div class="pflip"><button type="button" class="pfront" data-act="sportsHub" aria-label="Voir tous les sports"><span class="evst open">${SPL.length} TERRAINS</span><span class="tka163">${SPL.filter(([id])=>id!=="free").map(([id])=>goldSp(id,18)).join("")}</span><span class="pfl pfl2">Découvrir →</span><span class="evdt">Foot, tennis, F1, golf… ou ton pari perso</span></button></div></div>`;}
@@ -4608,7 +4626,7 @@ function vSportsHub(){const now=+NOW,day=864e5;let pr="";try{pr=fromPrice(1).rep
   const TK=Object.assign({free:["#5A4512","#1E1606","rgba(243,224,166,.45)"]},H3_TK||{});
   const tk=([id,n])=>{const sp=SPORTS.find(x=>x.id===id);let nEv=0,nLive=0;if(sp)sp.comps.forEach(c0=>{const c=FIND[c0.id]||c0;if(!c||c.custom)return;const s=compSpan(c);if(!s||s.b<now)return;nEv++;if(s.a<=now)nLive++;});
     const col=TK[id]||TK.free,isF=id==="free",chip=isF?"✨ À TOI DE JOUER":nLive?"● EN COURS":"À VENIR",nC=sp?sp.comps.filter(c0=>!(FIND[c0.id]||c0).custom).length:0,big=isF?"TON PARI":nEv?nEv+" ÉVÉNEMENT"+(nEv>1?"S":""):nC+" COMPÉTITION"+(nC>1?"S":""),dt=isF?"Invente ton pari · dès "+pr:"dès "+pr+" la partie";
-    return`<div class="prowbox tkv tkev tksp163" style="--t1:${col[0]};--t2:${col[1]};--tg:${col[2]}"><span class="pcart sp-${isF?"free":id} tkart" aria-hidden="true"></span><button type="button" class="pwid" data-act="spOpen" data-id="${id}"><b>${esc(n)}</b></button><div class="pflip"><button type="button" class="pfront" data-act="spOpen" data-id="${id}" aria-label="Choisir ${esc(n)}"><span class="evst ${nLive&&!isF?"live":"open"}">${chip}</span><span class="pfrow pfbar"></span><span class="pfl pfl2">${big}</span><span class="evdt">${goldSp(id,18)}${esc(dt)}</span></button></div></div>`;};
+    return`<div class="prowbox tkv tkev tksp163" style="--t1:${col[0]};--t2:${col[1]};--tg:${col[2]}"><span class="pcart sp-${isF?"free":id} tkart" aria-hidden="true"></span><button type="button" class="pwid" data-act="spOpen" data-id="${id}"><b>${esc(n)}</b></button><div class="pflip"><button type="button" class="pfront" data-act="spOpen" data-id="${id}" aria-label="Choisir ${esc(n)}"><span class="evst ${nLive&&!isF?"live":"open"}">${chip}</span><span class="pfl pfl2">${big}</span><span class="evdt">${goldSp(id,18)}${esc(dt)}</span></button></div></div>`;};
   let h=pageHead("LES <b>SPORTS</b>","Choisis ton terrain de jeu, puis ton tournoi.");
   h+=`<div class="pdash spg163">${H3_SP.filter(([id])=>id==="free"||spOn(id)).map(tk).join("")}</div>`;return h;}
 function spOpen(id){const H=hmS();Object.assign(H,{validated:false,mode:null,duel:null,multi:[],inv:{duel:null,multi:null},q:{duel:"",multi:""},flip:null,keepWho:false});
@@ -4790,12 +4808,12 @@ function h3Front(){const H=hmS(),nm=x=>{const m=x.k==="m"?memberByName(x.name):n
 function h3Done(nm){const H=hmS(),duel=H.mode==="duel",av=(x,z)=>{if(x.k==="g")return`<span class="hfgav" style="width:${z}px;height:${z}px">👥</span>`;const m=x.k==="m"?memberByName(x.name):null;return avatar(m||{short:x.name,color:"#4A5280"},z);};
   const ME=avatar(me(),56);
   if(duel)return`<div class="hff hfdone hfd-duel"><button type="button" class="hfsum" data-act="h3Flip" data-ctx="multi" aria-label="Modifier ton adversaire">
-    <span class="hfvs"><span class="hfp">${ME}<b>Toi</b></span><span class="hfbolt" aria-hidden="true"><svg viewBox="0 0 24 40"><defs><linearGradient id="hfbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1C4"/><stop offset=".5" stop-color="#E2BC66"/><stop offset="1" stop-color="#9C7432"/></linearGradient></defs><path d="M15 1 L3 23 L11 23 L8 39 L21 15 L13 15 Z" fill="url(#hfbg)" stroke="#2A1D06" stroke-width="1.2" stroke-linejoin="round"/></svg></span><span class="hfp">${av(H.duel,56)}<b>${esc(nm(H.duel))}</b></span></span>
+    <span class="hfvs"><span class="hfp">${ME}<b>${esc(myLabel()||"Moi")}</b></span><span class="hfbolt" aria-hidden="true"><svg viewBox="0 0 24 40"><defs><linearGradient id="hfbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1C4"/><stop offset=".5" stop-color="#E2BC66"/><stop offset="1" stop-color="#9C7432"/></linearGradient></defs><path d="M15 1 L3 23 L11 23 L8 39 L21 15 L13 15 Z" fill="url(#hfbg)" stroke="#2A1D06" stroke-width="1.2" stroke-linejoin="round"/></svg></span><span class="hfp">${av(H.duel,56)}<b>${esc(nm(H.duel))}</b></span></span>
     <span class="hfedit">✎ Modifier</span></button></div>`;
   const ppl=H.multi,tot=ppl.reduce((a,x)=>a+(x.k==="g"?Math.max(0,gMem(x).length):1),0),MAX=6,more=Math.max(0,ppl.length-MAX),g1=ppl.length===1&&ppl[0].k==="g";
   return`<div class="hff hfdone hfd-multi"><button type="button" class="hfsum" data-act="h3Flip" data-ctx="multi" aria-label="Modifier tes joueurs">
     <span class="hfstack">${avatar(me(),44)}${ppl.slice(0,MAX).map(x=>av(x,44)).join("")}${more?`<span class="hfmore">+${more}</span>`:""}</span>
-    <b class="hfmt">${g1?"Groupe "+esc(nm(ppl[0])):"Toi + "+tot+" joueur"+(tot>1?"s":"")}</b>
+    <b class="hfmt">${g1?"Groupe "+esc(nm(ppl[0])):esc(myLabel()||"Moi")+" + "+tot+" joueur"+(tot>1?"s":"")}</b>
     <small class="hfms">${esc(ppl.slice(0,3).map(nm).join(", "))}${ppl.length>3?" …":""}</small>
     <span class="hfedit">✎ Modifier</span></button></div>`;}
 function h3Back(){const H=hmS(),ctx=H.flip;if(!ctx)return`<div class="hfb" aria-hidden="true"></div>`;const duel=ctx==="duel",sel=duel?(H.duel?[H.duel]:[]):H.multi;
@@ -4804,12 +4822,12 @@ ${hmVs(ctx,sel)}   <div class="hms">${HM_ICO.search}<input class="inp" type="sea
    <div class="hfscroll"><div class="hmr" id="hmr-${ctx}">${hmResults(ctx)}</div>
     ${sel.length||H.q[ctx]?"":`<p class="hmnone">${duel?"Ou tape un prénom ou un e-mail pour inviter.":"Ou tape un prénom, un groupe ou un e-mail pour inviter."}</p>`}
     ${hmInvBox(ctx)}${!duel&&H.multi.length>1?`<button type="button" class="hfgrp" data-act="hmGrpOpen">👥 En faire un groupe</button>`:""}</div>
-   <button type="button" class="hfok${sel.length?"":" off"}" data-act="h3Unflip"${sel.length?"":" disabled aria-disabled=\"true\""}>${hmOkLbl(sel)}</button></div>`;}
+</div>`;}
 /* v136 : « Ta partie » en haut — Toi 🆚 tes potes / ton groupe */
 function hmNm(x){const m=x.k==="m"?memberByName(x.name):null;return x.k==="g"?(groupById(x.id)||{name:x.name}).name:(m?m.short:x.name);}
-function hmVs(ctx,sel){const meA=avatar(me(),44);if(!sel.length)return`<div class="hmvs empty"><span class="hmvme">${meA}<b>Toi</b></span><i class="hmvx">🆚</i><span class="hmvnone">Choisis au moins un pote ou un groupe</span></div>`;
-  return`<div class="hmvs"><span class="hmvme">${meA}<b>Toi</b></span><i class="hmvx">🆚</i><span class="hmvl">${sel.map((x,i)=>{const m=x.k==="m"?memberByName(x.name):null,g=x.k==="g"?groupById(x.id):null,n=g?(g.members||[]).length:0;
-    return`<span class="hmvp">${x.k==="g"?'<span class="hmgi hmvg">👥</span>':x.k==="inv"?'<span class="hmgi hmvg">✉️</span>':avatar(m||{short:x.name,color:"#4A5280"},44)}<b>${esc(hmNm(x))}${g?` (${n})`:""}</b><button type="button" class="hmvdel" data-act="hmDel" data-ctx="${ctx}" data-i="${ctx==="duel"?0:i}" aria-label="Retirer ${esc(hmNm(x))}">✕</button></span>`;}).join("")}</span></div>`;}
+function hmVs(ctx,sel){const meA=avatar(me(),44);if(!sel.length)return`<div class="hmvs empty"><span class="hmvme">${meA}<b>${esc(myLabel()||"Moi")}</b></span><i class="hmvx">🆚</i><span class="hmvnone">Choisis au moins un pote ou un groupe</span></div>`;
+  return`<div class="hmvs"><span class="hmvme">${meA}<b>${esc(myLabel()||"Moi")}</b></span><i class="hmvx">🆚</i><span class="hmvl">${sel.map((x,i)=>{const m=x.k==="m"?memberByName(x.name):null,g=x.k==="g"?groupById(x.id):null,n=g?(g.members||[]).length:0;
+    return`<span class="hmvp">${x.k==="g"?'<span class="hmgi hmvg">👥</span>':x.k==="inv"?'<span class="hmgi hmvg">✉️</span>':avatar(m||{short:x.name,color:"#4A5280"},44)}<b>${esc(hmNm(x))}${g?` (${n})`:""}</b><button type="button" class="hmvdel" data-act="hmDel" data-ctx="${ctx}" data-i="${ctx==="duel"?0:i}" aria-label="Retirer ${esc(hmNm(x))}">✕</button></span>`;}).join("")}</span><button type="button" class="hfok hmvok" data-act="h3Unflip" aria-label="${esc(hmOkLbl(sel).replace("C'est bon · ","Valider : "))}"><span>C'est bon ✓</span><small>${esc(hmOkLbl(sel).replace(/^C'est bon · /,""))}</small></button></div>`;}
 function hmOkLbl(sel){if(!sel.length)return"C'est bon";if(sel.length===1&&sel[0].k==="g")return"C'est bon · "+esc(hmNm(sel[0]));const n=sel.reduce((a,x)=>a+(x.k==="g"?gMem(x).length:1),0);return"C'est bon · "+n+" pote"+(n>1?"s":"");}
 function h3Create(){const H=hmS(),rd=h3Ready(),A=S._cwAnim,was=A&&performance.now()-A.t0<H3CW_D?true:!!S._cwOn;H.goSeen=rd;S._cwOn=rd;
   return`<div class="h3cw${was?"":" off"}" data-on="${rd?1:0}"${rd?"":" inert aria-hidden=\"true\""}><div class="h3ci"><button type="button" class="h3create" data-act="h3Go"${rd?"":" tabindex=\"-1\""}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Démarrer</button></div></div>`;}
@@ -5985,7 +6003,7 @@ function groupForParty(p){const want=new Set(partyNames(p).map(normS));return(S.
 const canGroupParty=p=>!!(p&&!p.demo&&!p.free&&isOwner(p)&&partyNames(p).length>=2&&!groupForParty(p));
 function groupTab(p){const others=partyNames(p).filter(n=>n!=="Toi");
   return`<div class="pad" style="margin-top:14px"><div class="card"><div class="lab">Créer un groupe avec les membres de cette partie</div><p class="muted" style="font-size:13px;margin:0 0 10px">Ces joueurs n'ont pas encore de groupe ensemble. Un groupe garde le même cercle d'amis pour vos prochaines parties, avec un classement commun.</p>
-   <div class="mpc" style="margin-bottom:12px">${["Toi"].concat(others).map(n=>`<span class="chip2">${esc(n)}</span>`).join("")}</div>
+   <div class="mpc" style="margin-bottom:12px">${[myLabel()||"Moi"].concat(others).map(n=>`<span class="chip2">${esc(n)}</span>`).join("")}</div>
    <label class="lab" for="pgname">Nom du groupe</label><input class="inp" id="pgname" data-pg="1" value="${esc(S.pgName!=null?S.pgName:p.name)}" maxlength="40">
    <button type="button" class="btn block" style="margin-top:12px" data-act="groupFromParty">👥 Créer le groupe</button></div></div>`;}
 function friendsSet(){const set=new Set();allGroups().forEach(g=>g.members.forEach(n=>set.add(normS(n))));(me().friends||[]).forEach(n=>set.add(normS(n)));try{realFriends().forEach(f=>set.add(normS(f.name)));}catch(_){}return set;}
@@ -10481,5 +10499,10 @@ html body #app .gb164r .evsp.on .gsp svg [fill]:not([fill="none"]){fill:#E9C877!
 html body #app .gb164r .evsp:focus-visible{outline:2px solid #1A1206;outline-offset:-4px}
 @media (max-width:360px){html body #app .gb164r .evsp{height:46px}html body #app .gb164r .evsp .gsp{width:22px!important;height:22px!important}}
 .hs164e{text-align:center;opacity:.8;margin:6px 0 14px}
+
+/* v165 : « C'est bon » dans l'encadré Toi 🆚 sélection, à droite (plus besoin de descendre) */
+html body #app .hmvs .hmvok{flex:none;align-self:center;margin:0 0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:44px;padding:8px 14px;border-radius:12px;font-size:13.5px;font-weight:900;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.45)}
+html body #app .hmvs .hmvok small{font-size:10px;font-weight:800;opacity:.8;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:370px){html body #app .hmvs:not(.empty){flex-wrap:wrap}html body #app .hmvs .hmvok{flex:1 1 100%;margin:4px 0 0;flex-direction:row;gap:8px}}
 </style></body>
 </html>
