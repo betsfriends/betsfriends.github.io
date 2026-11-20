@@ -3724,6 +3724,9 @@ html body .prowbox.tkev .pwid .tkhl165{align-self:stretch;justify-content:center
 .tkev .pfront{justify-content:center!important;gap:6px}
 .tkev .pfront .pfl2{margin-top:10px}
 .hshelf .pdash>.prowbox.tkev:first-child{margin-top:6px}
+
+/* v169 : pas de pastille d icônes sur le ticket « Tous les sports » */
+html body #app .tklg166.lgall{display:none!important}
 </style>
 </head>
 <body>
@@ -3798,7 +3801,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v166";
+const APP_VER="v169";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -10495,6 +10498,12 @@ html body #app .pfr161 .mc.mc-open,html body #app .pfr161 .mc.open{outline-offse
 @media (max-width:360px){html body #app .pfr161{margin-left:8px;margin-right:8px}html body #app .pfr161>.ptbody{padding:10px 8px 12px}html body #app .pfr161>.v137t.v137t.v137t{padding:0 8px!important}}
 @media (max-width:360px){html body #app .pfr161.pfr-board>.ptbody,html body #app .pfr161.pfr-settings>.ptbody{padding:8px 3px 10px}}
 html body #app .pfr161 .mc.open{margin-left:2px!important;margin-right:2px!important}
+/* v168 : le cadre doré englobe AUSSI les onglets (un seul grand cadre) */
+html body #app .pfr161{border:1px solid rgba(233,199,122,.85);border-radius:22px 22px 26px 26px;padding:10px 10px 12px;background:linear-gradient(180deg,rgba(233,199,122,.05),rgba(0,0,0,0) 160px)}
+html body #app .pfr161>.v137t.v137t.v137t{padding:0!important;align-items:stretch!important}
+html body #app .pfr161>.v137t.v137t.v137t>button,html body #app .pfr161>.v137t.v137t.v137t>button.on,html body #app .pfr161>.v137t.v137t.v137t>button[aria-selected="true"]{margin-bottom:0!important;min-height:50px!important;border-radius:14px!important}
+html body #app .pfr161>.ptbody{border:0!important;border-top:1px solid rgba(233,199,122,.35)!important;border-radius:0!important;margin-top:10px!important;padding:12px 0 2px!important;background:none!important}
+@media (max-width:360px){html body #app .pfr161{padding:8px 6px 10px}html body #app .pfr161>.ptbody{padding:10px 0 2px!important}}
 
 /* v163 : vitrine d'évents sur l'accueil + ticket « Tous les sports » + page Sports */
 .hshelf{margin-top:6px}
@@ -10545,6 +10554,15 @@ html body #app .prowbox.tkev>.pwid>b{font-family:"Big Shoulders Display","Oswald
 .tklg166.lgall{padding:17%!important;grid-template-rows:1fr 1fr}
 .tklg166.lgall>.gsp{width:calc(var(--lg) * .3)!important;height:calc(var(--lg) * .3)!important;display:block;justify-self:center;align-self:center}
 .tklg166.lgall>.gsp svg{width:100%!important;height:100%!important;display:block}
+/* v167 : logo du talon plus petit, sans cercle */
+html body #app .tklg166{--lg:clamp(28px,9vw,40px)!important;margin:0 0 6px!important;border-radius:0!important}
+html body #app .tklg166.lgimg{background:none!important;box-shadow:none!important;overflow:visible!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+html body #app .tklg166.lgimg img{width:100%!important;height:100%!important;max-height:var(--lg)!important;object-fit:contain!important}
+html body #app .tklg166.lgimg{margin-bottom:12px!important}
+html body #app .tklg166.lgsp{background:none!important;box-shadow:none!important;backdrop-filter:none!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));color:#E9C77A}
+html body #app .tklg166.lgsp>.gsp{width:calc(var(--lg) * .85)!important;height:calc(var(--lg) * .85)!important}
+html body #app .tklg166.lgall{background:none!important;box-shadow:none!important;padding:4%!important}
+html body #app .tklg166.lgall>.gsp{width:calc(var(--lg) * .45)!important;height:calc(var(--lg) * .45)!important}
 /* tampon encreur */
 .stamp166{position:absolute;left:10px;bottom:14px;z-index:4;pointer-events:none;transform:rotate(-9deg);transform-origin:left bottom;--ink:#FF5A4C;color:var(--ink);opacity:.92;
   -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.0 2.15'/%3E%3C/filter%3E%3Crect width='160' height='60' fill='%23fff' filter='url(%23n)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.0 2.15'/%3E%3C/filter%3E%3Crect width='160' height='60' fill='%23fff' filter='url(%23n)'/%3E%3C/svg%3E");-webkit-mask-size:160px 60px;mask-size:160px 60px}
