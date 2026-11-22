@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v180";
+const APP_VER="v182";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -7515,7 +7515,7 @@ function mcBarUpd(){/* v153 : barre flottante EN BAS (au-dessus du menu), cadre 
   const k=e.dataset.k,vb=e.querySelector(".mcxgo [data-act=betValidate]"),ed=!!vb,cf=ed&&/Confirmer/.test(vb.textContent),dis=ed&&vb.disabled,mode=(ed?"e":"r")+(cf?"c":"")+(dis?"d":"");
   if(b.dataset.k!==k||b.dataset.m!==mode){const tp=e.querySelector("template.mcmini"),lf=e.dataset.blf||"Replier",ls=e.dataset.bls||"Replier";
     /* v172 : UN seul bouton pour replier — gros bouton or plein « ▴ Replier mon pari » (en saisie : « Valider mes paris » orange + « ▴ Replier » or) ; plus de mini-récap */
-    b.innerHTML=`<div class="mcbi m172${ed?" ed":""}"><button type="button" class="mcbr m172r m180r" data-act="mcTog" data-key="${esc(k)}" data-close="1" data-lf="▴" data-ls="▴" aria-label="Replier">▴</button></div>`;b.dataset.k=k;b.dataset.m=mode;b.dataset.w="";}
+    b.innerHTML=`<div class="mcbi m172${ed?" ed":""}"><button type="button" class="mcbr m172r m180r" data-act="mcTog" data-key="${esc(k)}" data-close="1" aria-label="Replier"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#1a1206" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></button></div>`;b.dataset.k=k;b.dataset.m=mode;b.dataset.w="";}
   const ap=document.getElementById("app").getBoundingClientRect(),G=ap.width<=360?10:16;
   {const w=String(Math.round(ap.width));if(b.dataset.w!==w){b.dataset.w=w;b.style.width=(ap.width-2*G)+"px";mcFit(b);const bt=b.querySelector(".mcbr");b.classList.toggle("lbfull",!!bt&&bt.textContent===bt.dataset.lf&&/–/.test(bt.dataset.lf));}}
   b.style.left=(ap.left+G)+"px";b.style.width=(ap.width-2*G)+"px";
@@ -11009,6 +11009,17 @@ html body #app .evg179t small{white-space:nowrap;overflow:hidden;text-overflow:e
 html body #app .rt157 .rtpc>b .rt179s{white-space:normal!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
 /* v180 : barre du bas = un seul gros bouton pleine largeur, juste une flèche ▴ (Valider/Confirmer restent en bas des paris dans la carte) */
-html body .m180r.m180r{flex:1 1 100%!important;width:100%!important;font-size:30px!important;line-height:1!important;letter-spacing:0!important;padding:0!important;min-height:58px}
+html body #mcbar .m172 .m172r.m180r{flex:1 1 100%!important;width:100%!important;font-size:30px!important;line-height:1!important;letter-spacing:0!important;padding:0!important;min-height:58px}
+
+/* v181 : bouton ▴ plus fin, or texturé (hachures fines) + chevron net */
+html body #mcbar .m172 .m172r.m180r.m180r{min-height:42px!important;height:42px!important;font-size:0!important;border-radius:14px!important;border:1px solid rgba(255,236,180,.55)!important;
+background:repeating-linear-gradient(135deg,rgba(255,255,255,.10) 0 2px,rgba(255,255,255,0) 2px 7px),linear-gradient(180deg,#F0D592 0%,#D9B25E 55%,#B88A3A 100%)!important;
+box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(0,0,0,.18)!important;display:flex!important;align-items:center;justify-content:center}
+html body #mcbar .m172 .m180r svg{display:block;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
+
+/* v182 : bouton ▴ couleur cuivre, plus doux */
+html body #mcbar .m172 .m172r.m180r.m180r{background:repeating-linear-gradient(135deg,rgba(255,220,190,.07) 0 2px,rgba(255,220,190,0) 2px 7px),linear-gradient(180deg,#B87A4B 0%,#9A5F36 55%,#7A4626 100%)!important;border:1px solid rgba(232,170,120,.45)!important;box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,210,170,.30),inset 0 -1px 0 rgba(0,0,0,.25)!important}
+html body #mcbar .m172 .m180r svg path{stroke:#F6DCC2}
+html body #mcbar .m172 .m180r svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
 </style></body>
 </html>
