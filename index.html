@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v176";
+const APP_VER="v178";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -3917,8 +3917,12 @@ function atpfBuild(){
   /* v165 : 3e journée — vraies affiches (mêmes clés m0/m1 et mêmes heures : les parties gardent leurs choix) */
   days.push({id:"j4",name:"Jeudi 19 · "+ATPF_GN.A,sub:"Phase de groupes · 3e journée",items:[M("m0","Ben Shelton","Rafael Jódar","A",D(2026,11,19,14,0)),M("m1","Alexander Zverev","Arthur Fils","A",D(2026,11,19,20,30))]});
   days.push({id:"j5",name:"Vendredi 20 · "+ATPF_GN.B,sub:"Phase de groupes · 3e journée",items:[M("m0","Carlos Alcaraz","Flavio Cobolli","B",D(2026,11,20,14,0)),M("m1","Daniil Medvedev","Frances Tiafoe","B",D(2026,11,20,20,30))]});
-  days.push({id:"sf",name:"Demi-finales",sub:"Samedi 21 novembre",items:[{id:"m0",label:"Zverev – 2e Lendl",sub:"Demi-finale 1 · 1er McEnroe contre 2e Lendl",date:D(2026,11,21,14,0),tbd:true},{id:"m1",label:"1er Lendl – Shelton",sub:"Demi-finale 2 · 1er Lendl contre 2e McEnroe",date:D(2026,11,21,20,30),tbd:true}]});
-  days.push({id:"f",name:"Finale",sub:"Dimanche 22 novembre",items:[{id:"m0",label:"La finale",sub:"Inalpi Arena, Turin",date:D(2026,11,22,18,0),tbd:true}]});
+  /* v177 : demi-finales et finale avec les vrais joueurs (mêmes clés sf/m0, sf/m1, f/m0 et mêmes heures : les parties gardent leurs choix).
+     Cause du bug : tant qu'un élément est « tbd », il n'a pas de joueurs (sides) → absent de la recherche, du flux live ESPN et affiché « La finale ».
+     Sources : ESPN 22 nov. 2026 — Zverev bat Medvedev 7-6(0) 6-4 ; Alcaraz bat Shelton 3-6 6-3 7-6(1) ; finale Alcaraz – Zverev dim. 22 nov. (18:00). */
+  const K=(id,p,q,sub,dt)=>({id,label:sn(p)+" – "+sn(q),sub:p+" contre "+q+" · "+sub,date:dt});
+  days.push({id:"sf",name:"Demi-finales",sub:"Samedi 21 novembre",items:[K("m0","Alexander Zverev","Daniil Medvedev","Demi-finale 1",D(2026,11,21,14,0)),K("m1","Carlos Alcaraz","Ben Shelton","Demi-finale 2",D(2026,11,21,20,30))]});
+  days.push({id:"f",name:"Finale",sub:"Dimanche 22 novembre · Inalpi Arena, Turin",items:[K("m0","Carlos Alcaraz","Alexander Zverev","Finale",D(2026,11,22,18,0))]});
   days.push({id:"season",name:"Paris du tournoi",sub:"Réglés après la finale",items:[{id:"wdc",label:"Vainqueur des ATP Finals",sub:"Pari de long terme",date:D(2026,11,22,18,0)},{id:"wcc",label:"Vainqueur du groupe John McEnroe",sub:"Pari de long terme",date:D(2026,11,19,20,30)},{id:"rook",label:"Vainqueur du groupe Ivan Lendl",sub:"Pari de long terme",date:D(2026,11,20,20,30)}]});
   return days;
 }
@@ -5623,7 +5627,9 @@ const compOpenNew=(c,sid)=>{try{return subsOf(c).some(su=>(!sid||su.id===sid)&&s
 const unlLate=i=>!!(i&&i._c==="unl"&&!i.tbd&&+new Date(i.date)===+new Date("2026-11-14T17:00:00Z")&&Date.now()<+new Date("2026-11-14T17:15:00Z"));
 /* v59 : exception du 15 nov. — Austin Championship (PGA Tour) : dernier tour + tournoi entier ouverts jusqu'à 20 h (départ des leaders) */
 const austinLate=i=>{if(!i||i.tbd||Date.now()>=+new Date("2026-11-15T19:00:00Z"))return false;const c=FIND[i._c];return!!(c&&c.auto&&/austin/i.test(c.name||"")&&(i.whole||i.golfDay===4||i.final));};
-const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)||unlLate(i)||austinLate(i)));
+/* v178 : exception du 22 nov. — tournois PGA Tour (RSM Classic…) : jour 4 + tournoi entier ouverts toute la journée (jusqu'à 23:59 Bruxelles) */
+const pga22Late=i=>{if(!i||i.tbd||Date.now()>=+new Date("2026-11-22T22:59:00Z"))return false;const isDay4=i.golfDay===4&&+new Date(i.date)>=+new Date("2026-11-22T00:00:00Z")&&+new Date(i.date)<+new Date("2026-11-23T00:00:00Z");if(isDay4)return true;if(i.whole){const c=FIND[i._c];let tx="";try{tx=JSON.stringify([c&&c.sp,c&&c.sport,c&&c.tour,c&&c.name])}catch(_){}const e=+new Date(i.date);return /golf|pga|rsm/i.test(tx)&&e>=+new Date("2026-11-19T00:00:00Z")&&e<+new Date("2026-11-23T00:00:00Z");}return false;};
+const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)||unlLate(i)||austinLate(i)||pga22Late(i)));
 /* les pronos se ferment au coup d'envoi de chaque match / session */
 const CLOSE_MS=0,closeAt=i=>+i.date-CLOSE_MS;
 const canPickIt=i=>!isDone(i)&&(lateOk(i)||(closeAt(i)>+NOW&&(!i.live||liveSt(i)==="NS")));
@@ -7358,19 +7364,46 @@ function ballsRow(p,r){if(p.free||!r||!r.it)return"";const pls=playersOf(p);if(p
 function myId(p){const pl=rawPlayers(p),m=meP(p);return(m||pl.find(x=>x.id==="me")||pl[0]).id;}
 function golfOddsFor(p,k,v){const[rk,bid]=k.split("|"),it=findItem(p,rk),c=FIND[p.comp];if(!it||!c)return null;if(Array.isArray(v)){const o={};v.forEach(x=>{const y=oddFor(c,it,bid,x);if(y)o[x]=y;});return Object.keys(o).length?o:null;}return oddFor(c,it,bid,v);}
 function myVal(p,k){const d=S.myDraft||{};if(k in d)return d[k];return(picksOf(p)[myId(p)]||{})[k];}
+/* v177 : saisie compacte des scores — deux cases au lieu d'une longue liste (même format enregistré qu'avant : "a-b" côté 1 – côté 2) */
+const SC7_OK=new Set(["6-0","6-1","6-2","6-3","6-4","7-5","7-6","0-6","1-6","2-6","3-6","4-6","5-7","6-7"]);
+function sc7Last(n){const w=String(n).trim().split(/\s+/);return w[w.length-1];}
+function sc7Tennis(k,v,sd,bid,opts){const st=(S.sc7||{})[k]||{};let a="",c="";const m=String(v||"").match(/^(\d+)-(\d+)$/);if(m){a=m[1];c=m[2];}
+  if(st.a!=null)a=st.a;if(st.b!=null)c=st.b;const act=st.side==null?(a===""?0:c===""?1:-1):st.side;
+  const both=a!==""&&c!=="",ok=both&&SC7_OK.has(a+"-"+c),bad=both&&!ok;const extra=opts.filter(o=>!/^\d+-\d+$/.test(o));
+  const box=(i,val)=>`<button type="button" class="sc7b${act===i?" on":""}${val!==""?" fill":""}" data-act="sc7box" data-k="${esc(k)}" data-side="${i}" aria-label="Jeux ${esc(sd[i])}">${val===""?"–":esc(val)}</button>`;
+  const win=ok?(+a>+c?sc7Last(sd[0]):sc7Last(sd[1])):"";
+  return`<div class="sc7"><div class="sc7l"><span class="sc7n">${esc(sc7Last(sd[0]))}</span>${box(0,a)}<b>–</b>${box(1,c)}<span class="sc7n r">${esc(sc7Last(sd[1]))}</span></div>
+  ${act>=0?`<div class="sc7d">${[0,1,2,3,4,5,6,7].map(d=>`<button type="button" class="sc7g${String(d)===(act?c:a)?" on":""}" data-act="sc7dig" data-k="${esc(k)}" data-side="${act}" data-d="${d}">${d}</button>`).join("")}</div>`:""}
+  <p class="sc7m${bad?" bad":""}">${bad?"Score impossible en tennis":ok?"✓ "+esc(win)+" gagne le set "+esc(+a>+c?a+"-"+c:c+"-"+a):"Touche une case, puis le nombre de jeux"}</p>
+  ${extra.length?`<div class="mpc">${extra.map(o=>`<button type="button" class="pick${v===o?" on":""}" data-act="sc7x" data-k="${esc(k)}" data-v="${esc(o)}"><span>${esc(o)}</span></button>`).join("")}</div>`:""}</div>`;}
+function sc7Score(k,v,sd){const[a,c]=String(v||"-").split("-");const cell=(i,val)=>`<div class="sc7s"><span class="sc7n">${esc(sd[i])}</span><div class="sc7st"><button type="button" class="sc7pm" data-act="sc7np" data-k="${esc(k)}" data-kind="score" data-side="${i}" data-d="-1" aria-label="moins">−</button><b class="sc7v">${val===""||val==null?"–":esc(val)}</b><button type="button" class="sc7pm" data-act="sc7np" data-k="${esc(k)}" data-kind="score" data-side="${i}" data-d="1" aria-label="plus">+</button></div></div>`;
+  return`<div class="sc7 sc7f">${cell(0,a)}<b class="sc7dash">–</b>${cell(1,c)}</div>`;}
+function sc7Num(k,v,row,b){const val=v==null||v===""?"":String(v);return`<div class="sc7 sc7f sc7one"><div class="sc7st"><button type="button" class="sc7pm" data-act="sc7np" data-k="${esc(k)}" data-kind="num" data-d="-1" aria-label="moins">−</button><b class="sc7v">${val===""?"–":esc(val)}</b><button type="button" class="sc7pm" data-act="sc7np" data-k="${esc(k)}" data-kind="num" data-d="1" aria-label="plus">+</button></div></div>`;}
+const SC7_BASE={games:20,aces:10,breaks:4,df:5,dur:100,five:2,goals:3,corners:9,ndnf:2,wins:5,score:110,total:220,margin:8,tries:5,gap:5,sub70:5,pts:5};
+function sc7Base(k){const id=String(k).split("|").pop();return SC7_BASE[id]!=null?SC7_BASE[id]:0;}
+function sc7Step(k,kind,side,d){const p=partyById(S.partyView);if(!p)return;const cur=myVal(p,k);
+  if(kind==="num"){let n=cur==null||cur===""?null:+cur;n=n==null?sc7Base(k):Math.max(0,n+d);setPick(p,k,String(n));return;}
+  const arr=String(cur||"-").split("-");let n=arr[side]===""||arr[side]==null?null:+arr[side];n=n==null?0:Math.max(0,Math.min(20,n+d));arr[side]=String(n);setPick(p,k,arr.join("-"));}
+let SC7T=null;function sc7Hold(el){clearTimeout(SC7T);clearInterval(SC7T);const k=el.dataset.k,kind=el.dataset.kind,side=+el.dataset.side||0,d=+el.dataset.d;
+  SC7T=setTimeout(()=>{SC7T=setInterval(()=>{sc7Step(k,kind,side,d);render();},110);},420);}
+["pointerup","pointercancel","pointerleave","touchend"].forEach(ev=>document.addEventListener(ev,()=>{clearTimeout(SC7T);clearInterval(SC7T);},true));
+document.addEventListener("pointerdown",e=>{const t=e.target.closest&&e.target.closest('[data-act="sc7np"]');if(t)sc7Hold(t);},true);
 function betInput(p,row,b,t,label,locked){if(!locked&&(row.cat==="f1x_q"||row.cat==="f1x_r")&&X175_RULE[b.id]&&!X175[t]){const _h=betInput0(p,row,b,t,label,locked);return`<p class="x175r">${esc(X175_RULE[b.id])}</p>`+_h;}return betInput0(p,row,b,t,label,locked);}
 function betInput0(p,row,b,t,label,locked){const k=row.key+"|"+b.id,v=myVal(p,k);
   if(locked)return`<div class="mpv">${v!=null&&v!==""?`<span class="chip2">${t==="choice"?mark(v):""}<span>${esc(tnL(row,b.id,v))}</span></span>`:`<span class="muted" style="font-size:13px">Pas de prono</span>`}</div>`;
   if(t==="yesno")return`<div class="mpc">${["Oui","Non"].map(o=>`<button type="button" class="pick${v===o?" on":""}" data-act="mpick" data-k="${esc(k)}" data-v="${o}">${o}</button>`).join("")}</div>`;
   if(t==="near"||t==="exactnum"){const par=b.id==="wscore"||b.id==="leadscore";return`<input class="inp mpin" inputmode="${par?"text":"numeric"}"${par?"":' pattern="[0-9]*"'} data-mp="${esc(k)}" value="${esc(v||"")}" placeholder="${par?"ex. -12 (E = par)":"ex. 63 coups"}">`;}
-  if(t==="number")return`<input class="inp mpin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" name="bfq9212-${esc(k)}" enterkeyhint="done" data-mp="${esc(k)}" value="${esc(v||"")}" placeholder="Ton chiffre">`;
+  if(t==="number")return sc7Num(k,v,row,b);
+  if(t==="number_OLD")return`<input class="inp mpin" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" name="bfq9212-${esc(k)}" enterkeyhint="done" data-mp="${esc(k)}" value="${esc(v||"")}" placeholder="Ton chiffre">`;
   if(t==="text")return`<input class="inp mpin" data-mp="${esc(k)}" value="${esc(v||"")}" placeholder="Écris un nom">`;
-  if(t==="score"&&(row.cat==="foot"||row.cat==="foot_ko"||row.cat==="cu_duel3"||row.cat==="cu_duel2n")){const[a,c]=(v||"-").split("-");const sd=sides(row.it)||["Domicile","Extérieur"];
+  if(t==="score"&&(row.cat==="foot"||row.cat==="foot_ko"||row.cat==="cu_duel3"||row.cat==="cu_duel2n"))return sc7Score(k,v,sides(row.it)||["Domicile","Extérieur"]);
+  if(t==="score_OLD"){const[a,c]=(v||"-").split("-");const sd=sides(row.it)||["Domicile","Extérieur"];
     return`<div class="mps"><span>${esc(sd[0])}</span><input class="inp" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" name="bfq6137-${esc(k)}" enterkeyhint="done" data-mps="${esc(k)}" data-side="0" value="${esc(a||"")}" aria-label="Buts ${esc(sd[0])}"><b>–</b><input class="inp" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" name="bfq2681-${esc(k)}" enterkeyhint="done" data-mps="${esc(k)}" data-side="1" value="${esc(c||"")}" aria-label="Buts ${esc(sd[1])}"><span>${esc(sd[1])}</span></div>`;}
   const cfg=normCfg(effCfg(p,row)||defaultCfg(row.cat,"C"),row.cat);const opts=optsOf(cfg.bets.find(x=>x.id===b.id)||b,p,row.key,row.cat);
   if(X175[t])return x175Input(p,row,b,t,k,v,opts);
   if(golfPickable(p,b,t))return golfPicker(p,row,b,t,k,v,opts);
   if(t==="rank"){const arr=Array.isArray(v)?v:[];return`<div class="mpr">${[0,1,2].map(i=>`<label><span>${i+1}${i?"e":"er"}</span><select class="inp" data-mpr="${esc(k)}" data-i="${i}"><option value="">Choisir</option>${opts.map(o=>`<option${arr[i]===o?" selected":""}>${esc(o)}</option>`).join("")}</select></label>`).join("")}</div>`;}
+  if(/^set[123]$/.test(b.id)&&String(row.cat).startsWith("tennis")&&sides(row.it))return sc7Tennis(k,v,sides(row.it),b.id,opts);
   const tnHint=TN_SC.has(b.id)&&String(row.cat).startsWith("tennis")&&sides(row.it)?`<p class="muted" style="font-size:12px;margin:0 0 8px">Touche le joueur qui gagne ${b.id==="set1"?"le 1er set":b.id==="set2"?"le 2e set":b.id==="set3"?"le 3e set (ou « Pas de 3e set »)":"le match"} et son score.</p>`:"";
   return`${tnHint}<div class="mpc">${tnSort(row,b.id,opts).map(o=>`<button type="button" class="pick${v===o?" on":""}" data-act="mpick" data-k="${esc(k)}" data-v="${esc(o)}">${mark(o)}<span>${esc(tnL(row,b.id,o))}</span>${(()=>{const od=oddFor(FIND[p.comp],row.it,b.id,o);return od?`<em class="podd">${od.toFixed(2)}</em>`:"";})()}</button>`).join("")}</div>`;
 }
@@ -8785,6 +8818,12 @@ document.addEventListener("click",e=>{
       if(db)db.collection("live").doc(lid).set(Object.assign({},LIVE[lid])).then(done,()=>{toast("Enregistrement impossible, réessaie.");render();});else done();break;}
     case "mmulti":{const p=partyById(S.partyView),k=t.dataset.k,cv=myVal(p,k),cur=Array.isArray(cv)?cv.filter(Boolean):[];const v=t.dataset.v,i=cur.indexOf(v);if(i>=0)cur.splice(i,1);else{if(cur.length>=3){toast("3 joueurs maximum : retire d'abord un joueur.");break;}cur.push(v);}setPick(p,k,cur.length?cur:null);setPick(p,k+"@odd",cur.length?golfOddsFor(p,k,cur):null);render();break;}
     case "gpOpen":{const b=t.dataset.box;S.gopen=Object.assign({},S.gopen,{[b]:!(S.gopen||{})[b]});if(!S.gopen[b]&&S.gq)S.gq[b]="";render();if(S.gopen[b]){const e=document.querySelector(`[data-gq="${b}"]`);if(e)e.focus();}break;}
+    case "sc7box":{S.sc7=S.sc7||{};const k=t.dataset.k;S.sc7[k]=Object.assign({},S.sc7[k],{side:+t.dataset.side});render();break;}
+    case "sc7dig":{S.sc7=S.sc7||{};const k=t.dataset.k,sd=+t.dataset.side,p=partyById(S.partyView);const prev=String(myVal(p,k)||"").match(/^(\d+)-(\d+)$/);const st=Object.assign({a:prev?prev[1]:"",b:prev?prev[2]:""},S.sc7[k]);
+      if(sd===0)st.a=t.dataset.d;else st.b=t.dataset.d;st.side=sd===0&&st.b===""?1:sd===0?-1:(st.a===""?0:-1);S.sc7[k]=st;
+      const v=st.a!==""&&st.b!==""?st.a+"-"+st.b:null;setPick(p,k,v&&SC7_OK.has(v)?v:null);render();break;}
+    case "sc7x":{const p=partyById(S.partyView),k=t.dataset.k;const nv=myVal(p,k)===t.dataset.v?null:t.dataset.v;if(S.sc7)delete S.sc7[k];setPick(p,k,nv);render();break;}
+    case "sc7np":{if(t.__held)break;sc7Step(t.dataset.k,t.dataset.kind,+t.dataset.side||0,+t.dataset.d);render();break;}
     case "mpick":{const p=partyById(S.partyView),k=t.dataset.k;const nv=myVal(p,k)===t.dataset.v?null:t.dataset.v;setPick(p,k,nv);const gl=t.closest(".gpl");if(gl)setPick(p,k+"@odd",nv?golfOddsFor(p,k,nv):null);if(gl){S.gopen=Object.assign({},S.gopen,{[gl.id]:false});S.gq=Object.assign({},S.gq,{[gl.id]:""});}render();break;}
     case "vtk":{const k=t.dataset.k,g=document.querySelector("#app .spgrid");if(!g){S.pfOpen=S.pfOpen===k?null:k;render();break;}
       if(document.querySelector(".vtmove"))break;vtkFlip(g,()=>{S.pfOpen=S.pfOpen===k?null:k;render();},k);break;}
@@ -10911,5 +10950,32 @@ html body #app .av176t b,html body #app .av176t small,html body #app .av176t em{
 html body #app .av176t small{text-transform:uppercase}
 html body #app .evg176l img{width:28px;height:28px}
 html body #app .evg176,html body #app .evg176w{min-width:0;max-width:100%;box-sizing:border-box}
+
+/* v177 : saisie compacte des scores */
+.sc7{margin:2px 0 4px}
+.sc7l{display:flex;align-items:center;justify-content:center;gap:10px}
+.sc7n{flex:1;min-width:0;font-weight:700;font-size:15px;color:#f3e6c4;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc7n.r{text-align:left}
+.sc7b{all:unset;box-sizing:border-box;width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font:800 26px/1 var(--fd,inherit);color:#f3e6c4;background:rgba(0,0,0,.35);border:1.5px solid rgba(217,178,94,.45);cursor:pointer}
+.sc7b.fill{color:#F0D592}
+.sc7b.on{border-color:#F0D592;box-shadow:0 0 0 3px rgba(240,213,146,.25)}
+.sc7l>b{color:#a8946a;font-size:22px}
+.sc7d{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:10px 0 0}
+.sc7g{all:unset;box-sizing:border-box;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:17px;color:#E9C77A;border:1px solid rgba(217,178,94,.45);background:rgba(20,14,6,.6);cursor:pointer}
+.sc7g.on{background:linear-gradient(180deg,#F0D592,#C9A04E);color:#1a1206;border-color:#F0D592}
+.sc7m{margin:8px 0 0;font-size:12.5px;color:#a8946a;text-align:center}
+.sc7m.bad{color:#ff8a80;font-weight:700}
+.sc7 .mpc{margin-top:8px}
+.sc7f{display:flex;align-items:flex-end;justify-content:center;gap:10px}
+.sc7s{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sc7s .sc7n{text-align:center;font-size:13.5px;max-width:100%}
+.sc7st{display:flex;align-items:center;gap:8px}
+.sc7pm{all:unset;box-sizing:border-box;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:700;color:#E9C77A;border:1.5px solid rgba(217,178,94,.6);background:rgba(20,14,6,.6);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.sc7pm:active{background:linear-gradient(180deg,#F0D592,#C9A04E);color:#1a1206}
+.sc7v{min-width:46px;text-align:center;font:800 28px/1 var(--fd,inherit);color:#F0D592}
+.sc7dash{color:#a8946a;font-size:22px;padding-bottom:10px}
+.sc7one{justify-content:flex-start}
+@media (max-width:400px){.sc7f{gap:4px}.sc7st{gap:4px}.sc7pm{width:34px;height:34px;font-size:20px}.sc7v{min-width:30px;font-size:24px}.sc7dash{font-size:18px;padding-bottom:8px}}
+@media (max-width:360px){.sc7b{width:46px;height:46px;font-size:22px}.sc7g{height:36px;font-size:15px}.sc7l{gap:6px}.sc7n{font-size:13.5px}.sc7pm{width:31px;height:31px;font-size:18px}.sc7v{min-width:26px;font-size:22px}.sc7f{gap:2px}.sc7st{gap:3px}}
 </style></body>
 </html>
