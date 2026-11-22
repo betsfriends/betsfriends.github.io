@@ -516,7 +516,7 @@ dialog[open]{animation:entre .28s ease}
   .hero-haut{z-index:2!important}
   .hero-photo::after{content:"";position:absolute;inset:0;pointer-events:none;
     background:radial-gradient(48% 42% at 0% 100%,rgba(12,10,8,.72),rgba(12,10,8,.35) 55%,transparent 100%)}
-  .hero-carte{max-width:30rem;gap:1.2rem}
+  .hero-carte{max-width:32rem;gap:1.1rem}
   .hero-carte::before{content:"";width:3rem;height:1px;background:var(--brass-2)}
   .hero-lede b{font-weight:400;color:#EED39C;display:block}
   .hero-lede{color:#F6F1E8;font-size:clamp(1.5rem,1rem + 1.3vw,2.2rem);line-height:1.18;max-width:20ch;text-shadow:0 2px 18px rgba(0,0,0,.45)}
@@ -613,6 +613,21 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
 @media(max-width:40rem){dialog#fiche{width:100vw;max-width:100vw;height:100%;max-height:100%;margin:0}}
 @media(prefers-reduced-motion:reduce){dialog#fiche:not(.prep) .f-corps>*{animation:none}}
 @media(prefers-reduced-motion:reduce){.grain{display:none}}
+
+/* accueil option B : tout le texte en une colonne, dans la partie sombre à gauche */
+@media(min-width:52.01rem){
+  .hero-photo::before{display:none}
+  .hero-photo::after{background:linear-gradient(90deg,rgba(10,9,8,.82) 0%,rgba(10,9,8,.55) 32%,transparent 58%),linear-gradient(0deg,rgba(10,9,8,.5),transparent 40%)!important}
+  .hero-carte::before{display:none}
+  .hero .hero-eye{color:#E6C98F;text-shadow:none;margin-bottom:.2rem}
+  .hero h1{color:#F6F1E8;text-shadow:none;font-size:clamp(2rem,1rem + 2.2vw,3.3rem);line-height:1.06}
+  .hero h1 .l1,.hero h1 span.l1{color:#F6F1E8!important;white-space:normal;display:block}
+  .hero h1 span:not(.l1){color:#E6C98F}
+  .hero-lede{font-family:var(--f-body);font-size:clamp(1.02rem,.9rem + .45vw,1.28rem);line-height:1.5;max-width:34ch;color:#D9D2C6;text-shadow:0 1px 12px rgba(0,0,0,.5)}
+}
+@media(max-width:52rem){
+  .hero-lede{font-family:var(--f-body);font-size:1.05rem;line-height:1.5;color:var(--graphite)}
+}
 </style>
 </head>
 <body>
@@ -630,10 +645,6 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
 <a class="retour-haut" id="retour-haut" href="#accueil" aria-label="Revenir à l'accueil"><span aria-hidden="true">↑</span> Accueil</a>
 <main id="haut">
 <section class="hero" id="accueil">
-  <div class="wrap hero-haut">
-    <p class="mono hero-eye">Promotion 2027 · Recrutement de licenciés</p>
-    <h1><span class="l1">Devenez licencié de</span> <span>La Cuisine Louise Verlaine.</span></h1>
-  </div>
   <div class="hero-photo">
     <img id="hero-img" alt="Un showroom La Cuisine Louise Verlaine : cuisines exposées, îlot en pierre et, au premier plan, la table Touch Reality">
     <button type="button" class="hotspot" id="hotspot" style="left:65.5%;top:86%" data-x=".655" data-y=".86" aria-label="Voir la vidéo de la Touch Reality">
@@ -643,7 +654,9 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
   </div>
   <div class="wrap hero-bas">
     <div class="hero-carte">
-      <p class="hero-lede"><b>Ouvrez votre showroom</b>et faites la différence avec un concept unique au&nbsp;monde.</p>
+      <p class="mono hero-eye">Promotion 2027 · Recrutement de licenciés</p>
+      <h1><span class="l1">Devenez licencié de</span> <span>La Cuisine Louise Verlaine.</span></h1>
+      <p class="hero-lede">Ouvrez votre showroom et faites la différence avec un concept unique au&nbsp;monde.</p>
       <a class="hero-lien" href="#villes">Découvrir les ouvertures 2027 <span aria-hidden="true">→</span></a>
     </div>
   </div>
