@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v183";
+const APP_VER="v184";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -7228,7 +7228,7 @@ const r99=v=>Math.max(0.99,Math.ceil(v)-0.01);
 /* v183 : suppression d'une partie par l'organisateur — permise avant tout match ; après le 1er coup d'envoi, seulement si personne d'autre n'a de prono et qu'aucun match n'est terminé */
 function delInfo183(p){try{if(!p||p.demo)return{ok:false,why:""};if(!isOwner(p))return{ok:false,why:"Seul l'organisateur peut supprimer la partie."};const c=FIND[p.comp];if(c&&c.custom)return{ok:true};
   let rows=[];try{rowsOfParty(p);rows=rowsOfParty(p);}catch(_){}const started=potLocked(p);if(!started)return{ok:true};
-  if(isClosed(p)||rows.some(r=>r.it&&isDone(r.it)))return{ok:false,why:"Impossible : un match est déjà terminé, le classement a commencé."};
+  /* v184 : même si des matchs sont terminés — si personne d'autre n'a joué, il n'y a pas de vraie partie : suppression permise */
   const P=picksOf(p)||{};const others=Object.keys(P).filter(id=>id!==p.owner&&id!==myId(p)&&P[id]&&Object.values(P[id]).some(v=>v!==undefined&&v!==null&&v!==""));
   if(others.length){const pl=rawPlayers(p);const nm=others.map(id=>{const x=pl.find(y=>y.id===id);return x&&x.name?String(x.name).split(" ")[0]:null;}).filter(Boolean);return{ok:false,why:"Impossible : "+(nm.length?nm.slice(0,2).join(" et ")+(nm.length>2?" et d'autres":""):"un autre joueur")+(nm.length>1?" ont":" a")+" déjà fait "+(nm.length>1?"leurs":"ses")+" pronos."};}
   return{ok:true};}catch(_){return{ok:false,why:"Suppression impossible pour l'instant."};}}
@@ -8284,7 +8284,7 @@ function vParty(){
     h+=`<div class="pad" style="margin-top:18px;display:grid;gap:8px">${pays.length?`<div class="card"><div class="lab">Paiements de la partie</div>${pays.map(x=>`<div class="pl2"><span>${esc(x.what)}</span><b>${eur(x.amount)}</b></div>`).join("")}</div>`:""}
      ${p.demo?`<p class="muted" style="text-align:center;font-size:13px;margin:0">Partie d'exemple : pronostics et résultats simulés.</p>`
       :""}</div>`;}
-    if(boss&&!p.demo){const di=delInfo183(p);h+=`<div class="pad" style="margin-top:18px"><button type="button" class="btn block del183" data-act="delParty" data-id="${esc(p.id)}"${di.ok?"":" disabled aria-disabled=\"true\""}>🗑️ Supprimer la partie</button><p class="muted" style="font-size:12px;text-align:center;margin:6px 0 0">${di.ok?(c&&c.custom?"Ton championnat sera supprimé avec ses matchs et ses pronos.":started?"Personne d'autre n'a encore joué et aucun match n'est terminé.":"Possible tant que personne d'autre n'a joué."):esc(di.why)}</p></div>`;}
+    if(boss&&!p.demo){const di=delInfo183(p);h+=`<div class="pad" style="margin-top:18px"><button type="button" class="btn block del183" data-act="delParty" data-id="${esc(p.id)}"${di.ok?"":" disabled aria-disabled=\"true\""}>🗑️ Supprimer la partie</button><p class="muted" style="font-size:12px;text-align:center;margin:6px 0 0">${di.ok?(c&&c.custom?"Ton championnat sera supprimé avec ses matchs et ses pronos.":started?"Personne d'autre n'a encore joué : tu peux supprimer la partie.":"Possible tant que personne d'autre n'a joué."):esc(di.why)}</p></div>`;}
     }
     if(rt==="bets"&&!p.free){h+=betsAdmin(p,c,started);
     if(c&&c.custom&&own){const cu=c.custom,k=cu.kind,opt=`<option value="">Choisir</option>`+cu.teams.map(n=>`<option>${esc(n)}</option>`).join("");
