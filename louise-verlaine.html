@@ -614,16 +614,20 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
 @media(prefers-reduced-motion:reduce){dialog#fiche:not(.prep) .f-corps>*{animation:none}}
 @media(prefers-reduced-motion:reduce){.grain{display:none}}
 
-/* accueil option B : tout le texte en une colonne, dans la partie sombre à gauche */
+/* accueil option D : panneau noir à gauche pour le texte, photo intacte à droite */
 @media(min-width:52.01rem){
-  .hero-photo::before{display:none}
-  .hero-photo::after{background:linear-gradient(90deg,rgba(10,9,8,.82) 0%,rgba(10,9,8,.55) 32%,transparent 58%),linear-gradient(0deg,rgba(10,9,8,.5),transparent 40%)!important}
+  .hero{position:relative}
+  .hero-photo{margin-left:36%;width:64%}
+  .hero-photo::before,.hero-photo::after{display:none}
+  .hero-bas{top:0!important;bottom:0!important;left:0!important;right:auto!important;width:36%;max-width:none!important;margin:0!important;
+    display:flex;align-items:center;padding:0 clamp(1.6rem,3vw,3rem) 0 max(clamp(1.6rem,3vw,3rem),calc((100vw - 76rem)/2 + 16px))!important;background:linear-gradient(160deg,#16130F,#0C0B0A);border-right:1px solid rgba(198,164,106,.35)}
+  .hero-carte{max-width:none!important;gap:1.1rem}
   .hero-carte::before{display:none}
   .hero .hero-eye{color:#E6C98F;text-shadow:none;margin-bottom:.2rem}
-  .hero h1{color:#F6F1E8;text-shadow:none;font-size:clamp(2rem,1rem + 2.2vw,3.3rem);line-height:1.06}
+  .hero h1{color:#F6F1E8;text-shadow:none;font-size:clamp(1.9rem,.9rem + 2vw,3.1rem);line-height:1.08}
   .hero h1 .l1,.hero h1 span.l1{color:#F6F1E8!important;white-space:normal;display:block}
   .hero h1 span:not(.l1){color:#E6C98F}
-  .hero-lede{font-family:var(--f-body);font-size:clamp(1.02rem,.9rem + .45vw,1.28rem);line-height:1.5;max-width:34ch;color:#D9D2C6;text-shadow:0 1px 12px rgba(0,0,0,.5)}
+  .hero-lede{font-family:var(--f-body);font-size:clamp(1rem,.9rem + .4vw,1.25rem);line-height:1.5;max-width:34ch;color:#D9D2C6;text-shadow:none}
 }
 @media(max-width:52rem){
   .hero-lede{font-family:var(--f-body);font-size:1.05rem;line-height:1.5;color:var(--graphite)}
