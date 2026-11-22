@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v184";
+const APP_VER="v185";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -4105,7 +4105,9 @@ function tkRip143(box){try{if(!box||!box.parentElement)return false;
     {transform:"translate("+dx+"px,"+dy+"px) rotate(-38deg)",opacity:0,filter:"drop-shadow(16px 16px 18px rgba(0,0,0,.5))",offset:1}
   ],{duration:900,easing:"cubic-bezier(.45,0,.4,1)",fill:"forwards"});
   return true;}catch(_){return false;}}
-function liveWrap(o){return new Proxy(o,{set(t,k,v){if(v&&typeof v==="object"&&!v.manual&&tlIs(k)){v=Object.assign({},v,{status:"LIVE",minute:v.status==="LIVE"&&v.minute?v.minute:(/^atpf~/.test(String(k))?"":"90'"),line:v.status==="LIVE"?(v.line||""):(/^atpf~/.test(String(k))?String(v.line||"").replace(/\s*·.*$/,""):""),winner:undefined});delete v.ftAt;if(FTAT[k]){delete FTAT[k];ftatSave();}t[k]=v;return true;}if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
+/* v185 : heure à laquelle CET appareil a vu un match « en direct » (pour la courte pause « TERMINÉ » du Salon) */
+var LV_SEEN185={};
+function liveWrap(o){return new Proxy(o,{set(t,k,v){try{if(v&&typeof v==="object"&&v.status==="LIVE"&&!LV_SEEN185[k])LV_SEEN185[k]=Date.now();}catch(_){}if(v&&typeof v==="object"&&!v.manual&&tlIs(k)){v=Object.assign({},v,{status:"LIVE",minute:v.status==="LIVE"&&v.minute?v.minute:(/^atpf~/.test(String(k))?"":"90'"),line:v.status==="LIVE"?(v.line||""):(/^atpf~/.test(String(k))?String(v.line||"").replace(/\s*·.*$/,""):""),winner:undefined});delete v.ftAt;if(FTAT[k]){delete FTAT[k];ftatSave();}t[k]=v;return true;}if(LV_RAW){t[k]=v;return true;}const old=t[k];const isEnd=x=>x&&(x.status==="FT"||x.status==="END");
   /* v101 : LIVE → NS/PST (source qui « perd » le match) : on garde le direct */
   if(v&&typeof v==="object"&&!v.manual&&old&&old.status==="LIVE"&&(v.status==="NS"||v.status==="PST"||!v.status))return true;
   if(v&&typeof v==="object"&&v.status==="LIVE"&&!isEnd(old)&&FTAT[k]){delete FTAT[k];ftatSave();}
@@ -6142,6 +6144,8 @@ function vProfile(){
     <p class="pfnote">Tout s'enregistre automatiquement.</p></div>
    <h2 class="pfh">Mes sports</h2>
    <div class="pfcard"><p class="pfnote" style="margin:0 0 10px">Décoche un sport pour le retirer de ton accueil et de la page Évents.</p><div class="pfsps">${H3_SP.map(([id,n])=>{const on=!(m.hs||[]).includes(id);return`<button type="button" class="pfsp${on?" on":""}" data-act="pfSport" data-v="${id}" aria-pressed="${on}">${goldSp(id,30)}<span>${esc(n)}</span><i aria-hidden="true">${on?"✓":""}</i></button>`;}).join("")}</div></div>
+   <h2 class="pfh">Sons et vibrations</h2>
+   <div class="pfcard"><div class="tk185row"><span><b>Son des sélecteurs</b><small>Un petit « tac » quand tu fais défiler les journées</small></span><button type="button" class="pfpl${TK185.on?"":" ghost"}" data-act="tick185" aria-pressed="${TK185.on}">${TK185.on?"Activé":"Désactivé"}</button></div></div>
    <h2 class="pfh">Mot de passe</h2>
    <div class="pfcard"><label class="pff"><span>Mot de passe actuel</span><input class="inp" id="pwc" type="password" autocomplete="current-password"></label>
     <label class="pff"><span>Nouveau mot de passe</span><input class="inp" id="pwn" type="password" autocomplete="new-password" minlength="6" placeholder="6 caractères minimum"></label>
@@ -6573,8 +6577,14 @@ function ntile(p,k,D){const sid=sportOfParty(p),tk=SP_TK[sid]||SP_TK.free,r=D.RK
 function estLive(it){if(!it||it.tbd||isDone(it))return false;const st=it.live?liveSt(it):"NS";if(st==="LIVE"||st==="FT"||st==="END")return false;if(st==="PST"){const L=LIVE[it.lid]||{};if(L.sa==null&&!L.line)return false;}const t=+new Date(it.date),now=+NOW;/* v176 : en attente du résultat → reste « en direct » (Salon) jusqu'au résultat ; garde-fou 48 h */return t<=now&&now<t+(it.live||it.custom?48:(it.dur||3))*3600e3&&!(it.custom&&it.res);}
 const GRACE=15*60e3;
 function inGrace(it){if(!it||!it.live||it.tbd)return false;const st=liveSt(it);if(st!=="FT"&&st!=="END")return false;if(!lvEndOk(it.lid,LIVE[it.lid]))return false;if(+NOW>+new Date(it.date)+6*3600e3)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;if(!f)return false;const d=+NOW-f;return d>=-60e3&&d<GRACE;}
+/* v185 : un match dont le résultat est connu quitte le Salon tout de suite.
+   Seule exception : on l'a regardé EN DIRECT sur cet appareil et il vient de finir (15 min, « TERMINÉ »).
+   (avant : l'heure de fin était celle où l'appareil découvrait le résultat → un match fini depuis 3 h restait 15 min de plus à chaque ouverture) */
+function resKnown185(it){if(!it||it.tbd)return false;try{if(isDone(it))return true;}catch(_){}const L=LIVE[it.lid];return!!(L&&(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L));}
+function lrGrace185(it){try{if(!inGrace(it))return false;const s0=LV_SEEN185[it.lid];if(!s0)return false;const L=LIVE[it.lid]||{},f=FTAT[it.lid]?+new Date(FTAT[it.lid]):L.ftAt?+new Date(L.ftAt):0;return!!f&&f-s0>=25e3;}catch(_){return false;}}
+function lrOut185(it){return resKnown185(it)&&!lrGrace185(it);}
 function inPlay(it){return!!it&&((it.live&&liveSt(it)==="LIVE")||estLive(it)||inGrace(it));}
-function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{const cl=isClosed(p);rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it));rows.forEach(r=>out.push({p,r,cl:cl&&inGrace(r.it)}));}catch(_){}});
+function liveRowsAll(){const out=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;let rows=[];try{const cl=isClosed(p);rows=rowsOfParty(p).filter(r=>r.it&&inPlay(r.it)&&!lrOut185(r.it));rows.forEach(r=>out.push({p,r,cl:cl&&inGrace(r.it)}));}catch(_){}});
   out.sort((x,y)=>(+y.r.it.date)-(+x.r.it.date));return out;}
 /* noms courts, comme sur l'affiche du match (« Tirante – Munar ») */
 function shortSides(it){const sd=sides(it);if(!sd)return null;const l=String(it.label||""),sep=l.includes(" @ ")?" @ ":" – ",pr=l.split(sep);return pr.length===2?pr:sd;}
@@ -6642,7 +6652,7 @@ const LR_SEEN={};
 function lrKey(it,fb){let k=it.lid||fb;try{const sd=sides(it);if(sd&&sd.length===2)k="m:"+sd.map(normS).sort().join("|")+":"+new Date(it.date).toDateString();}catch(_){}return k;}
 function liveMatches(){const out=liveMatches0(),by={},now=+NOW;out.forEach(m=>{by[m.k]=1;LR_SEEN[m.k]={k:m.k,it:m.it,c:m.c,rows:m.rows};});
   Object.values(LR_SEEN).forEach(s=>{if(by[s.k])return;const rows=[];(S.parties||[]).forEach(p=>{if(!p||p.free)return;try{rowsOfParty(p).forEach(r=>{if(r.it&&lrKey(r.it,r.key)===s.k)rows.push({p,r});});}catch(_){}});
-    const its=rows.map(x=>x.r.it).concat([s.it]),fin=its.some(it=>{const L=LIVE[it.lid]||{};return(L.status==="FT"||L.status==="END")&&lvEndOk(it.lid,L)&&!inGrace(it);});
+    const its=rows.map(x=>x.r.it).concat([s.it]),fin=its.some(it=>lrOut185(it));
     if(!its.some(i=>tlItem(i))&&(fin||now>+new Date(s.it.date)+48*3600e3)){delete LR_SEEN[s.k];return;}
     const it=its.find(i=>liveSt(i)==="LIVE")||its[0];
     try{const D=JSON.parse(localStorage.getItem("bf_lrdiag")||"[]");D.push({at:new Date().toISOString(),k:s.k,its:its.map(i=>i.lid+":"+liveSt(i)+":"+(+new Date(i.date))),rows:rows.length,v:APP_VER});localStorage.setItem("bf_lrdiag",JSON.stringify(D.slice(-30)));}catch(_){}
@@ -7660,7 +7670,9 @@ function myBetsTab(p,sc){
   if(suIds.length>1){const KJ=p.id+":"+kf;kj=S.kj&&S.kj[KJ];
     if(!suIds.includes(kj)){if(kf==="done")kj=suIds[suIds.length-1];else{const pool=inF.filter(x=>x.kind==="todo"||x.kind==="ready"),f0=(pool.length?pool:inF).slice().sort((x,y)=>closeAt(x.r.it)-closeAt(y.r.it))[0];kj=f0?suOf(f0):suIds[0];}}
     const lab=su=>{const n=String(su.name||"");const m=n.match(/^(Journée|Matchday|Round|Tour|Étape|Manche)\s+(\d+)$/i);return m?(m[1][0].toUpperCase()==="J"?"J":m[1].slice(0,1).toUpperCase())+m[2]:n;};
-    h+=`<div class="kjbar" role="tablist" aria-label="Choisir la journée">${suIds.map(id=>{const su=subs.find(x=>x.id===id),n=inF.filter(x=>suOf(x)===id).length,on=id===kj;return`<button type="button" role="tab" aria-selected="${on}" class="kj${on?" on":""}" data-act="kj" data-k="${esc(KJ)}" data-v="${esc(id)}" title="${esc(su.name)}"><b>${esc(lab(su))}</b><small>${n}</small></button>`;}).join("")}</div>`;}
+    /* v185 : journées en INTERCALAIRES sur une seule rangée qui défile cran par cran (plus de rangée de mini-pastilles) */
+    const many185=suIds.length>3,sp185=many185?`<span class="rt185sp" aria-hidden="true"></span>`:"";
+    h+=`<div class="rt185w${many185?" sc":""}"><div class="rt185" role="tablist" aria-label="Choisir la journée">${sp185}${suIds.map(id=>{const su=subs.find(x=>x.id===id),n=inF.filter(x=>suOf(x)===id).length,on=id===kj;return`<button type="button" role="tab" aria-selected="${on}" class="kj rt185b${on?" on":""}" data-act="kj" data-k="${esc(KJ)}" data-v="${esc(id)}" title="${esc(su.name)}"><b>${esc(lab(su))}</b><small>${n} match${n>1?"s":""}</small></button>`;}).join("")}${sp185}</div></div>`;}
   const vis=kj?items.filter(x=>suOf(x)===kj):items;
   const shown=SECT.filter(([k])=>kf==="all"||FILT[kf].includes(k));let any=false;
   /* v159 : matchs EN DIRECT en tête, puis ordre chronologique. v157 : vue « tout » = UNE liste dans l'ordre chronologique (MATCH 1/N en premier) ; l'urgence reste visible par la pastille / le bouton orange */
@@ -8632,7 +8644,26 @@ if(!window._touchOn){window._touchOn=1;const on=()=>{clearTimeout(window._touchT
 /* v136 : aucun re-rendu « venu d'ailleurs » (données en direct, chat, notifications, minuteurs) ne remplace l'écran pendant qu'un doigt touche l'écran :
    sur iPhone, si le bouton touché disparaît entre le toucher et le relâcher, le tap est perdu. Les rendus demandés par une action (tap) restent immédiats. */
 window._inAct=0;window._rPend=0;
-function render(){if(window._touching&&!window._inAct){if(!window._rPend){window._rPend=1;const w=()=>{if(window._touching){setTimeout(w,120);return;}window._rPend=0;try{_renderNow();}catch(e){try{diag("err","render "+(e&&e.message||e));}catch(_){}}};setTimeout(w,120);}return;}window._rPend=0;const R=_renderNow();try{setTimeout(()=>{try{mcBarUpd();}catch(_){}try{tkFit166();}catch(_){}},0);setTimeout(()=>{try{tkFit166();}catch(_){}},260);setTimeout(()=>{try{tkFit166();}catch(_){}},900);}catch(_){}return R;}
+/* v185 : « tac » des sélecteurs — son très court (Web Audio), vibration Android, retour haptique iOS 18+ au toucher */
+const TK185={ctx:null,on:(()=>{try{return localStorage.getItem("bf_tick")!=="0";}catch(_){return true;}})()};
+function tk185Ctx(){try{if(!TK185.on)return null;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!TK185.ctx)TK185.ctx=new AC();if(TK185.ctx.state==="suspended")TK185.ctx.resume();return TK185.ctx;}catch(_){return null;}}
+["touchend","pointerup","click"].forEach(ev=>addEventListener(ev,()=>{if(TK185.ctx||document.querySelector(".rt185w"))tk185Ctx();},{passive:true,capture:true}));
+function tk185Audio(){if(!TK185.on)return;try{const c=TK185.ctx;if(!c||c.state!=="running")return;const n=Math.max(64,Math.floor(c.sampleRate*0.008)),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,5);const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type="highpass";f.frequency.value=2200;const g=c.createGain();g.gain.value=0.16;s.connect(f);f.connect(g);g.connect(c.destination);s.start();}catch(_){}}
+function tk185Vib(ms){try{if(TK185.on&&navigator.vibrate)navigator.vibrate(ms);}catch(_){}}
+function tk185Hap(){if(!TK185.on)return;try{if(navigator.vibrate){navigator.vibrate(12);return;}let l=document.getElementById("hap185");if(!l){l=document.createElement("label");l.id="hap185";l.setAttribute("aria-hidden","true");l.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none";const i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");i.tabIndex=-1;l.appendChild(i);document.body.appendChild(l);}l.click();}catch(_){}}
+function rt185Init(){document.querySelectorAll("#app .rt185w.sc .rt185").forEach(sc=>{if(sc._i185)return;sc._i185=1;const W=sc.parentNode,bs=[...sc.querySelectorAll(".rt185b")];if(!bs.length)return;const on=sc.querySelector(".rt185b.on")||bs[0];
+  const cen=b=>b.offsetLeft+b.offsetWidth/2-sc.clientWidth/2;sc.style.scrollSnapType="none";sc.scrollLeft=cen(on);requestAnimationFrame(()=>{sc.style.scrollSnapType="";});
+  let cur=bs.indexOf(on),user=false,touch=false,tmr=0;
+  const edges=()=>{W.classList.toggle("atS",sc.scrollLeft<6);W.classList.toggle("atE",sc.scrollLeft>sc.scrollWidth-sc.clientWidth-6);};edges();
+  const settle=()=>{if(!user||touch)return;user=false;const b=bs[cur];if(b&&!b.classList.contains("on")&&b.isConnected){S.kj=Object.assign({},S.kj,{[b.dataset.k]:b.dataset.v});render();}};
+  sc.addEventListener("touchstart",()=>{user=true;touch=true;},{passive:true});sc.addEventListener("touchend",()=>{touch=false;clearTimeout(tmr);tmr=setTimeout(settle,160);},{passive:true});sc.addEventListener("touchcancel",()=>{touch=false;},{passive:true});
+  sc.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch")user=true;},{passive:true});sc.addEventListener("wheel",()=>{user=true;},{passive:true});
+  sc.addEventListener("scroll",()=>{edges();const mid=sc.scrollLeft+sc.clientWidth/2;let bi=cur,bd=1e9;bs.forEach((b,i)=>{const d=Math.abs(b.offsetLeft+b.offsetWidth/2-mid);if(d<bd){bd=d;bi=i;}});
+    if(bi!==cur){cur=bi;if(user){tk185Audio();tk185Vib(8);const b=bs[bi];b.classList.remove("tk");void b.offsetWidth;b.classList.add("tk");setTimeout(()=>b.classList.remove("tk"),150);}}
+    clearTimeout(tmr);tmr=setTimeout(settle,160);},{passive:true});
+  if("onscrollend" in window)sc.addEventListener("scrollend",()=>{clearTimeout(tmr);settle();});});}
+try{let q185=0;const ap=document.getElementById("app");if(ap&&window.MutationObserver)new MutationObserver(()=>{if(q185)return;q185=1;requestAnimationFrame(()=>{q185=0;try{rt185Init();}catch(_){}});}).observe(ap,{childList:true,subtree:true});}catch(_){}
+function render(){if(window._touching&&!window._inAct){if(!window._rPend){window._rPend=1;const w=()=>{if(window._touching){setTimeout(w,120);return;}window._rPend=0;try{_renderNow();try{rt185Init();}catch(_){}}catch(e){try{diag("err","render "+(e&&e.message||e));}catch(_){}}};setTimeout(w,120);}return;}window._rPend=0;const R=_renderNow();try{rt185Init();}catch(_){}try{setTimeout(()=>{try{mcBarUpd();}catch(_){}try{tkFit166();}catch(_){}},0);setTimeout(()=>{try{tkFit166();}catch(_){}},260);setTimeout(()=>{try{tkFit166();}catch(_){}},900);}catch(_){}return R;}
 /* v136 : journal de diagnostic (appui long sur le numéro de version) */
 function diag(k,m){try{const L=JSON.parse(localStorage.getItem("bf_diag")||"[]");L.push({t:new Date().toLocaleTimeString("fr-BE"),k,m:String(m||"").slice(0,180)});localStorage.setItem("bf_diag",JSON.stringify(L.slice(-30)));}catch(_){}}
 (()=>{let ts=null,clicked=0,rpK="",rpAt=0,lastScroll=0;addEventListener("scroll",()=>{lastScroll=Date.now();},{passive:true,capture:true});
@@ -8904,7 +8935,8 @@ document.addEventListener("click",e=>{
       g.id="m"+Date.now().toString(36);cu.games.push(g);p.items=(p.items||[]).concat(["g/"+g.id]);registerCustom(p);savePartyDoc(p,"Match ajouté");break;}
     case "member":go("member",{memberView:t.dataset.id});break;
     case "kmore":S.kmore=Object.assign({},S.kmore,{[t.dataset.k]:1});render();break;
-    case "kj":{S.kj=Object.assign({},S.kj,{[t.dataset.k]:t.dataset.v});render();requestAnimationFrame(()=>{const b=document.querySelector(".kj.on");if(b)b.scrollIntoView({inline:"center",block:"nearest"});});break;}
+    case "kj":{tk185Hap();S.kj=Object.assign({},S.kj,{[t.dataset.k]:t.dataset.v});render();try{rt185Init();}catch(_){}break;}
+    case "tick185":{TK185.on=!TK185.on;try{localStorage.setItem("bf_tick",TK185.on?"1":"0");}catch(_){}if(TK185.on){tk185Hap();tk185Audio();}render();break;}
 case "kf":{const p=partyById(S.partyView),k=t.dataset.k,cur=(S.kf||{})[p.id];S.kf=Object.assign({},S.kf,{[p.id]:cur===k?"all":k});render();break;}
     case "mcTog":{const p=partyById(S.partyView);if(!p)break;const k=t.dataset.key,cur=(S.mcOpen||{})[p.id],close=cur===k;
       if(close&&S.editKey===k){discardDraft(k);S.editKey=null;}S.mcOpen=Object.assign({},S.mcOpen,{[p.id]:close?null:k});const fromBar=!!t.closest("#mcbar");const e0=mcEl(k),y0=e0?e0.getBoundingClientRect().top:null;
@@ -11041,5 +11073,30 @@ html body #mcbar .m172 .m180r svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
 html body #app .btn.del183{background:#1a0d0b!important;color:#FF8A80!important;border:1.5px solid #E0393B!important;box-shadow:none!important;font-weight:800}
 html body #app .btn.del183[disabled]{opacity:.45;filter:grayscale(.4);cursor:not-allowed}
 html body .vmbox .btn.del183y{background:linear-gradient(180deg,#E0393B,#B32528)!important;color:#fff!important;border:0!important}
+
+/* v185 : journées en intercalaires (une rangée qui défile cran par cran) */
+html body #app .rt185w{position:relative;margin:12px 0 14px}
+html body #app .rt185{position:relative;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:4px 0 12px;border-bottom:2px solid #D9B25E;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+html body #app .rt185::-webkit-scrollbar{display:none}
+html body #app .rt185w.sc .rt185{scroll-snap-type:x mandatory}
+html body #app .rt185sp{flex:0 0 calc(50% - 52px)}
+html body #app .rt185b{flex:0 0 84px;scroll-snap-align:center;scroll-snap-stop:always;position:relative;min-height:52px;border-radius:14px;border:1.5px solid rgba(217,178,94,.75);background:rgba(18,13,6,.72);color:#E9C77A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 6px;cursor:pointer;transition:transform .12s ease;-webkit-tap-highlight-color:transparent}
+html body #app .rt185w:not(.sc) .rt185b{flex:1 1 0;min-width:0}
+html body #app .rt185b b{font-size:17px;font-weight:900;letter-spacing:.02em;line-height:1.05;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #app .rt185b small{font-size:10.5px;font-weight:700;opacity:.72;letter-spacing:.04em}
+html body #app .rt185b.on{background:linear-gradient(180deg,#F2D28A,#C79A45);color:#1A1208;border-color:#F2D28A;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+html body #app .rt185b.on small{opacity:.8}
+html body #app .rt185b.on::after{content:"";position:absolute;top:calc(100% - 2px);left:24%;right:24%;height:14px;background:linear-gradient(180deg,#CFA552,#C9A04E);pointer-events:none}
+html body #app .rt185b.tk{transform:scale(1.08)}
+html body #app .rt185w.sc::before,html body #app .rt185w.sc::after{content:"";position:absolute;top:0;bottom:14px;width:34px;z-index:3;pointer-events:none;display:flex;align-items:center;font-size:22px;font-weight:900;color:#E9C77A;transition:opacity .15s}
+html body #app .rt185w.sc::before{left:0;content:"‹";justify-content:flex-start;padding-left:2px;background:linear-gradient(90deg,rgba(15,11,5,.97),rgba(15,11,5,0))}
+html body #app .rt185w.sc::after{right:0;content:"›";justify-content:flex-end;padding-right:2px;background:linear-gradient(270deg,rgba(15,11,5,.97),rgba(15,11,5,0))}
+html body #app .rt185w.atS::before,html body #app .rt185w.atE::after{opacity:0}
+html body .tk185row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+html body .tk185row span{display:flex;flex-direction:column;min-width:0}
+html body .tk185row b{font-size:15px}
+html body .tk185row small{font-size:12px;opacity:.7}
+@media (max-width:360px){html body #app .rt185b{flex-basis:74px}html body #app .rt185sp{flex-basis:calc(50% - 47px)}html body #app .rt185b b{font-size:15px}}
+@media (prefers-reduced-motion:reduce){html body #app .rt185b{transition:none}html body #app .rt185b.tk{transform:none}}
 </style></body>
 </html>
