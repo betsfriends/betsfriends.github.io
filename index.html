@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v178";
+const APP_VER="v179";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -6545,7 +6545,7 @@ function rtile157(p,c,sp,k,X){const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||
     :`<span class="rt157s${X.panel?" rt157k":""}"${X.panel?` role="button" tabindex="0" data-act="rtRk" data-id="${esc(p.id)}" aria-expanded="${on}" aria-label="Voir le classement"`:""}><span class="rt157x">${X.state||""}</span>${X.panel?chev:""}</span>`;
   const panel=X.panel?`<span class="rt157p"><span class="rt157pi"><span class="rtlist rt157l">${X.panel}</span></span></span>`:"";
   const cta=k==="pending"?`<span class="bigact orange rt154cta">Faire mon prono</span>`:k==="ready"?`<span class="bigact green rt154cta">Modifier mon prono</span>`:`<span class="bigact gold rt154cta">Voir la partie</span>`;
-  return`<button type="button" class="lrc lrc-${sp} rtile rtA rt152 rt154 rt157 rt172${on?" rkon":""}" data-act="party" data-id="${esc(p.id)}"><span class="rtband"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span>${X.live?'<span class="rtlive">● EN DIRECT</span>':""}<span class="rtpty"><small>Ta partie</small><span class="rtpc"><span class="spic${hasLg?" haslg":""}">${hasLg?`<img src="${COMP_LOGO[c.id]}" alt="">`:goldSp(sp,18)}</span><b>${esc(evTitle153(p,c,SPORTS.find(x=>x.id===sp)))}</b>${nx.l?`<span class="rt154nx"><em>${esc(nx.l)}</em>${nx.pl?`<small>${esc(nx.pl)}</small>`:""}</span>`:""}</span></span></span><span class="rt172pf" aria-hidden="true"></span>
+  return`<button type="button" class="lrc lrc-${sp} rtile rtA rt152 rt154 rt157 rt172${on?" rkon":""}" data-act="party" data-id="${esc(p.id)}"><span class="rtband"><span class="pcart sp-${sp} rtart" aria-hidden="true"></span>${X.live?'<span class="rtlive">● EN DIRECT</span>':""}<span class="rtpty"><small>Ta partie</small><span class="rtpc"><span class="spic${hasLg?" haslg":""}">${hasLg?`<img src="${COMP_LOGO[c.id]}" alt="">`:goldSp(sp,18)}</span><b>${esc(evTitle153(p,c,SPORTS.find(x=>x.id===sp)))}${(()=>{const sc=scope179(p);return sc?`<small class="rt179s">${esc(sc)}</small>`:"";})()}</b>${nx.l?`<span class="rt154nx"><em>${esc(nx.l)}</em>${nx.pl?`<small>${esc(nx.pl)}</small>`:""}</span>`:""}</span></span></span><span class="rt172pf" aria-hidden="true"></span>
     <span class="rtev rt153w rt176w">${avec176(p)}</span>${row}${panel}
     <span class="lrfoot rtfoot rt154f rt157f"><span class="rtright">${cta}</span></span></button>`;}
 /* v172 : talon du ticket de partie — nombre d'éléments de la partie (« 2 MATCHS », « 6 SESSIONS », « 4 TOURS », « 3 ÉTAPES ») + lieu */
@@ -6677,12 +6677,29 @@ function avec176(p,cls){let pl=[];try{pl=playersOf(p).filter(x=>!x.fake);}catch(
   const fc=oth.slice(0,4).map(x=>{let im="";try{im=bubImg(personOf(p,x));}catch(_){}return`<i style="background:hsl(${hs(x.name||"?")%360} 40% 30%)" title="${esc(x.name)}">${im||esc(fn(x).charAt(0).toUpperCase())}</i>`;}).join("")+(oth.length>4?`<i class="more">+${oth.length-4}</i>`:"");
   return`<span class="av176 ${cls||""}">${fc?`<span class="av176f">${fc}</span>`:""}<span class="av176t"><small>avec</small><b>${esc(grp)}</b>${names?`<em>${esc(names)}</em>`:""}</span></span>`;}
 /* v176 : autres parties sur le même événement → « Aussi avec » */
-function aussi176(p){if(!p||p.free)return"";const L=(S.parties||[]).filter(q=>q&&q.id!==p.id&&!q.free&&q.comp===p.comp);if(!L.length)return"";
-  return`<span class="aus176"><small>Aussi avec :</small>${L.slice(0,4).map(q=>{let n="";try{n=grpWith153(q);}catch(_){}if(!n){try{n=partyLabel(q);}catch(_){n=q.name;}}return`<button type="button" class="aus176b" data-act="partySwap" data-id="${esc(q.id)}">${esc(n)}</button>`;}).join("")}</span>`;}
+/* v179 : PORTÉE d'une partie — ce qu'elle couvre dans l'événement (« Finale · Alcaraz – Zverev », « Tout le tournoi », « Qualifs + Course »…) */
+function scopeSig179(p){if(!p||p.free)return"free:"+(p&&p.id);return String(p.comp)+"|"+(p.full?"ALL":[...(p.items||[])].sort().join(","));}
+function rnd179(su){if(!su)return"";const sb=String(su.sub||"");if(/^Phase de groupes/i.test(sb)){const m=sb.match(/(\d+)\s*(?:re|e|ère)\s*journée/i);return"Poules"+(m?" · J"+m[1]:"");}return String(su.name||"");}
+function scope179(p){try{if(!p||p.free)return"";const c=FIND[p.comp];if(!c)return"";if(p.full)return"Tout le tournoi";const subs=subsOf(c);
+  const R=(p.items||[]).map(key=>{const[sid,iid]=String(key).split("/");let su=subs.find(x=>x.id===sid),it=su&&su.items.find(i=>i.id===iid);if(!it){su=subs.find(x=>x.items.some(i=>i.id===iid));it=su&&su.items.find(i=>i.id===iid);}return it?{su,it}:null;}).filter(Boolean);
+  if(!R.length)return"";const gen=/^(toute la compétition|la finale|les \d|tous les|toutes les|le dernier jour|les matchs de poule|les 2 demi)/i;
+  const lbl=x=>{const l=String(x.it.label||"");return!l||gen.test(l)||l===x.su.name?"":l;};
+  const sp=c.sport&&c.sport.id,unit=n=>sp==="f1"?n+" session"+(n>1?"s":""):sp==="golf"?n+" jour"+(n>1?"s":""):sp==="velo"?n+" étape"+(n>1?"s":""):n+" match"+(n>1?"s":"");
+  if(R.length===1){const r=rnd179(R[0].su),l=lbl(R[0]);if(R[0].su.id==="tour"||/toute la compétition/i.test(R[0].it.label||""))return"Tout le tournoi";return r&&l&&r!==l?r+" · "+l:(r||l);}
+  const rs=[];R.forEach(x=>{const r=rnd179(x.su)||lbl(x);if(r&&!rs.includes(r))rs.push(r);});
+  if(rs.length===1){const su=R[0].su;return su&&R.length>=su.items.length?rs[0]:rs[0]+" · "+unit(R.length);}
+  if(rs.length<=3){const ls=R.length<=3?R.map(x=>{const l=lbl(x);return R.every(y=>y.su===x.su)?l:(rnd179(x.su)&&!/^(qualifs|course|sprint)/i.test(l)?rnd179(x.su):l||rnd179(x.su));}).filter(Boolean):rs;const u=[...new Set(ls)];if(u.length&&u.join(" + ").length<=38)return u.join(" + ");return rs.join(" + ").length<=38?rs.join(" + "):unit(R.length)+" · "+rs[0]+" → "+rs[rs.length-1];}
+  return unit(R.length)+" · "+rs[0]+" → "+rs[rs.length-1];}catch(_){return"";}}
+/* v176 → v179 : « Aussi avec » = seulement les autres parties sur EXACTEMENT les mêmes matchs (même évent), sans doublon ni la partie courante */
+function aussi176(p){if(!p||p.free)return"";const sig=scopeSig179(p),seen=new Set([p.id]),L=[];
+  (S.parties||[]).forEach(q=>{if(!q||q.free||seen.has(q.id)||q.comp!==p.comp||scopeSig179(q)!==sig)return;seen.add(q.id);L.push(q);});if(!L.length)return"";
+  const names=new Set();let myG="";try{myG=grpWith153(p);}catch(_){}
+  const B=L.map(q=>{let n="";try{n=grpWith153(q);}catch(_){}if(!n){try{n=partyLabel(q);}catch(_){n=q.name;}}n=String(n||"").replace(/^avec /i,"");if(!n||names.has(n)||(myG&&n===myG))return"";names.add(n);return`<button type="button" class="aus176b" data-act="partySwap" data-id="${esc(q.id)}">${esc(n)}</button>`;}).filter(Boolean);
+  if(!B.length)return"";return`<span class="aus176"><small>Aussi avec :</small>${B.slice(0,4).join("")}</span>`;}
 /* v176 : regroupe les parties d'un même événement sous un en-tête « ATP FINALS · 3 parties » */
-function grp176(list,T){const by=new Map(),ord=[];list.forEach(p=>{const k=p.free?"free:"+p.id:"c:"+p.comp;if(!by.has(k)){by.set(k,[]);ord.push(k);}by.get(k).push(p);});
+function grp176(list,T){const by=new Map(),ord=[];list.forEach(p=>{const k=p.free?"free:"+p.id:"c:"+scopeSig179(p);if(!by.has(k)){by.set(k,[]);ord.push(k);}by.get(k).push(p);});
   return ord.map(k=>{const L=by.get(k);if(L.length<2)return L.map(T).join("");const p=L[0],c=FIND[p.comp];if(!c)return L.map(T).join("");const sp=c.sport.id,lg=typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id];let t="";try{t=evTitle153(p,c,SPORTS.find(x=>x.id===sp));}catch(_){t=c.name;}
-    return`<div class="evg176"><div class="evg176h"><span class="evg176l">${lg?`<img src="${lg}" alt="">`:goldSp(sp,18)}</span><b>${esc(t)}</b><small>· ${L.length} parties</small></div><div class="evg176w">${L.map(T).join("")}</div></div>`;}).join("");}
+    return`<div class="evg176"><div class="evg176h"><span class="evg176l">${lg?`<img src="${lg}" alt="">`:goldSp(sp,18)}</span><span class="evg179t"><b>${esc(t)}</b><small>${(()=>{const sc=scope179(p);return sc?esc(sc)+" · ":"";})()}${L.length} parties</small></span></div><div class="evg176w">${L.map(T).join("")}</div></div>`;}).join("");}
 function grpWith153(p){let b="";try{const g=partyGroupLike(p);if(g)return g.name;b=partyBase(p);}catch(_){return"";}b=String(b||"");if(/^avec /i.test(b))return b.replace(/^avec /i,"");return"";}
 function descExtra153(p,c,grp){let d=String(p.name||"").trim();if(!d)return"";const n=c?String(c.name||""):"";
   if(n&&normS(d).startsWith(normS(n)))d=d.slice(n.length).replace(/^\s*·\s*/,"");
@@ -7511,14 +7528,14 @@ addEventListener("focusin",()=>{try{mcBarUpd();}catch(_){}});addEventListener("f
 addEventListener("scroll",()=>{try{mcBarUpd();}catch(_){}},{passive:true});addEventListener("resize",()=>{try{mcBarUpd();}catch(_){}});
 /* v160 : en-tête de partie qui se replie au défilement — l'encart s'estompe progressivement, puis une barre fine se colle en haut (retour · événement · groupe · chat) */
 function phInfo(){try{if(S.screen!=="party")return null;const p=partyById(S.partyView);if(!p||p.free)return null;const c=FIND[p.comp],sp=c&&c.sport;if(!sp)return null;
-  return{p,c,sp,t:evTitle153(p,c,sp),g:grpWith153(p),lg:typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id]};}catch(_){return null;}}
+  return{p,c,sp,t:evTitle153(p,c,sp),s:scope179(p),g:grpWith153(p),lg:typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id]};}catch(_){return null;}}
 function phUpd(){let b=document.getElementById("phbar");const he=document.querySelector("#app .hero.evhero"),I=he&&!S.leaveAsk?phInfo():null;
   if(!I){if(b){b.classList.remove("on");b.setAttribute("aria-hidden","true");b.dataset.k="";}if(he)he.style.removeProperty("--php");return;}
   if(!b){b=document.createElement("div");b.id="phbar";b.setAttribute("role","banner");b.setAttribute("aria-hidden","true");document.body.appendChild(b);}
   let n=0;try{n=chatUnread(I.p)||0;}catch(_){}
-  const key=[I.p.id,I.t,I.g,n,I.sp.id].join("|");
+  const key=[I.p.id,I.t,I.s,I.g,n,I.sp.id].join("|");
   if(b.dataset.k!==key){b.dataset.k=key;try{b.style.setProperty("--evb",evGrad(I.sp.id));}catch(_){}
-    b.innerHTML=`<div class="phi">${backBtn}<button type="button" class="pht" data-act="phTop" aria-label="Revenir en haut de la partie"><span class="phic${I.lg?" lg":""}">${I.lg?`<img src="${I.lg}" alt="">`:goldSp(I.sp.id,20)}</span><span class="phtx"><b>${esc(I.t)}</b>${I.g?`<small>avec ${esc(I.g)}</small>`:""}</span></button><button type="button" class="phc" data-act="phChat" data-id="${esc(I.p.id)}" aria-label="Ouvrir le chat${n?" · "+n+" non lu"+(n>1?"s":""):""}"><span aria-hidden="true">💬</span>${n?`<i>${n>9?"9+":n}</i>`:""}</button></div>`;}
+    b.innerHTML=`<div class="phi">${backBtn}<button type="button" class="pht" data-act="phTop" aria-label="Revenir en haut de la partie"><span class="phic${I.lg?" lg":""}">${I.lg?`<img src="${I.lg}" alt="">`:goldSp(I.sp.id,20)}</span><span class="phtx"><b>${esc(I.t)}${I.s?`<em class="ph179"> · ${esc(I.s)}</em>`:""}</b>${I.g?`<small>avec ${esc(I.g)}</small>`:""}</span></button><button type="button" class="phc" data-act="phChat" data-id="${esc(I.p.id)}" aria-label="Ouvrir le chat${n?" · "+n+" non lu"+(n>1?"s":""):""}"><span aria-hidden="true">💬</span>${n?`<i>${n>9?"9+":n}</i>`:""}</button></div>`;}
   const ap=document.getElementById("app").getBoundingClientRect();b.style.left=ap.left+"px";b.style.width=ap.width+"px";
   const rm=matchMedia("(prefers-reduced-motion: reduce)").matches,hr=he.getBoundingClientRect(),bh=b.offsetHeight||56,id=he.querySelector(".evid"),ir=id?id.getBoundingClientRect():hr;
   const span=Math.max(1,hr.height-bh),pr=Math.max(0,Math.min(1,-hr.top/span));
@@ -8191,7 +8208,7 @@ function vParty(){
       const evN=evTitle153(p,c,sp),grp=grpWith153(p);
       const cl=[sp.name,c.custom?"":(c.flag||""),compRange(c)||"",nItems+" "+unitN].filter(Boolean).join(" · ");
       const ds=descExtra153(p,c,grp),lg=typeof COMP_LOGO!=="undefined"&&COMP_LOGO[c.id];
-      return`<div class="evid v149id v153id"><span class="gspc${lg?" v153lg":""}">${lg?`<img src="${lg}" alt="">`:goldSp(sp.id,40)}</span><div class="v149nt"><small>Ta partie${p.demo?" · exemple":""}</small><h1 class="disp v149n${Math.max(...evN.split(/\s+/).map(w=>w.length))>9||evN.length>20?" v149s":""}">${esc(evN)}</h1></div></div>${avec176(p,"h176")}${aussi176(p)}
+      return`<div class="evid v149id v153id"><span class="gspc${lg?" v153lg":""}">${lg?`<img src="${lg}" alt="">`:goldSp(sp.id,40)}</span><div class="v149nt"><small>Ta partie${p.demo?" · exemple":""}</small><h1 class="disp v149n${Math.max(...evN.split(/\s+/).map(w=>w.length))>9||evN.length>20?" v149s":""}">${esc(evN)}</h1>${(()=>{const sc=scope179(p);return sc?`<p class="v179s">${esc(sc)}</p>`:"";})()}</div></div>${avec176(p,"h176")}${aussi176(p)}
     <p class="v149c">${esc(cl)}</p>${ds?`<p class="v149d">${esc(ds)}</p>`:""}`;})()}${rawPlayers(p).length>1?`<div class="evacc">${bubRow(partyAccList(p),"ont accepté de jouer")}</div>`:""}</div>`:`<div class="night"><div class="hero chichero" style="background:transparent"><div class="bar">${backBtn}<span class="chip" style="border:1px solid var(--pink)">Pari libre</span></div><h1 class="disp">${esc(p.name)}</h1><p class="muted">${esc(p.freeTitle||"")}</p></div></div>`);
   const pot=p.amount*effPeople(p),sc=scoreParty(Object.assign({},p,{players:playersOf(p)}));
   if(isMemberView(p)){S.welcome=S.welcome||{};if(!(p.id in S.welcome))S.welcome[p.id]=!welcomeSeen(p.id);
@@ -10977,5 +10994,18 @@ html body #app .evg176,html body #app .evg176w{min-width:0;max-width:100%;box-si
 .sc7one{justify-content:flex-start}
 @media (max-width:400px){.sc7f{gap:4px}.sc7st{gap:4px}.sc7pm{width:34px;height:34px;font-size:20px}.sc7v{min-width:30px;font-size:24px}.sc7dash{font-size:18px;padding-bottom:8px}}
 @media (max-width:360px){.sc7b{width:46px;height:46px;font-size:22px}.sc7g{height:36px;font-size:15px}.sc7l{gap:6px}.sc7n{font-size:13.5px}.sc7pm{width:31px;height:31px;font-size:18px}.sc7v{min-width:26px;font-size:22px}.sc7f{gap:2px}.sc7st{gap:3px}}
+
+/* v179 : ligne de portée de la partie */
+html body #app .v179s{margin:4px 0 0;font:600 14px/1.2 var(--ui,inherit);letter-spacing:.02em;color:#F0D592;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+html body #app .rt157 .rtpc>b{display:flex!important;flex-direction:column!important;justify-content:center;min-width:0}
+html body #app .rt157 .rtpc>b .rt179s{display:block;margin-top:3px;font:600 12px/1.15 system-ui,-apple-system,sans-serif!important;letter-spacing:.02em!important;text-transform:none!important;color:#F0D592;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;-webkit-text-stroke:0}
+@media (max-width:360px){html body #app .rt157 .rtpc>b .rt179s{font-size:11px!important}}
+#phbar .ph179{font:600 .72em/1 system-ui,-apple-system,sans-serif;color:#F0D592;letter-spacing:.02em;font-style:normal;text-transform:none}
+#phbar .phtx b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:block}
+
+html body #app .evg179t{display:flex;flex-direction:column;min-width:0;gap:2px}
+html body #app .evg179t b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+html body #app .evg179t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none!important;letter-spacing:.02em!important;font-size:12.5px!important}
+html body #app .rt157 .rtpc>b .rt179s{white-space:normal!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 </style></body>
 </html>
