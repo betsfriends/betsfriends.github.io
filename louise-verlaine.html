@@ -617,14 +617,18 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
 /* accueil option D : panneau noir à gauche pour le texte, photo intacte à droite */
 @media(min-width:52.01rem){
   .hero{position:relative}
-  .hero-photo{margin-left:36%;width:64%}
   .hero-photo::before,.hero-photo::after{display:none}
-  .hero-bas{top:0!important;bottom:0!important;left:0!important;right:auto!important;width:36%;max-width:none!important;margin:0!important;
-    display:flex;align-items:center;padding:0 clamp(1.6rem,3vw,3rem) 0 max(clamp(1.6rem,3vw,3rem),calc((100vw - 76rem)/2 + 16px))!important;background:linear-gradient(160deg,#16130F,#0C0B0A);border-right:1px solid rgba(198,164,106,.35)}
+  .hero-bas{top:0!important;bottom:0!important;left:0!important;right:auto!important;width:var(--pw,32%);max-width:none!important;margin:0!important;
+    display:flex;align-items:flex-end;padding:0 1.4rem clamp(3rem,10vh,6.5rem) var(--pl,clamp(2rem,4.5vw,5rem))!important;background:linear-gradient(90deg,rgba(13,12,11,.93) 0%,rgba(13,12,11,.86) 65%,rgba(13,12,11,.72) 100%);border-right:1px solid rgba(198,164,106,.35)}
+  .hero-lien{white-space:nowrap}
   .hero-carte{max-width:none!important;gap:1.1rem}
   .hero-carte::before{display:none}
   .hero .hero-eye{color:#E6C98F;text-shadow:none;margin-bottom:.2rem}
-  .hero h1{color:#F6F1E8;text-shadow:none;font-size:clamp(1.9rem,.9rem + 2vw,3.1rem);line-height:1.08}
+  .hero h1{color:#F6F1E8;text-shadow:none;font-size:var(--fs,clamp(1.6rem,2.2vw,3.2rem));line-height:1.08}
+  .hero-lede{max-width:none!important;font-size:var(--fl,clamp(.95rem,1.05vw,1.3rem))!important}
+  .hero-lien{white-space:nowrap!important;letter-spacing:.1em!important;font-size:.72rem!important}
+  .hero h1 .l1{white-space:normal!important}
+  .hero .hero-eye{white-space:normal;font-size:clamp(.6rem,.72vw,.75rem)}
   .hero h1 .l1,.hero h1 span.l1{color:#F6F1E8!important;white-space:normal;display:block}
   .hero h1 span:not(.l1){color:#E6C98F}
   .hero-lede{font-family:var(--f-body);font-size:clamp(1rem,.9rem + .4vw,1.25rem);line-height:1.5;max-width:34ch;color:#D9D2C6;text-shadow:none}
@@ -633,6 +637,9 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
   .hero-lede{font-family:var(--f-body);font-size:1.05rem;line-height:1.5;color:var(--graphite)}
 }
 .version{margin-top:1.6rem;font-size:.6rem;letter-spacing:.14em;color:rgba(236,231,222,.3)}
+
+/* en-tête : logo aligné sur le texte de l'accueil */
+@media(min-width:52.01rem){.top .wrap{max-width:none;padding-left:clamp(28px,3.5vw,56px);padding-right:clamp(28px,3.5vw,56px)}}
 </style>
 </head>
 <body>
@@ -759,7 +766,7 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
         <li><b>Un magasin prêt à ouvrir ou un projet sur mesure</b><span>Reprenez un showroom déjà prêt, ou construisons ensemble votre projet dans la ville de votre choix.</span></li>
         <li><b>La Touch Reality, en exclusivité</b><span>Le concept de conception en trois dimensions, réservé aux magasins La Cuisine Louise Verlaine et installé au cœur de votre showroom.</span></li>
         <li><b>Une formation certifiante de trois semaines</b><span>La vente, la conception avec la Touch Reality et la gestion du magasin, avant votre ouverture.</span></li>
-        <li><b>Les conditions du réseau</b><span>Les tarifs d'achat du réseau, les méthodes et les outils de pilotage.</span></li>
+        <li><b>Des fournisseurs choisis avec soin</b><span>Une sélection rigoureuse de fabricants, qui vous donne des conditions d'achat ultra compétitives sur le marché moyen et haut de gamme.</span></li>
         <li><b>Un suivi à chacune des étapes</b><span>Nous restons à vos côtés du premier rendez-vous jusqu'après l'ouverture.</span>
           <ol class="suivi"><li>La rencontre</li><li>La formation</li><li>Le dossier bancaire</li><li>L'ouverture</li><li>Les premiers mois</li></ol></li>
       </ul>
@@ -775,11 +782,6 @@ dialog#fiche:not(.prep) .f-corps>:nth-child(n+5){animation-delay:.24s}
     </dl>
     <a class="btn" href="#candidature">Je candidate</a>
   </div>
-</div></section>
-
-<section class="devise ambi-pierre"><div class="wrap">
-  <blockquote>Nous choisissons nos partenaires comme nos emplacements&nbsp;: avec rigueur, avec soin, <em>jamais au hasard.</em></blockquote>
-  <p>Chaque emplacement est étudié, chaque implantation réalisée avec rigueur. Nos partenaires sont choisis avec le même soin, car ce sont eux qui contribuent au succès de notre maison.</p>
 </div></section>
 
 <section class="appel" id="candidature"><div class="wrap">
@@ -842,6 +844,12 @@ function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 
 $("logo").src=PHOTOS.logo;
+(function(){var hb=document.querySelector(".hero-bas"),box=document.querySelector(".hero-photo"),img=$("hero-img"),logo=document.querySelector(".marque");
+  function cale(){if(!img.naturalWidth||innerWidth<=832){hb.style.removeProperty("--pw");hb.style.removeProperty("--pl");return;}
+    var W=box.clientWidth,H=box.clientHeight,k=Math.max(W/img.naturalWidth,H/img.naturalHeight),w2=img.naturalWidth*k,
+      mr=logo.getBoundingClientRect().right,bord=(W-w2)*.5+w2*.30,pl=Math.max(28,Math.min(innerWidth*.035,56)),dispo=Math.max(bord-pl-28,180);
+    hb.style.setProperty("--pw",bord+"px");hb.style.setProperty("--pl",pl+"px");hb.style.setProperty("--fs",Math.min(Math.max(dispo/8.6,20),46)+"px");hb.style.setProperty("--fl",Math.min(Math.max(dispo/17,14),19)+"px");}
+  img.addEventListener("load",cale);addEventListener("resize",cale);cale();})();
 (function(){var m=document.querySelector(".marque"),im=$("logo"),s=m.querySelector("small"),b=m.querySelector("b");
   function cale(){var c=document.createElement("canvas").getContext("2d");
     function enc(el){var cs=getComputedStyle(el);c.font=cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;var t=c.measureText("LOUISE VERLAINE".slice(0,1)+"H");
