@@ -3799,7 +3799,7 @@ window.bfChangePw=async(cur,nw)=>{const u=Ae.currentUser;if(!u||!u.email)throw{m
    ===================================================================== */
 (()=>{try{if(navigator.maxTouchPoints>1||"ontouchstart" in window)document.documentElement.classList.add("tch");}catch(_){}})();
 /* v90 : numéro de version visible (petit, en bas à droite) */
-const APP_VER="v186";
+const APP_VER="v187";
 (()=>{const put=()=>{if(document.getElementById("appver"))return;const e=document.createElement("div");e.id="appver";e.textContent=APP_VER;e.setAttribute("aria-hidden","true");document.body.appendChild(e);};if(document.body)put();else document.addEventListener("DOMContentLoaded",put);})();
 (()=>{let el=null,x0=0,y0=0,dx=0,mv=false,lock=null;const W=104;
   const reset=keep=>document.querySelectorAll(".swrow.open").forEach(r=>{if(r!==keep)r.classList.remove("open");});
@@ -3911,9 +3911,11 @@ const ATPF_GN={A:"groupe John McEnroe",B:"groupe Ivan Lendl"};
    (mêmes ids t1/r0, t1/r1, t2/r0 et mêmes heures : les parties gardent leurs choix). */
 const DC26_SF=[null,null],DC26_F=null;
 function dcBuild(){const T=(id,a,b,sub,dt)=>({id,label:a+" – "+b,sub:a+" contre "+b+" · "+sub,a,b,date:dt,dct:true,dur:8});
+  /* v187 : matchs (rubbers) d'une rencontre = vrais matchs de tennis (paris tennis standard) */
+  const R=(id,p,q,sub,dt)=>({id,label:p.split(" ").slice(-1)[0]+" – "+q.split(" ").slice(-1)[0],sub:p+" contre "+q+" · "+sub,date:dt,dur:3,dcq:"r1"});
   const P=(id,x,y,sub,dt,pair)=>pair?T(id,pair[0],pair[1],sub,dt):({id,label:x+" – "+y,sub:sub+" · affiche fixée après le tour précédent",date:dt,dct:true,tbd:true,dur:8});
-  return[{id:"t0",name:"Quarts",sub:"24 – 26 novembre",items:[T("r0","Tchéquie","Canada","Quart de finale 1",new Date("2026-11-24T15:00:00Z")),T("r1","Italie","Corée du Sud","Quart de finale 2",new Date("2026-11-25T15:00:00Z")),T("r2","Grande-Bretagne","Allemagne","Quart de finale 3",new Date("2026-11-26T09:00:00Z")),T("r3","Autriche","Espagne","Quart de finale 4",new Date("2026-11-26T16:00:00Z"))]},
-    {id:"t1",name:"Demies",sub:"27 – 28 novembre",items:[P("r0","Vainqueur Italie / Corée","Vainqueur Tchéquie / Canada","Demi-finale 1",new Date("2026-11-27T15:00:00Z"),DC26_SF[0]),P("r1","Vainqueur GB / Allemagne","Vainqueur Autriche / Espagne","Demi-finale 2",new Date("2026-11-28T11:00:00Z"),DC26_SF[1])]},
+  return[{id:"t0",name:"Quarts",sub:"24 – 26 novembre",items:[T("r0","Tchéquie","Canada","Quart de finale 1",new Date("2026-11-24T15:00:00Z")),Object.assign(T("r1","Italie","Corée du Sud","Quart de finale 2 · la rencontre",new Date("2026-11-25T15:00:00Z")),{dcq:"r1"}),R("r1s1","Lorenzo Musetti","Hyeon Chung","Simple 1 · Italie – Corée du Sud",new Date("2026-11-25T15:00:00Z")),R("r1s2","Flavio Cobolli","Soonwoo Kwon","Simple 2 · Italie – Corée du Sud · à suivre",new Date("2026-11-25T17:00:00Z")),Object.assign({id:"r1d",label:"Italie – Corée du Sud",sub:"Double · joué seulement si 1-1 après les simples · paires à confirmer",a:"Italie",b:"Corée du Sud",date:new Date("2026-11-25T19:00:00Z"),dur:3},{dcq:"r1"}),T("r2","Grande-Bretagne","Allemagne","Quart de finale 3",new Date("2026-11-26T09:00:00Z")),T("r3","Autriche","Espagne","Quart de finale 4",new Date("2026-11-26T16:00:00Z"))]},
+    {id:"t1",name:"Demies",sub:"27 – 28 novembre",items:[P("r0","Vainqueur Italie / Corée","Tchéquie","Demi-finale 1",new Date("2026-11-27T15:00:00Z"),DC26_SF[0]),P("r1","Vainqueur GB / Allemagne","Vainqueur Autriche / Espagne","Demi-finale 2",new Date("2026-11-28T11:00:00Z"),DC26_SF[1])]},
     {id:"t2",name:"Finale",sub:"Dimanche 29 novembre",items:[P("r0","Vainqueur demie 1","Vainqueur demie 2","Finale",new Date("2026-11-29T14:00:00Z"),DC26_F)]}];}
 function atpfBuild(){
   const sn=n=>n.split(" ").slice(-1)[0],G={A:ATPF_A,B:ATPF_B},days=[];
@@ -4483,7 +4485,9 @@ async function tnFetch(cid){const f=TFEED[cid],now=Date.now(),day=now>=+new Date
   if(fm&&c)lvItems(c).forEach(([su,it])=>{if(it.id!=="wdc"||!it.lid||(LIVE[it.lid]||{}).manual)return;const W=fm.p[fm.w],Lo=fm.p[1-fm.w],la=fm.ls[fm.w]||[],lb=fm.ls[1-fm.w]||[];let sw=0,sl=0;la.forEach((x,k)=>{if(x.v!=null&&lb[k]&&lb[k].v!=null){if(x.v>lb[k].v)sw++;else sl++;}});
     const o={status:"FT",winner:W,line:"Vainqueur : "+W,ans:{win:W,final:Lo,fscore:sw+"-"+sl},src:"espn"};LIVE[it.lid]=o;lvSave1(it.lid,o);});
   lvMeta();}
-function resMark(c,su){if(!c.sport||!RES_SP.includes(c.sport.id)||c.custom)return;su.items.forEach(it=>{if(it.live||it.lid||it.tbd)return;if(+it.date>=LIVE_FROM||(TFEED[c.id]&&it.id==="wdc")){it.live=true;it.lid=c.id+"~"+su.id+"~"+it.id;it.cid=c.id;}});}
+/* v187 : résultat Tchéquie 2-0 Canada (24 nov.) — Macháč bat Draxl 6-2 3-6 6-2, Lehečka bat Auger-Aliassime, double non joué */
+function dcSeed(lid){try{if(lid!=="dc26~t0~r0"||(LIVE[lid]&&LIVE[lid].status==="FT"))return;const R=dcCalc(["Tchéquie","Canada"],"Tchéquie","Tchéquie","Pas joué","Oui");LV_RAW=true;try{LIVE[lid]={status:"FT",ans:R.ans,sa:R.sa,sb:R.sb,manual:true,line:R.line,winner:R.ans.win,seed:"v187"};}finally{LV_RAW=false;}if(!FTAT[lid])FTAT[lid]=+new Date("2026-11-24T19:30:00Z");}catch(_){}}
+function resMark(c,su){if(!c.sport||!RES_SP.includes(c.sport.id)||c.custom)return;su.items.forEach(it=>{if(it.live||it.lid||it.tbd)return;if(+it.date>=LIVE_FROM||(TFEED[c.id]&&it.id==="wdc")){it.live=true;it.lid=c.id+"~"+su.id+"~"+it.id;it.cid=c.id;if(c.id==="dc26")dcSeed(it.lid);}});}
 function subsOf(c){if(!CACHE[c.id]){const RAW=(FEED[c.id]&&LCAL[c.id]&&LCAL[c.id].ev&&LCAL[c.id].ev.length)?calBuild(c):(TFEED[c.id]&&TCAL[c.id]&&TCAL[c.id].ev&&TCAL[c.id].ev.length&&!TFEED[c.id].fill)?tnBuild(c):FEED[c.id]&&!REAL_STATIC[c.id]?c.build().filter(su=>su.items.length&&su.items.every(i=>i.tbd)):c.build();if(TFEED[c.id]&&TFEED[c.id].fill)tnFill(c,RAW);CACHE[c.id]=RAW.map(su=>{resMark(c,su);su.items.forEach(i=>{i._c=c.id;});/* golf : chaque jour et la compétition entière se règlent sur live/<comp>-r<N> */if(c.sport&&c.sport.id==="golf"&&!c.custom)su.items.forEach(i=>{if(!i.lid&&(i.golfDay||i.whole)){i.lid=c.id+"-r"+(i.whole?i.golfDays:i.golfDay);i.live=true;}});const ds=su.items.map(i=>+i.date);su.start=su.start||new Date(Math.min(...ds));su.end=su.end||new Date(Math.max(...ds));return su;});}return CACHE[c.id];}
 const isDone=it=>it.custom?!!it.res:it.live?["FT","END"].includes(liveSt(it)):(window.BF_SIM?+it.date<+NOW-(it.dur||2.5)*3600e3:false);
 function subStatus(su){if(su.items.every(isDone))return["done","Terminé"];if(su.items.some(i=>canPickIt(i)))return["open","Ouvert"];return["live","En cours"];}
@@ -4617,7 +4621,7 @@ function vEvents(home,zIds){const now=+NOW,day=864e5,F=["best","new","all"].incl
   /* 1 évent = 1 ticket (même style que Mes parties et Sports) */
   const TK={foot:["#1E7A3A","#062A1C","rgba(46,204,113,.45)"],tennis:["#B5532A","#3A1607","rgba(255,140,80,.5)"],f1:["#8E1B1B","#16070A","rgba(255,70,60,.45)"],golf:["#3B7A3F","#0F2A12","rgba(243,224,166,.4)"],velo:["#B8901F","#2A1E05","rgba(255,226,120,.45)"],basket:["#B8682A","#2A1709","rgba(255,154,60,.45)"],rugby:["#1B5A3D","#0B2117","rgba(233,220,195,.35)"]};
   const liveOf=c=>live.filter(x=>x.c.id===c.id).length;
-  const ticket=(x,lab)=>{const c=x.c,sp=x.sp,K="ev-"+c.id+(x.sub?"-"+x.sub:""),op=S.pfOpen===K,col=TK[sp.id]||TK.foot,[tl,tc]=tag(x),nl=liveOf(c),u=c.id==="dc26"?"rencontre":sp.id==="f1"?"session":sp.id==="golf"?"tour":sp.id==="velo"?(c.id==="monu27"||c.id==="wc27"?"course":"étape"):"match",un=u+(x.s.n>1?"s":"");
+  const ticket=(x,lab)=>{const c=x.c,sp=x.sp,K="ev-"+c.id+(x.sub?"-"+x.sub:""),op=S.pfOpen===K,col=TK[sp.id]||TK.foot,[tl,tc]=tag(x),nl=liveOf(c),u=sp.id==="f1"?"session":sp.id==="golf"?"tour":sp.id==="velo"?(c.id==="monu27"||c.id==="wc27"?"course":"étape"):"match",un=u+(x.s.n>1?"s":"");
     let pr="";try{pr=fromPrice(1).replace(/^dès /,"");}catch(e){}
     const subs=(()=>{try{return subsOf(c).filter(su=>!x.sub||su.id===x.sub);}catch(e){return[];}})();
     const rows=subs.map(su=>{const ds=su.items.filter(i=>!i.tbd&&!/^(wdc|wcc|rook)$/.test(i.id)).map(i=>+i.date);const ss=ds.length?{a:Math.min(...ds),b:Math.max(...ds)}:null;const nd=su.items.filter(i=>isDone(i)).length;
@@ -5527,7 +5531,7 @@ function compKinds(c){const sp=c.sport.id,subs=subsOf(c),ko=subs.some(su=>su.ite
   const who=c.id==="dc26"?["Par nation","nations","Choisis une nation : toutes ses rencontres"]:sp==="tennis"?["Par joueur","joueurs","Choisis un joueur : tous ses matchs"]:c.id==="six"?["Par nation","nations","Choisis une nation : tous ses matchs"]:["Par club","clubs","Choisis un club : tous ses matchs"];
   const rnd=sp==="velo"?(c.id==="monu27"||c.id==="wc27"?["Par course","Une course d'un jour"]:["Par étape","Plat, montagne, contre-la-montre"]):sp==="tennis"?["Par stade","Huitièmes, quarts, demies, finale…"]:sp==="f1"?["Par Grand Prix","Qualifs, sprint et course"]:sp==="golf"?["Par jour","Leader du jour et top 10"]:c.id==="nba"?["Par soirée","Tous les matchs d'une nuit"]:c.id==="ucl"?["Par journée","Phase de ligue, puis 8es, quarts…"]:ko?["Par tour","Chaque tour du tournoi"]:["Par journée","Une journée, tous ses matchs"];
   return{who:compSides(c).length&&sp!=="velo"?who:null,rnd};}
-function compSides(c){const set=new Set();subsOf(c).forEach(su=>su.items.forEach(i=>{if(c.id==="dc26"&&i.tbd)return;const sd=sides(i);if(sd)sd.forEach(x=>set.add(x));}));return[...set].sort((a,b)=>a.localeCompare(b,"fr"));}
+function compSides(c){const set=new Set();subsOf(c).forEach(su=>su.items.forEach(i=>{if(c.id==="dc26"&&(i.tbd||(i.dcq&&!i.dct)))return;const sd=sides(i);if(sd)sd.forEach(x=>set.add(x));}));return[...set].sort((a,b)=>a.localeCompare(b,"fr"));}
 /* golf : l'écran d'un tournoi est une liste à cocher, comme les matchs d'une journée de foot */
 const isGolfTour=c=>!!(c&&c.sport.id==="golf"&&!c.custom&&subsOf(c).some(s=>s.id==="tour"));
 function golfItemRow(c,su,i){const k=su.id+"/"+i.id,on=S.sel.comp===c.id&&!!S.sel.items[k],done=isDone(i),can=canPickIt(i),res=done?resultOf(c,su,i):null,onAir=i.live&&liveSt(i)==="LIVE";
@@ -5578,7 +5582,7 @@ function vComp(){
   h+=standingsBlock(c);
   /* un ticket par façon de choisir ses matchs (même style que les autres pages) */
   const TK={foot:["#1E7A3A","#062A1C","rgba(46,204,113,.45)"],tennis:["#B5532A","#3A1607","rgba(255,140,80,.5)"],f1:["#8E1B1B","#16070A","rgba(255,70,60,.45)"],golf:["#3B7A3F","#0F2A12","rgba(243,224,166,.4)"],velo:["#B8901F","#2A1E05","rgba(255,226,120,.45)"],basket:["#B8682A","#2A1709","rgba(255,154,60,.45)"],rugby:["#1B5A3D","#0B2117","rgba(233,220,195,.35)"]},col=TK[sp.id]||TK.foot;
-  const u=c.id==="dc26"?"rencontre":sp.id==="golf"?"jour":sp.id==="f1"?"session":sp.id==="velo"?"étape":"match";
+  const u=sp.id==="golf"?"jour":sp.id==="f1"?"session":sp.id==="velo"?"étape":"match";
   const tk=(k,name,num,unit,line,inner)=>{const K="cp-"+c.id+"-"+k,op=S.pfOpen===K;
     return`<div class="prowbox tkv tkev${op?" torn open":""}" style="--t1:${col[0]};--t2:${col[1]};--tg:${col[2]}"><span class="pcart sp-${sp.id} tkart" aria-hidden="true"></span><button type="button" class="pwid" data-act="pflip" data-k="${K}"><b>${esc(name)}</b></button><div class="pflip" data-k="${K}"><button type="button" class="pfront" data-act="pflip" aria-label="Ouvrir ${esc(name)}"><span class="pfrow pfbar"></span><span class="pfl pfl2">${esc(String(num))} ${esc(unit)}</span>${line?`<span class="evdt">${esc(line)}</span>`:""}</button><div class="tkl"><div class="tkh"><b>${esc(name)}</b><small>${esc(String(num))} ${esc(unit)}${line?" · "+esc(line):""}</small></div>${inner}</div><button type="button" class="tkx" data-act="pflipBack" aria-label="Refermer le ticket">✕</button></div></div>`;};
   const fullIn=`<div class="list" style="padding:0;gap:8px"><div class="item" style="cursor:default"><span class="main"><b>Tous les ${u}s de ${esc(c.name)}</b><span>${total} ${u}${total>1?"s":""} à venir${sp.id==="foot"||sp.id==="f1"?" + paris de long terme (vainqueur, meilleur buteur…)":""}</span></span></div></div><button type="button" class="item cubanner${full?" on":""}" data-act="full" style="margin-top:12px"><span class="main"><b>${full?"✓ Toute la compétition est choisie":"🎟️ Choisir toute la compétition"}</b><span>dès ${eur(PRICE.full)} · ${full?"touche pour annuler":"puis crée ta partie en bas"}</span></span>${arrow}</button>`;
@@ -5641,7 +5645,8 @@ const austinLate=i=>{if(!i||i.tbd||Date.now()>=+new Date("2026-11-15T19:00:00Z")
 /* v178 : exception du 22 nov. — tournois PGA Tour (RSM Classic…) : jour 4 + tournoi entier ouverts toute la journée (jusqu'à 23:59 Bruxelles) */
 const pga22Late=i=>{if(!i||i.tbd||Date.now()>=+new Date("2026-11-22T22:59:00Z"))return false;const isDay4=i.golfDay===4&&+new Date(i.date)>=+new Date("2026-11-22T00:00:00Z")&&+new Date(i.date)<+new Date("2026-11-23T00:00:00Z");if(isDay4)return true;if(i.whole){const c=FIND[i._c];let tx="";try{tx=JSON.stringify([c&&c.sp,c&&c.sport,c&&c.tour,c&&c.name])}catch(_){}const e=+new Date(i.date);return /golf|pga|rsm/i.test(tx)&&e>=+new Date("2026-11-19T00:00:00Z")&&e<+new Date("2026-11-23T00:00:00Z");}return false;};
 /* v186 : exception de test — Coupe Davis, Tchéquie – Canada (QF du 24 nov. 16:00) : pronos ouverts jusqu'au 24 nov. 23:59 Bruxelles ou jusqu'au résultat (à retirer après le 24 nov.) */
-const davisLate=i=>!!(i&&i._c==="dc26"&&!i.tbd&&i.a==="Tchéquie"&&i.b==="Canada"&&Date.now()<+new Date("2026-11-24T22:59:00Z")&&!isDone(i));
+/* v187 : Italie – Corée du Sud (rencontre + simples + double) ouverte aux pronos jusqu'au 25 nov. 23:59 Bruxelles — à retirer après le 25 nov. */
+const davisLate=i=>!!(i&&i._c==="dc26"&&i.dcq==="r1"&&!i.tbd&&Date.now()<+new Date("2026-11-25T22:59:00Z")&&!isDone(i));
 const lateOk=i=>!!(i&&(i.lateOpen||testOpen(i)||stLate(i)||unlLate(i)||austinLate(i)||pga22Late(i)||davisLate(i)));
 /* les pronos se ferment au coup d'envoi de chaque match / session */
 const CLOSE_MS=0,closeAt=i=>+i.date-CLOSE_MS;
@@ -6609,7 +6614,7 @@ function rtile157(p,c,sp,k,X){const me=myId(p),nm=x=>x.id===me||x.name==="Toi"||
 /* v172 : hauteur du talon = jusqu'au bas de la cartouche du titre (1 ou 2 lignes) → encoches et perforation juste dessous */
 function rt172Fit(){document.querySelectorAll("#app .rtile.rt172").forEach(t=>{const pt=t.querySelector(".rtpty");if(!pt||!t.offsetHeight)return;const y=Math.round(pt.getBoundingClientRect().bottom-t.getBoundingClientRect().top+14);if(y>40&&t.style.getPropertyValue("--py")!==y+"px")t.style.setProperty("--py",y+"px");});}
 addEventListener("resize",()=>{try{rt172Fit();}catch(_){}});
-function cnt172(p,c,sp){let n=0;try{n=rowsOfParty(p).filter(r=>r.it).length;}catch(_){}const u=c&&c.id==="dc26"?"rencontre":sp==="f1"?"session":sp==="golf"?"tour":sp==="velo"?(c&&(c.id==="monu27"||c.id==="wc27")?"course":"étape"):"match";
+function cnt172(p,c,sp){let n=0;try{n=rowsOfParty(p).filter(r=>r.it).length;}catch(_){}const u=c&&sp==="f1"?"session":sp==="golf"?"tour":sp==="velo"?(c&&(c.id==="monu27"||c.id==="wc27")?"course":"étape"):"match";
   let pl="";try{pl=(nxt154(p,c,sp)||{}).pl||"";}catch(_){}return{l:n?(n+" "+u+(n>1?"s":"")).toUpperCase():"",pl};}
 function nxt154(p,c,sp){try{const R=rowsOfParty(p).filter(r=>r.it).sort((a,b)=>+a.it.date-+b.it.date);if(!R.length)return{};let i=R.findIndex(r=>!isDone(r.it));if(i<0)i=R.length-1;const it=R[i].it,lb=String(it.label||R[i].title||"").trim(),N=R.length;
   const gen=/^(Europe|Monde|International|Angleterre|Espagne|Italie|Allemagne|France|Belgique)$/i;let pl=c.flag&&!gen.test(c.flag)?String(c.flag).split(",")[0].trim():"";if(/\d/.test(pl))pl="";
@@ -6981,7 +6986,7 @@ const FLAG={KR:"🇰🇷",CN:"🇨🇳",CO:"🇨🇴",FR:"🇫🇷",GB:"🇬🇧
 const F1_TEAMS={"Red Bull":"#1E3D8F","Ferrari":"#DC0000","Mercedes":"#00A19C","McLaren":"#FF8000","Aston Martin":"#00665E","Williams":"#1868DB","Alpine":"#0093CC","Haas":"#9EA3A8","Audi":"#B5132C","Racing Bulls":"#6C98FF","Cadillac":"#3B3B3B"};
 const F1_GRID=[["Max Verstappen","NL","Red Bull"],["Isack Hadjar","FR","Red Bull"],["Charles Leclerc","MC","Ferrari"],["Lewis Hamilton","GB","Ferrari"],["George Russell","GB","Mercedes"],["Kimi Antonelli","IT","Mercedes"],["Lando Norris","GB","McLaren"],["Oscar Piastri","AU","McLaren"],["Fernando Alonso","ES","Aston Martin"],["Lance Stroll","CA","Aston Martin"],["Alexander Albon","TH","Williams"],["Carlos Sainz","ES","Williams"],["Pierre Gasly","FR","Alpine"],["Franco Colapinto","AR","Alpine"],["Esteban Ocon","FR","Haas"],["Oliver Bearman","GB","Haas"],["Nico Hülkenberg","DE","Audi"],["Gabriel Bortoleto","BR","Audi"],["Liam Lawson","NZ","Racing Bulls"],["Arvid Lindblad","GB","Racing Bulls"],["Sergio Pérez","MX","Cadillac"],["Valtteri Bottas","FI","Cadillac"]];
 const F1_ROOKIES=["Arvid Lindblad"];
-const TENNIS_PL=[["Jannik Sinner","IT"],["Carlos Alcaraz","ES"],["Alexander Zverev","DE"],["Novak Djokovic","RS"],["Taylor Fritz","US"],["Ben Shelton","US"],["Jack Draper","GB"],["Alex de Minaur","AU"],["Daniil Medvedev","NEU"],["Lorenzo Musetti","IT"],["Flavio Cobolli","IT"],["Arthur Fils","FR"],["Frances Tiafoe","US"],["Rafael Jódar","ES"],["Holger Rune","DK"],["Casper Ruud","NO"],["Jakub Menšík","CZ"],["Félix Auger-Aliassime","CA"],["Alexander Bublik","KZ"],["Tommy Paul","US"],["João Fonseca","BR"],["Andrey Rublev","NEU"]];
+const TENNIS_PL=[["Jannik Sinner","IT"],["Carlos Alcaraz","ES"],["Alexander Zverev","DE"],["Novak Djokovic","RS"],["Taylor Fritz","US"],["Ben Shelton","US"],["Jack Draper","GB"],["Alex de Minaur","AU"],["Daniil Medvedev","NEU"],["Lorenzo Musetti","IT"],["Hyeon Chung","KR"],["Soonwoo Kwon","KR"],["Flavio Cobolli","IT"],["Arthur Fils","FR"],["Frances Tiafoe","US"],["Rafael Jódar","ES"],["Holger Rune","DK"],["Casper Ruud","NO"],["Jakub Menšík","CZ"],["Félix Auger-Aliassime","CA"],["Alexander Bublik","KZ"],["Tommy Paul","US"],["João Fonseca","BR"],["Andrey Rublev","NEU"]];
 const GOLF_PGA=[["Scottie Scheffler","US"],["Rory McIlroy","GB"],["Xander Schauffele","US"],["Bryson DeChambeau","US"],["Jon Rahm","ES"],["Ludvig Åberg","SE"],["Tommy Fleetwood","ENG"],["Collin Morikawa","US"],["Viktor Hovland","NO"],["Matt Fitzpatrick","ENG"],["Patrick Cantlay","US"],["Hideki Matsuyama","JP"],["Shane Lowry","IE"],["Justin Rose","ENG"],["Robert MacIntyre","SCO"],["J.J. Spaun","US"]];
 const GOLF_LIV=[["Bryson DeChambeau","US"],["Jon Rahm","ES"],["Joaquín Niemann","CL"],["Tyrrell Hatton","ENG"],["Cameron Smith","AU"],["Dustin Johnson","US"],["Sergio García","ES"],["Talor Gooch","US"],["Louis Oosthuizen","ZA"],["Abraham Ancer","MX"]];
 /* champ réel : 120 joueurs (départs officiels, tours 1-2) */
@@ -7672,7 +7677,7 @@ function myBetsTab(p,sc){
     const kind=st==="open"?(isLater(r.it)?"later":todoK.has(r.key)?"todo":"ready"):st==="done"?(res&&!res.pending?"done":"live"):+r.it.date>+NOW?"locked":"live";
     return{r,st,res,kind};});
   /* v153 : plus de dépliage d'office — un match ne s'ouvre tout seul que si on arrive exprès pour lui */
-  const ord147=rows.slice().sort((a,b)=>+a.it.date-+b.it.date).map(x=>x.key),num147=k=>`${p&&p.comp==="dc26"?"RENCONTRE":"MATCH"} ${ord147.indexOf(k)+1}/${ord147.length}`;
+  const ord147=rows.slice().sort((a,b)=>+a.it.date-+b.it.date).map(x=>x.key),num147=k=>{const r=rows.find(x=>x.key===k);return`${p&&p.comp==="dc26"&&r&&r.it&&r.it.dct?"RENCONTRE":p&&p.comp==="dc26"&&r&&r.it&&r.it.id==="r1d"?"DOUBLE":"MATCH"} ${ord147.indexOf(k)+1}/${ord147.length}`;};
   const card=({r,st,res,kind})=>{const gain=kind==="done"&&sc.per[r.key]?sc.per[r.key][myId(p)]||0:null,w=kind==="done"?stageWinner(p,r,sc):null;
     const L=r.it.live?(LIVE[r.it.lid]||{}):{};
     const lv=r.it.live?liveSt(r.it):"";const extra=kind==="done"&&res&&res.void?`<span class="kx">Match non joué · aucun point distribué</span>`:kind==="done"?""
@@ -8294,7 +8299,7 @@ function vParty(){
   const c=p.free?null:FIND[p.comp],sp=c?c.sport:null,owner=isOwner(p),boss=orgOn(p),own=boss,started=partyStarted(p),tab=S.ptab&&S.ptab!=="bets"?S.ptab:"board";
   const nItems=p.free?0:rowsOfParty(p).filter(r=>r.it).length;
   let h='<div>'+(sp?`<div class="hero evhero chichero ev-${sp.id}" style="background:${sp.body};--evb:${evGrad(sp.id)}">${scene(sp.id)}<div class="shade"></div><span class="chicwm">${goldSp(sp.id,230)}</span><div class="bar">${backBtn}<span class="chip spball" title="${esc(sp.name)}"><i aria-label="${esc(sp.name)}">${SPEM[sp.id]||esc(sp.name)}</i></span></div>
-    ${(()=>{const pn=partyHeroName(p),unitN=p.comp==="dc26"?"rencontre"+(nItems>1?"s":""):sp.id==="f1"?"session"+(nItems>1?"s":""):sp.id==="golf"?"sélection"+(nItems>1?"s":""):sp.id==="velo"?"étape"+(nItems>1?"s":""):"match"+(nItems>1?"s":"");
+    ${(()=>{const pn=partyHeroName(p),unitN=sp.id==="f1"?"session"+(nItems>1?"s":""):sp.id==="golf"?"sélection"+(nItems>1?"s":""):sp.id==="velo"?"étape"+(nItems>1?"s":""):"match"+(nItems>1?"s":"");
       /* v153 : une partie = un ÉVÉNEMENT joué AVEC un groupe — l'événement en titre, le groupe en pastille */
       const evN=evTitle153(p,c,sp),grp=grpWith153(p);
       const cl=[sp.name,c.custom?"":(c.flag||""),compRange(c)||"",nItems+" "+unitN].filter(Boolean).join(" · ");
